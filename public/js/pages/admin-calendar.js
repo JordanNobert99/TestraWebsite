@@ -39,6 +39,7 @@ class CalendarManager {
         const monthViewBtn = document.getElementById('monthViewBtn');
         const weekViewBtn = document.getElementById('weekViewBtn');
         const contextMenu = document.getElementById('contextMenu');
+        const eventTypeSelect = document.getElementById('eventType');
 
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideModal());
@@ -93,6 +94,11 @@ class CalendarManager {
             weekViewBtn.dataset.initialized = 'true';
         }
 
+        if (eventTypeSelect && !eventTypeSelect.dataset.initialized) {
+            eventTypeSelect.addEventListener('change', (e) => this.handleEventTypeChange(e));
+            eventTypeSelect.dataset.initialized = 'true';
+        }
+
         // Context menu click handler - prevent closing when clicking menu items
         if (contextMenu && !contextMenu.dataset.initialized) {
             contextMenu.addEventListener('click', (e) => {
@@ -112,12 +118,31 @@ class CalendarManager {
         }
     }
 
+    handleEventTypeChange(e) {
+        const eventType = e.target.value;
+        const testTypeContainer = document.getElementById('testTypeContainer');
+        const noShowContainer = document.getElementById('noShowContainer');
+        const timeInputs = document.querySelectorAll('.time-input-group select');
+
+        if (eventType === 'drug-testing') {
+            testTypeContainer.style.display = 'grid';
+            noShowContainer.style.display = 'block';
+            // Make time required for drug testing
+            timeInputs.forEach(input => input.setAttribute('required', 'required'));
+        } else {
+            testTypeContainer.style.display = 'none';
+            noShowContainer.style.display = 'none';
+            // Make time optional for other events
+            timeInputs.forEach(input => input.removeAttribute('required'));
+        }
+    }
+
     populateTimeDropdowns() {
         const hourSelect = document.getElementById('timeHour');
         const minuteSelect = document.getElementById('timeMinute');
 
-        // Populate hours
-        hourSelect.innerHTML = '<option value="">Hour</option>';
+        // Populate hours (0-23)
+        hourSelect.innerHTML = '<option value=""></option>';
         for (let h = 0; h < 24; h++) {
             const option = document.createElement('option');
             option.value = String(h).padStart(2, '0');
@@ -126,7 +151,7 @@ class CalendarManager {
         }
 
         // Populate minutes in 15-minute increments
-        minuteSelect.innerHTML = '<option value="">Minute</option>';
+        minuteSelect.innerHTML = '<option value=""></option>';
         for (let m = 0; m < 60; m += 15) {
             const option = document.createElement('option');
             option.value = String(m).padStart(2, '0');
@@ -262,13 +287,13 @@ class CalendarManager {
             const displayCount = dayEvents.length > 5 ? 5 : dayEvents.length;
 
             eventsHTML = dayEvents.slice(0, displayCount).map(e => {
-                const displayTime = e.time ? e.time : '00:00';
+                const displayTime = e.time ? e.time : '—';
                 const eventClasses = this.getEventClasses(e);
                 return `
                     <div class="${eventClasses}" data-event-id="${e.id}" draggable="true">
                         <span class="event-time">${displayTime}</span>
                         <span class="event-client">${e.clientName}</span>
-                        <span class="event-test">${e.testType}</span>
+                        <span class="event-test">${e.testType || e.eventType}</span>
                     </div>
                 `;
             }).join('');
@@ -374,13 +399,13 @@ class CalendarManager {
             dayDiv.dataset.date = dateStr;
 
             const eventsHTML = dayEvents.map(e => {
-                const displayTime = e.time ? e.time : '00:00';
+                const displayTime = e.time ? e.time : '—';
                 const eventClasses = this.getEventClasses(e);
                 return `
                     <div class="${eventClasses}" data-event-id="${e.id}" draggable="true">
                         <span class="event-time">${displayTime}</span>
                         <span class="event-client">${e.clientName}</span>
-                        <span class="event-test">${e.testType}</span>
+                        <span class="event-test">${e.testType || e.eventType}</span>
                     </div>
                 `;
             }).join('');
@@ -490,9 +515,14 @@ class CalendarManager {
             document.getElementById('timeHour').value = hours;
             document.getElementById('timeMinute').value = minutes;
             
-            document.getElementById('testType').value = event.testType;
-            document.getElementById('status').value = event.status;
-            document.getElementById('noShow').checked = event.noShow || false;
+            if (event.eventType === 'drug-testing') {
+                document.getElementById('testType').value = event.testType;
+                document.getElementById('status').value = event.status;
+                document.getElementById('noShow').checked = event.noShow || false;
+            }
+            
+            // Trigger event type change to show/hide fields
+            this.handleEventTypeChange({ target: { value: event.eventType || 'drug-testing' } });
         } else {
             document.getElementById('modalTitle').textContent = 'Add New Event';
             document.getElementById('eventFormElement').reset();
@@ -521,6 +551,9 @@ class CalendarManager {
         document.getElementById('timeHour').value = hours;
         document.getElementById('timeMinute').value = minutes;
         document.getElementById('eventType').value = 'drug-testing';
+        
+        // Trigger event type change to show fields for new drug-testing event
+        this.handleEventTypeChange({ target: { value: 'drug-testing' } });
         this.editingId = null;
     }
 
@@ -537,9 +570,15 @@ class CalendarManager {
         const rect = eventElement.getBoundingClientRect();
         const eventId = eventElement.dataset.eventId;
         
+        // Get the height of the context menu
+        contextMenu.style.display = 'block';
+        const menuHeight = contextMenu.offsetHeight;
+        contextMenu.style.display = 'none';
+        
+        // Position menu BELOW the event with a small offset
         contextMenu.style.position = 'fixed';
         contextMenu.style.left = (rect.left + window.scrollX) + 'px';
-        contextMenu.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+        contextMenu.style.top = (rect.top + window.scrollY + menuHeight + 5) + 'px';
         contextMenu.style.display = 'block';
         
         this.contextMenuEventId = eventId;
@@ -577,21 +616,38 @@ class CalendarManager {
     async handleSave(e) {
         e.preventDefault();
 
+        const eventType = document.getElementById('eventType').value;
         const hour = document.getElementById('timeHour').value;
         const minute = document.getElementById('timeMinute').value;
-        const time = `${hour}:${minute}`;
+        
+        // Time is only required for drug-testing events
+        if (eventType === 'drug-testing' && (!hour || !minute)) {
+            alert('Please select a time for drug testing events');
+            return;
+        }
+        
+        const time = (hour && minute) ? `${hour}:${minute}` : '';
 
         const eventData = {
             clientName: document.getElementById('clientName').value,
             date: document.getElementById('date').value,
             time: time,
-            eventType: document.getElementById('eventType').value,
-            testType: document.getElementById('testType').value,
-            status: document.getElementById('status').value,
-            noShow: document.getElementById('noShow').checked,
+            eventType: eventType,
             userId: this.currentUser.uid,
             updatedAt: new Date()
         };
+
+        // Only include drug-testing specific fields if event type is drug-testing
+        if (eventType === 'drug-testing') {
+            eventData.testType = document.getElementById('testType').value;
+            eventData.status = document.getElementById('status').value;
+            eventData.noShow = document.getElementById('noShow').checked;
+        } else {
+            // Clear drug-testing fields for other event types
+            eventData.testType = null;
+            eventData.status = null;
+            eventData.noShow = false;
+        }
 
         try {
             if (this.editingId) {
