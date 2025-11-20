@@ -77,8 +77,15 @@ class InventoryManager {
         const tbody = document.getElementById('inventoryTableBody');
         const emptyRow = document.getElementById('emptyRow');
 
+        // Safety checks
+        if (!tbody || !emptyRow) {
+            console.error('InventoryManager: Table elements not found');
+            return;
+        }
+
         if (this.items.length === 0) {
             emptyRow.style.display = 'table-row';
+            tbody.innerHTML = ''; // Clear the table body
             return;
         }
 
@@ -180,10 +187,13 @@ class InventoryManager {
                 .collection('inventory')
                 .doc(id)
                 .delete()
-                .then(() => this.loadInventory())
+                .then(() => {
+                    console.log('InventoryManager: Item deleted successfully');
+                    this.loadInventory();
+                })
                 .catch(error => {
                     console.error('InventoryManager: Error deleting item:', error);
-                    alert('Failed to delete item');
+                    alert('Failed to delete item: ' + error.message);
                 });
         }
     }
