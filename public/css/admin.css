@@ -17,6 +17,101 @@
     margin: 0;
 }
 
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+/* Event Modal */
+.event-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    z-index: 1000;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content {
+    padding: 2rem;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-primary);
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+    color: var(--primary-color);
+}
+
+/* Context Menu */
+.context-menu {
+    position: fixed;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    min-width: 180px;
+}
+
+.context-menu-item {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+}
+
+.context-menu-item:hover {
+    background: var(--bg-tertiary);
+}
+
+.context-menu-item.delete-item:hover {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
 /* Forms */
 .admin-form {
     background-color: var(--bg-secondary);
@@ -298,86 +393,27 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.events-section {
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    padding: 2rem;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.events-section h2 {
-    margin-top: 0;
-}
-
-.events-table-wrapper {
-    overflow-x: auto;
-}
-
-.events-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.events-table thead {
-    background: var(--primary-color);
-    color: white;
-}
-
-.events-table th {
-    padding: 1rem;
-    text-align: left;
+.event-client {
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.events-table td {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
+.event-test {
+    font-size: 0.7rem;
+    opacity: 0.9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.events-table tbody tr:hover {
-    background: var(--bg-tertiary);
-}
-
-.status-badge {
-    padding: 0.4rem 0.8rem;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.status-scheduled {
-    background: #dbeafe;
-    color: #1e40af;
-}
-
-.status-completed {
-    background: #dcfce7;
-    color: #166534;
-}
-
-.status-cancelled {
-    background: #fee2e2;
-    color: #991b1b;
-}
-
-.checkbox-group {
-    display: flex;
-    align-items: center;
-}
-
-.checkbox-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0;
-}
-
-.checkbox-group input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+.event-status {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @media (max-width: 768px) {
@@ -405,12 +441,11 @@
         padding: 0.25rem;
     }
 
-    .events-table {
-        font-size: 0.85rem;
+    .modal-content {
+        padding: 1.5rem;
     }
 
-    .events-table th,
-    .events-table td {
-        padding: 0.75rem;
+    .event-modal {
+        width: 95%;
     }
 }

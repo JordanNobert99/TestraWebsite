@@ -4,6 +4,7 @@ class CalendarManager {
         this.events = [];
         this.editingId = null;
         this.currentDate = new Date();
+        this.contextMenuEventId = null;
         this.init();
     }
 
@@ -26,13 +27,21 @@ class CalendarManager {
 
     setupEventListeners() {
         const cancelBtn = document.getElementById('cancelBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
         const form = document.getElementById('eventFormElement');
         const prevBtn = document.getElementById('prevMonth');
         const nextBtn = document.getElementById('nextMonth');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const deleteEventBtn = document.getElementById('deleteEventBtn');
         
         if (cancelBtn && !cancelBtn.dataset.initialized) {
-            cancelBtn.addEventListener('click', () => this.hideForm());
+            cancelBtn.addEventListener('click', () => this.hideModal());
             cancelBtn.dataset.initialized = 'true';
+        }
+
+        if (closeModalBtn && !closeModalBtn.dataset.initialized) {
+            closeModalBtn.addEventListener('click', () => this.hideModal());
+            closeModalBtn.dataset.initialized = 'true';
         }
         
         if (form && !form.dataset.initialized) {
@@ -49,6 +58,24 @@ class CalendarManager {
             nextBtn.addEventListener('click', () => this.nextMonth());
             nextBtn.dataset.initialized = 'true';
         }
+
+        if (modalOverlay && !modalOverlay.dataset.initialized) {
+            modalOverlay.addEventListener('click', () => this.hideModal());
+            modalOverlay.dataset.initialized = 'true';
+        }
+
+        if (deleteEventBtn && !deleteEventBtn.dataset.initialized) {
+            deleteEventBtn.addEventListener('click', () => this.deleteEvent(this.contextMenuEventId));
+            deleteEventBtn.dataset.initialized = 'true';
+        }
+
+        // Close context menu when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            const contextMenu = document.getElementById('contextMenu');
+            if (contextMenu && !e.target.closest('.event-item') && !e.target.closest('.context-menu')) {
+                this.hideContextMenu();
+            }
+        });
     }
 
     async loadCalendarEvents() {
@@ -110,20 +137,18 @@ class CalendarManager {
                 <div class="day-events">
                     ${dayEvents.map(e => `
                         <div class="event-item" data-event-id="${e.id}" title="${e.clientName} - ${e.testType}">
-                            ${e.clientName}
+                            <div class="event-client">${e.clientName}</div>
+                            <div class="event-test">${e.testType}</div>
+                            <div class="event-status">${e.status}</div>
                         </div>
                     `).join('')}
                 </div>
             `;
             
-            // Add click listener to day
+            // Add click listener to day for adding event
             dayDiv.addEventListener('click', (e) => {
-                // Only open form if clicking the day itself, not on an event
-                if (e.target.closest('.event-item')) {
-                    const eventId = e.target.closest('.event-item').dataset.eventId;
-                    this.editEvent(eventId);
-                } else {
-                    this.showFormForDate(dateStr);
+                if (!e.target.closest('.event-item')) {
+                    this.showModalForDate(dateStr);
                 }
             });
             
@@ -139,38 +164,75 @@ class CalendarManager {
             dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
             calendar.appendChild(dayDiv);
         }
+
+        // Attach event listeners to event items after rendering
+        this.attachEventItemListeners();
     }
 
-    showForm(id = null) {
-        document.getElementById('eventFormContainer').style.display = 'block';
+    attachEventItemListeners() {
+        document.querySelectorAll('.event-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const eventId = item.dataset.eventId;
+                this.editEvent(eventId);
+            });
+
+            item.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const eventId = item.dataset.eventId;
+                this.showContextMenu(e, eventId);
+            });
+        });
+    }
+
+    showModal(id = null) {
+        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById('eventModal').style.display = 'block';
         
         if (id) {
             this.editingId = id;
             const event = this.events.find(e => e.id === id);
-            document.getElementById('formTitle').textContent = 'Edit Event';
+            document.getElementById('modalTitle').textContent = 'Edit Event';
             document.getElementById('clientName').value = event.clientName;
             document.getElementById('date').value = event.date;
             document.getElementById('testType').value = event.testType;
             document.getElementById('status').value = event.status;
             document.getElementById('noShow').checked = event.noShow || false;
         } else {
-            document.getElementById('formTitle').textContent = 'Add New Event';
+            document.getElementById('modalTitle').textContent = 'Add New Event';
             document.getElementById('eventFormElement').reset();
             this.editingId = null;
         }
     }
 
-    showFormForDate(dateStr) {
-        document.getElementById('eventFormContainer').style.display = 'block';
-        document.getElementById('formTitle').textContent = 'Add New Event';
+    showModalForDate(dateStr) {
+        document.getElementById('modalOverlay').style.display = 'block';
+        document.getElementById('eventModal').style.display = 'block';
+        document.getElementById('modalTitle').textContent = 'Add New Event';
         document.getElementById('eventFormElement').reset();
         document.getElementById('date').value = dateStr;
         this.editingId = null;
     }
 
-    hideForm() {
-        document.getElementById('eventFormContainer').style.display = 'none';
+    hideModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.getElementById('eventModal').style.display = 'none';
         document.getElementById('eventFormElement').reset();
+    }
+
+    showContextMenu(event, eventId) {
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.display = 'block';
+        contextMenu.style.left = event.pageX + 'px';
+        contextMenu.style.top = event.pageY + 'px';
+        this.contextMenuEventId = eventId;
+    }
+
+    hideContextMenu() {
+        const contextMenu = document.getElementById('contextMenu');
+        contextMenu.style.display = 'none';
+        this.contextMenuEventId = null;
     }
 
     async handleSave(e) {
@@ -218,7 +280,7 @@ class CalendarManager {
                 await this.updateInventoryFromEvent(eventData);
             }
 
-            this.hideForm();
+            this.hideModal();
             setTimeout(() => {
                 this.renderCalendarDays();
             }, 50);
@@ -282,7 +344,7 @@ class CalendarManager {
     }
 
     editEvent(id) {
-        this.showForm(id);
+        this.showModal(id);
     }
 
     async deleteEvent(id) {
@@ -297,6 +359,7 @@ class CalendarManager {
                 this.events = this.events.filter(e => e.id !== id);
                 
                 console.log('CalendarManager: Event deleted successfully');
+                this.hideContextMenu();
                 this.renderCalendarDays();
             } catch (error) {
                 console.error('CalendarManager: Error deleting event:', error);
