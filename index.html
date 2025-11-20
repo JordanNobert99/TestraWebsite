@@ -20,14 +20,18 @@
     <nav class="navbar">
         <div class="container">
             <div class="nav-logo">
-                <img src="public/images/logo.svg" alt="Testra Logo" class="logo">
-                <span class="logo-text">Testra</span>
+                <a href="index.html">
+                    <img src="public/images/logo.svg" alt="Testra Logo" class="logo">
+                    <span class="logo-text">Testra</span>
+                </a>
             </div>
             <ul class="nav-links">
                 <li><a href="#services">Services</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="pages/contact.html">Contact</a></li>
-                <li><a href="pages/login.html" class="btn-nav-login">Login</a></li>
+                <li id="authNav">
+                    <a href="pages/login.html" class="btn-nav-login">Login</a>
+                </li>
             </ul>
             <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
                 <span class="theme-icon">🌙</span>

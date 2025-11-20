@@ -1,18 +1,33 @@
 class HomePageManager {
     constructor() {
-        this.sessionManager = new SessionManager();
         this.init();
     }
 
     init() {
-        // Subscribe to auth changes
-        this.sessionManager.subscribe((user) => {
+        // Wait for Firebase to be initialized
+        this.waitForFirebase();
+    }
+
+    waitForFirebase() {
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth()) {
+            this.setupAuthListener();
+        } else {
+            setTimeout(() => this.waitForFirebase(), 100);
+        }
+    }
+
+    setupAuthListener() {
+        // Subscribe to auth changes using SessionManager
+        const sessionManager = new SessionManager();
+        sessionManager.subscribe((user) => {
             this.updateNavigation(user);
         });
     }
 
     updateNavigation(user) {
         const authNav = document.getElementById('authNav');
+        
+        if (!authNav) return; // Safety check
         
         if (user) {
             // User is logged in
