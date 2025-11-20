@@ -2,25 +2,24 @@ class DashboardManager {
     constructor() {
         this.currentUser = null;
         this.userRole = null;
+        this.sessionUnsubscribe = null;
         this.init();
     }
 
     init() {
-        this.checkAuthentication();
-        this.setupEventListeners();
-    }
-
-    checkAuthentication() {
-        firebase.auth().onAuthStateChanged((user) => {
+        // Use SessionManager instead of direct Firebase auth
+        this.sessionUnsubscribe = new SessionManager().subscribe((user) => {
             if (user) {
                 this.currentUser = user;
                 this.loadUserData(user.uid);
                 this.setupLogout();
             } else {
                 // Redirect to login if not authenticated
-                window.location.href = '../login.html';
+                window.location.href = '../pages/login.html';
             }
         });
+        
+        this.setupEventListeners();
     }
 
     async loadUserData(uid) {
@@ -58,8 +57,8 @@ class DashboardManager {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
                 try {
-                    await firebase.auth().signOut();
-                    window.location.href = '../login.html';
+                    await new SessionManager().logout();
+                    window.location.href = '../pages/login.html';
                 } catch (error) {
                     console.error('Error logging out:', error);
                 }
