@@ -570,15 +570,10 @@ class CalendarManager {
         const rect = eventElement.getBoundingClientRect();
         const eventId = eventElement.dataset.eventId;
         
-        // Get the height of the context menu
-        contextMenu.style.display = 'block';
-        const menuHeight = contextMenu.offsetHeight;
-        contextMenu.style.display = 'none';
-        
-        // Position menu ABOVE the event with a small offset
+        // Position menu just BELOW the event with a small offset
         contextMenu.style.position = 'fixed';
         contextMenu.style.left = (rect.left + window.scrollX) + 'px';
-        contextMenu.style.top = (rect.top + window.scrollY - menuHeight - 5) + 'px';
+        contextMenu.style.top = (rect.bottom + window.scrollY + 2) + 'px';
         contextMenu.style.display = 'block';
         
         this.contextMenuEventId = eventId;
