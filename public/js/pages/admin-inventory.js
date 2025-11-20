@@ -3,24 +3,18 @@ class InventoryManager {
         this.currentUser = null;
         this.items = [];
         this.editingId = null;
+        this.authGuard = null;
         this.init();
     }
 
     init() {
-        this.checkAuth();
-        this.setupEventListeners();
-    }
-
-    checkAuth() {
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                this.currentUser = user;
-                document.getElementById('userEmail').textContent = user.email;
-                this.loadInventory();
-                this.setupLogout();
-            } else {
-                window.location.href = '../../pages/login.html';
-            }
+        // Use auth guard to check if user is logged in
+        this.authGuard = new AuthGuard((user) => {
+            this.currentUser = user;
+            document.getElementById('userEmail').textContent = user.email;
+            this.loadInventory();
+            this.setupEventListeners();
+            this.setupLogout();
         });
     }
 
