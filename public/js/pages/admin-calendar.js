@@ -6,6 +6,7 @@ class CalendarManager {
         this.currentDate = new Date();
         this.contextMenuEventId = null;
         this.draggedEvent = null;
+        this.currentView = 'month';
         this.init();
     }
 
@@ -18,7 +19,7 @@ class CalendarManager {
                 this.loadCalendarEvents();
                 this.setupEventListeners();
                 this.setupLogout();
-                this.renderCalendarDays();
+                this.renderCalendar();
             } else {
                 console.log('CalendarManager: User not authenticated, redirecting to login');
                 window.location.href = '../../pages/login.html';
@@ -34,6 +35,9 @@ class CalendarManager {
         const nextBtn = document.getElementById('nextMonth');
         const modalOverlay = document.getElementById('modalOverlay');
         const deleteEventBtn = document.getElementById('deleteEventBtn');
+        const monthViewBtn = document.getElementById('monthViewBtn');
+        const weekViewBtn = document.getElementById('weekViewBtn');
+        const timeSelect = document.getElementById('time');
         
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideModal());
@@ -51,12 +55,12 @@ class CalendarManager {
         }
 
         if (prevBtn && !prevBtn.dataset.initialized) {
-            prevBtn.addEventListener('click', () => this.previousMonth());
+            prevBtn.addEventListener('click', () => this.previousPeriod());
             prevBtn.dataset.initialized = 'true';
         }
 
         if (nextBtn && !nextBtn.dataset.initialized) {
-            nextBtn.addEventListener('click', () => this.nextMonth());
+            nextBtn.addEventListener('click', () => this.nextPeriod());
             nextBtn.dataset.initialized = 'true';
         }
 
@@ -73,12 +77,56 @@ class CalendarManager {
             deleteEventBtn.dataset.initialized = 'true';
         }
 
+        if (monthViewBtn && !monthViewBtn.dataset.initialized) {
+            monthViewBtn.addEventListener('click', () => this.switchView('month'));
+            monthViewBtn.dataset.initialized = 'true';
+        }
+
+        if (weekViewBtn && !weekViewBtn.dataset.initialized) {
+            weekViewBtn.addEventListener('click', () => this.switchView('week'));
+            weekViewBtn.dataset.initialized = 'true';
+        }
+
+        if (timeSelect && !timeSelect.dataset.initialized) {
+            timeSelect.addEventListener('change', () => {});
+            timeSelect.dataset.initialized = 'true';
+        }
+
         // Global click handler to close context menu
         if (!document.body.dataset.globalClickHandler) {
             document.addEventListener('click', (e) => {
                 this.hideContextMenu();
             });
             document.body.dataset.globalClickHandler = 'true';
+        }
+    }
+
+    generateTimeOptions() {
+        const options = [];
+        for (let hour = 0; hour < 24; hour++) {
+            for (let minute = 0; minute < 60; minute += 15) {
+                const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                options.push(timeStr);
+            }
+        }
+        return options;
+    }
+
+    populateTimeSelect() {
+        const timeSelect = document.getElementById('time');
+        const times = this.generateTimeOptions();
+        const currentValue = timeSelect.value;
+        
+        timeSelect.innerHTML = '<option value="">Select Time</option>';
+        times.forEach(time => {
+            const option = document.createElement('option');
+            option.value = time;
+            option.textContent = time;
+            timeSelect.appendChild(option);
+        });
+        
+        if (currentValue) {
+            timeSelect.value = currentValue;
         }
     }
 
@@ -96,22 +144,31 @@ class CalendarManager {
             }));
 
             console.log('CalendarManager: Loaded', this.events.length, 'events');
-            this.renderCalendarDays();
+            this.renderCalendar();
         } catch (error) {
             console.error('CalendarManager: Error loading events:', error);
         }
     }
 
-    renderCalendarDays() {
+    renderCalendar() {
+        if (this.currentView === 'month') {
+            this.renderMonthView();
+        } else {
+            this.renderWeekView();
+        }
+    }
+
+    renderMonthView() {
         const calendar = document.getElementById('calendarGrid');
-        if (!calendar) return;
+        const weekdaysHeader = document.getElementById('calendarWeekdays');
+        if (!calendar || !weekdaysHeader) return;
         
+        weekdaysHeader.style.display = 'grid';
         calendar.innerHTML = '';
         
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
         
-        // Update month/year header
         document.getElementById('currentMonth').textContent = 
             this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         
@@ -119,7 +176,6 @@ class CalendarManager {
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
         
-        // Add previous month's days
         for (let i = firstDay - 1; i >= 0; i--) {
             const day = daysInPrevMonth - i;
             const dayDiv = document.createElement('div');
@@ -128,7 +184,6 @@ class CalendarManager {
             calendar.appendChild(dayDiv);
         }
         
-        // Add current month's days
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayEvents = this.events
@@ -143,29 +198,22 @@ class CalendarManager {
             dayDiv.className = 'calendar-day';
             dayDiv.dataset.date = dateStr;
             
-            let eventsHTML = dayEvents.map(e => {
-                const displayTime = e.time ? e.time : 'No time';
+            let eventsHTML = '';
+            const displayCount = dayEvents.length > 5 ? 5 : dayEvents.length;
+            
+            eventsHTML = dayEvents.slice(0, displayCount).map(e => {
+                const displayTime = e.time ? e.time : '00:00';
                 return `
                     <div class="event-item" data-event-id="${e.id}" draggable="true">
-                        <div class="event-time">${displayTime}</div>
-                        <div class="event-client">${e.clientName}</div>
-                        <div class="event-test">${e.testType}</div>
-                        <div class="event-status status-${e.status}">${e.status}</div>
+                        <span class="event-time">${displayTime}</span>
+                        <span class="event-client">${e.clientName}</span>
+                        <span class="event-test">${e.testType}</span>
                     </div>
                 `;
             }).join('');
 
-            if (dayEvents.length > 3) {
-                eventsHTML = dayEvents.slice(0, 3).map(e => {
-                    const displayTime = e.time ? e.time : 'No time';
-                    return `
-                        <div class="event-item" data-event-id="${e.id}" draggable="true">
-                            <div class="event-time">${displayTime}</div>
-                            <div class="event-client">${e.clientName}</div>
-                        </div>
-                    `;
-                }).join('');
-                eventsHTML += `<div class="event-more">+${dayEvents.length - 3} more</div>`;
+            if (dayEvents.length > 5) {
+                eventsHTML += `<div class="event-more">+${dayEvents.length - 5} more</div>`;
             }
             
             dayDiv.innerHTML = `
@@ -175,25 +223,21 @@ class CalendarManager {
                 </div>
             `;
             
-            // Add click listener to day for adding event
             dayDiv.addEventListener('click', (e) => {
                 if (!e.target.closest('.event-item')) {
                     this.showModalForDate(dateStr);
                 }
             });
 
-            // Add drag over listener
             dayDiv.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 dayDiv.classList.add('drag-over');
             });
 
-            // Remove drag over class
             dayDiv.addEventListener('dragleave', (e) => {
                 dayDiv.classList.remove('drag-over');
             });
 
-            // Drop listener
             dayDiv.addEventListener('drop', (e) => {
                 e.preventDefault();
                 dayDiv.classList.remove('drag-over');
@@ -205,9 +249,8 @@ class CalendarManager {
             calendar.appendChild(dayDiv);
         }
         
-        // Add next month's days
         const totalCells = calendar.children.length + daysInMonth;
-        const remainingCells = 42 - totalCells; // 6 rows * 7 days
+        const remainingCells = 42 - totalCells;
         for (let day = 1; day <= remainingCells; day++) {
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day other-month';
@@ -215,13 +258,123 @@ class CalendarManager {
             calendar.appendChild(dayDiv);
         }
 
-        // Attach event listeners to event items after rendering
         this.attachEventItemListeners();
+    }
+
+    renderWeekView() {
+        const calendar = document.getElementById('calendarGrid');
+        const weekdaysHeader = document.getElementById('calendarWeekdays');
+        if (!calendar || !weekdaysHeader) return;
+        
+        calendar.innerHTML = '';
+        weekdaysHeader.innerHTML = '';
+        
+        const startOfWeek = this.getStartOfWeek(this.currentDate);
+        const weekDays = [];
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startOfWeek);
+            date.setDate(date.getDate() + i);
+            weekDays.push(date);
+            
+            const dayName = dayNames[date.getDay()];
+            const dayNum = date.getDate();
+            const header = document.createElement('div');
+            header.className = 'weekday';
+            header.textContent = `${dayName} ${dayNum}`;
+            weekdaysHeader.appendChild(header);
+        }
+        
+        const monthYear = this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        document.getElementById('currentMonth').textContent = 
+            `${monthYear} - Week of ${weekDays[0].toLocaleDateString()}`;
+        
+        calendar.classList.add('week-view');
+        
+        for (const date of weekDays) {
+            const dateStr = this.formatDate(date);
+            const dayEvents = this.events
+                .filter(e => e.date === dateStr)
+                .sort((a, b) => {
+                    const timeA = a.time || '00:00';
+                    const timeB = b.time || '00:00';
+                    return timeA.localeCompare(timeB);
+                });
+            
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day week-day';
+            dayDiv.dataset.date = dateStr;
+            
+            const eventsHTML = dayEvents.map(e => {
+                const displayTime = e.time ? e.time : '00:00';
+                return `
+                    <div class="event-item" data-event-id="${e.id}" draggable="true">
+                        <span class="event-time">${displayTime}</span>
+                        <span class="event-client">${e.clientName}</span>
+                        <span class="event-test">${e.testType}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            dayDiv.innerHTML = `<div class="day-events">${eventsHTML}</div>`;
+            
+            dayDiv.addEventListener('click', (e) => {
+                if (!e.target.closest('.event-item')) {
+                    this.showModalForDate(dateStr);
+                }
+            });
+
+            dayDiv.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dayDiv.classList.add('drag-over');
+            });
+
+            dayDiv.addEventListener('dragleave', (e) => {
+                dayDiv.classList.remove('drag-over');
+            });
+
+            dayDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dayDiv.classList.remove('drag-over');
+                if (this.draggedEvent) {
+                    this.moveEventToDate(this.draggedEvent, dateStr);
+                }
+            });
+            
+            calendar.appendChild(dayDiv);
+        }
+
+        this.attachEventItemListeners();
+    }
+
+    formatDate(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    getStartOfWeek(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        const diff = d.getDate() - day;
+        return new Date(d.setDate(diff));
+    }
+
+    switchView(view) {
+        this.currentView = view;
+        
+        document.querySelectorAll('.view-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-view="${view}"]`).classList.add('active');
+        
+        const calendar = document.getElementById('calendarGrid');
+        calendar.classList.remove('week-view');
+        
+        this.renderCalendar();
     }
 
     attachEventItemListeners() {
         document.querySelectorAll('.event-item').forEach(item => {
-            // Left click - edit event
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (e.button === 0) {
@@ -230,23 +383,19 @@ class CalendarManager {
                 }
             });
 
-            // Right click - delete event
             item.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const eventId = item.dataset.eventId;
-                console.log('Right-click detected on event:', eventId);
                 this.showContextMenu(e, eventId);
             });
 
-            // Drag start
             item.addEventListener('dragstart', (e) => {
                 this.draggedEvent = item.dataset.eventId;
                 item.style.opacity = '0.5';
                 e.dataTransfer.effectAllowed = 'move';
             });
 
-            // Drag end
             item.addEventListener('dragend', (e) => {
                 item.style.opacity = '1';
                 this.draggedEvent = null;
@@ -257,6 +406,7 @@ class CalendarManager {
     showModal(id = null) {
         document.getElementById('modalOverlay').style.display = 'block';
         document.getElementById('eventModal').style.display = 'block';
+        this.populateTimeSelect();
         
         if (id) {
             this.editingId = id;
@@ -281,7 +431,8 @@ class CalendarManager {
         document.getElementById('modalTitle').textContent = 'Add New Event';
         document.getElementById('eventFormElement').reset();
         document.getElementById('date').value = dateStr;
-        // Set current time to next 15-minute increment
+        
+        this.populateTimeSelect();
         const now = new Date();
         const roundedTime = this.roundToNextQuarter(now);
         document.getElementById('time').value = roundedTime;
@@ -301,7 +452,6 @@ class CalendarManager {
         contextMenu.style.left = event.pageX + 'px';
         contextMenu.style.top = event.pageY + 'px';
         this.contextMenuEventId = eventId;
-        console.log('Context menu displayed for event:', eventId);
     }
 
     hideContextMenu() {
@@ -314,10 +464,8 @@ class CalendarManager {
         const hours = date.getHours();
         let minutes = date.getMinutes();
         
-        // Round up to next 15-minute increment
         minutes = Math.ceil(minutes / 15) * 15;
         
-        // Handle hour overflow
         if (minutes === 60) {
             minutes = 0;
             date.setHours(hours + 1);
@@ -331,8 +479,6 @@ class CalendarManager {
 
     async moveEventToDate(eventId, newDate) {
         try {
-            console.log('CalendarManager: Moving event', eventId, 'to date', newDate);
-            
             await firebase.firestore()
                 .collection('calendar_events')
                 .doc(eventId)
@@ -347,8 +493,7 @@ class CalendarManager {
                 this.events[index].updatedAt = new Date();
             }
             
-            console.log('CalendarManager: Event moved successfully');
-            this.renderCalendarDays();
+            this.renderCalendar();
         } catch (error) {
             console.error('CalendarManager: Error moving event:', error);
             alert('Failed to move event: ' + error.message);
@@ -370,10 +515,7 @@ class CalendarManager {
         };
 
         try {
-            console.log('CalendarManager: Saving event:', eventData);
-            
             if (this.editingId) {
-                console.log('CalendarManager: Updating existing event:', this.editingId);
                 await firebase.firestore()
                     .collection('calendar_events')
                     .doc(this.editingId)
@@ -384,26 +526,21 @@ class CalendarManager {
                     this.events[index] = { id: this.editingId, ...eventData };
                 }
             } else {
-                console.log('CalendarManager: Adding new event');
                 eventData.createdAt = new Date();
                 const docRef = await firebase.firestore()
                     .collection('calendar_events')
                     .add(eventData);
                 
                 this.events.push({ id: docRef.id, ...eventData });
-                console.log('CalendarManager: Event added with ID:', docRef.id);
             }
-
-            console.log('CalendarManager: Event saved successfully');
             
-            // If event was marked as completed and not a no-show, update inventory
             if (eventData.status === 'completed' && !eventData.noShow) {
                 await this.updateInventoryFromEvent(eventData);
             }
 
             this.hideModal();
             setTimeout(() => {
-                this.renderCalendarDays();
+                this.renderCalendar();
             }, 50);
         } catch (error) {
             console.error('CalendarManager: Error saving event:', error);
@@ -413,25 +550,15 @@ class CalendarManager {
 
     async updateInventoryFromEvent(eventData) {
         try {
-            console.log('CalendarManager: Updating inventory for test type:', eventData.testType);
-            
             const testSupplies = {
-                'urine': [
-                    { name: 'Urine Test Cups', quantity: 1 }
-                ],
-                'hair': [
-                    { name: 'Hair Test Vials', quantity: 1 }
-                ],
-                'saliva': [
-                    { name: 'Saliva Test Strips', quantity: 1 }
-                ],
+                'urine': [{ name: 'Urine Test Cups', quantity: 1 }],
+                'hair': [{ name: 'Hair Test Vials', quantity: 1 }],
+                'saliva': [{ name: 'Saliva Test Strips', quantity: 1 }],
                 'blood': [
                     { name: 'Blood Test Vials', quantity: 2 },
                     { name: 'Blood Test Needles', quantity: 1 }
                 ],
-                'breath': [
-                    { name: 'Breathalyzer Cartridges', quantity: 1 }
-                ]
+                'breath': [{ name: 'Breathalyzer Cartridges', quantity: 1 }]
             };
 
             const supplies = testSupplies[eventData.testType.toLowerCase()] || [];
@@ -455,8 +582,6 @@ class CalendarManager {
                             quantity: newQuantity,
                             updatedAt: new Date()
                         });
-
-                    console.log(`CalendarManager: Updated ${supply.name} from ${currentQuantity} to ${newQuantity}`);
                 }
             }
         } catch (error) {
@@ -471,7 +596,6 @@ class CalendarManager {
     async deleteEvent(id) {
         if (confirm('Are you sure you want to delete this event?')) {
             try {
-                console.log('CalendarManager: Deleting event:', id);
                 await firebase.firestore()
                     .collection('calendar_events')
                     .doc(id)
@@ -479,9 +603,8 @@ class CalendarManager {
                 
                 this.events = this.events.filter(e => e.id !== id);
                 
-                console.log('CalendarManager: Event deleted successfully');
                 this.hideContextMenu();
-                this.renderCalendarDays();
+                this.renderCalendar();
             } catch (error) {
                 console.error('CalendarManager: Error deleting event:', error);
                 alert('Failed to delete event: ' + error.message);
@@ -489,14 +612,22 @@ class CalendarManager {
         }
     }
 
-    previousMonth() {
-        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-        this.renderCalendarDays();
+    previousPeriod() {
+        if (this.currentView === 'month') {
+            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        } else {
+            this.currentDate.setDate(this.currentDate.getDate() - 7);
+        }
+        this.renderCalendar();
     }
 
-    nextMonth() {
-        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-        this.renderCalendarDays();
+    nextPeriod() {
+        if (this.currentView === 'month') {
+            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        } else {
+            this.currentDate.setDate(this.currentDate.getDate() + 7);
+        }
+        this.renderCalendar();
     }
 
     setupLogout() {
@@ -504,7 +635,6 @@ class CalendarManager {
         if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
                 try {
-                    console.log('CalendarManager: Logout clicked');
                     await firebase.auth().signOut();
                 } catch (error) {
                     console.error('CalendarManager: Error logging out:', error);
@@ -515,6 +645,5 @@ class CalendarManager {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('CalendarManager: DOM ready, initializing');
     window.calendarManager = new CalendarManager();
 });

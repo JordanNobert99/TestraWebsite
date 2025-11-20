@@ -70,8 +70,10 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="time">Time (15-minute increments)</label>
-                                <input type="time" id="time" step="900" required>
+                                <label for="time">Time</label>
+                                <select id="time" required>
+                                    <option value="">Select Time</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="testType">Test Type</label>
@@ -123,10 +125,14 @@
                     <button id="prevMonth" class="btn-nav-btn">&larr;</button>
                     <h2 id="currentMonth"></h2>
                     <button id="nextMonth" class="btn-nav-btn">&rarr;</button>
+                    <div class="view-toggle">
+                        <button id="monthViewBtn" class="view-btn active" data-view="month">Month</button>
+                        <button id="weekViewBtn" class="view-btn" data-view="week">Week</button>
+                    </div>
                 </div>
 
                 <!-- Day Headers -->
-                <div class="calendar-weekdays">
+                <div class="calendar-weekdays" id="calendarWeekdays">
                     <div class="weekday">Sun</div>
                     <div class="weekday">Mon</div>
                     <div class="weekday">Tue</div>
