@@ -2,21 +2,12 @@ class DashboardManager {
     constructor() {
         this.currentUser = null;
         this.userRole = null;
-        this.sessionUnsubscribe = null;
-        console.log('DashboardManager: Constructor called');
         this.init();
     }
 
     init() {
-        console.log('DashboardManager: init() called');
-        
-        // Use SessionManager instead of direct Firebase auth
-        const sessionManager = new SessionManager();
-        console.log('DashboardManager: SessionManager created');
-        
-        this.sessionUnsubscribe = sessionManager.subscribe((user) => {
-            console.log('DashboardManager: Subscribe callback fired with user:', user ? user.email : 'null');
-            
+        // Directly use Firebase's onAuthStateChanged
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.currentUser = user;
                 console.log('DashboardManager: User logged in:', user.email);
@@ -29,7 +20,6 @@ class DashboardManager {
             }
         });
         
-        console.log('DashboardManager: Subscribe callback registered');
         this.setupEventListeners();
     }
 
@@ -76,17 +66,16 @@ class DashboardManager {
 
     setupLogout() {
         const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn && !logoutBtn.dataset.initialized) {
+        if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
                 try {
                     console.log('DashboardManager: Logout clicked');
-                    await new SessionManager().logout();
+                    await firebase.auth().signOut();
                     window.location.href = '../pages/login.html';
                 } catch (error) {
                     console.error('DashboardManager: Error logging out:', error);
                 }
             });
-            logoutBtn.dataset.initialized = 'true';
         }
     }
 
