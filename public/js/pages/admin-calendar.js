@@ -5,6 +5,7 @@ class CalendarManager {
         this.editingId = null;
         this.currentDate = new Date();
         this.contextMenuEventId = null;
+        this.draggedEvent = null;
         this.init();
     }
 
@@ -65,21 +66,19 @@ class CalendarManager {
         }
 
         if (deleteEventBtn && !deleteEventBtn.dataset.initialized) {
-            deleteEventBtn.addEventListener('click', () => {
+            deleteEventBtn.addEventListener('click', (e) => {
+                e.preventDefault();
                 this.deleteEvent(this.contextMenuEventId);
             });
             deleteEventBtn.dataset.initialized = 'true';
         }
 
-        // Close context menu when clicking elsewhere
-        if (!document.body.dataset.contextMenuInitialized) {
+        // Global click handler to close context menu
+        if (!document.body.dataset.globalClickHandler) {
             document.addEventListener('click', (e) => {
-                const contextMenu = document.getElementById('contextMenu');
-                if (contextMenu && !e.target.closest('.event-item') && !e.target.closest('.context-menu')) {
-                    this.hideContextMenu();
-                }
+                this.hideContextMenu();
             });
-            document.body.dataset.contextMenuInitialized = 'true';
+            document.body.dataset.globalClickHandler = 'true';
         }
     }
 
@@ -147,7 +146,7 @@ class CalendarManager {
             let eventsHTML = dayEvents.map(e => {
                 const displayTime = e.time ? e.time : 'No time';
                 return `
-                    <div class="event-item" data-event-id="${e.id}">
+                    <div class="event-item" data-event-id="${e.id}" draggable="true">
                         <div class="event-time">${displayTime}</div>
                         <div class="event-client">${e.clientName}</div>
                         <div class="event-test">${e.testType}</div>
@@ -160,7 +159,7 @@ class CalendarManager {
                 eventsHTML = dayEvents.slice(0, 3).map(e => {
                     const displayTime = e.time ? e.time : 'No time';
                     return `
-                        <div class="event-item" data-event-id="${e.id}">
+                        <div class="event-item" data-event-id="${e.id}" draggable="true">
                             <div class="event-time">${displayTime}</div>
                             <div class="event-client">${e.clientName}</div>
                         </div>
@@ -180,6 +179,26 @@ class CalendarManager {
             dayDiv.addEventListener('click', (e) => {
                 if (!e.target.closest('.event-item')) {
                     this.showModalForDate(dateStr);
+                }
+            });
+
+            // Add drag over listener
+            dayDiv.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dayDiv.classList.add('drag-over');
+            });
+
+            // Remove drag over class
+            dayDiv.addEventListener('dragleave', (e) => {
+                dayDiv.classList.remove('drag-over');
+            });
+
+            // Drop listener
+            dayDiv.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dayDiv.classList.remove('drag-over');
+                if (this.draggedEvent) {
+                    this.moveEventToDate(this.draggedEvent, dateStr);
                 }
             });
             
@@ -202,21 +221,35 @@ class CalendarManager {
 
     attachEventItemListeners() {
         document.querySelectorAll('.event-item').forEach(item => {
+            // Left click - edit event
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Only edit if not right-clicking
                 if (e.button === 0) {
                     const eventId = item.dataset.eventId;
                     this.editEvent(eventId);
                 }
             });
 
+            // Right click - delete event
             item.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const eventId = item.dataset.eventId;
-                console.log('Right-click on event:', eventId);
+                console.log('Right-click detected on event:', eventId);
                 this.showContextMenu(e, eventId);
+            });
+
+            // Drag start
+            item.addEventListener('dragstart', (e) => {
+                this.draggedEvent = item.dataset.eventId;
+                item.style.opacity = '0.5';
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            // Drag end
+            item.addEventListener('dragend', (e) => {
+                item.style.opacity = '1';
+                this.draggedEvent = null;
             });
         });
     }
@@ -248,6 +281,10 @@ class CalendarManager {
         document.getElementById('modalTitle').textContent = 'Add New Event';
         document.getElementById('eventFormElement').reset();
         document.getElementById('date').value = dateStr;
+        // Set current time to next 15-minute increment
+        const now = new Date();
+        const roundedTime = this.roundToNextQuarter(now);
+        document.getElementById('time').value = roundedTime;
         this.editingId = null;
     }
 
@@ -255,6 +292,7 @@ class CalendarManager {
         document.getElementById('modalOverlay').style.display = 'none';
         document.getElementById('eventModal').style.display = 'none';
         document.getElementById('eventFormElement').reset();
+        this.hideContextMenu();
     }
 
     showContextMenu(event, eventId) {
@@ -263,13 +301,58 @@ class CalendarManager {
         contextMenu.style.left = event.pageX + 'px';
         contextMenu.style.top = event.pageY + 'px';
         this.contextMenuEventId = eventId;
-        console.log('Context menu shown for event:', eventId);
+        console.log('Context menu displayed for event:', eventId);
     }
 
     hideContextMenu() {
         const contextMenu = document.getElementById('contextMenu');
         contextMenu.style.display = 'none';
         this.contextMenuEventId = null;
+    }
+
+    roundToNextQuarter(date) {
+        const hours = date.getHours();
+        let minutes = date.getMinutes();
+        
+        // Round up to next 15-minute increment
+        minutes = Math.ceil(minutes / 15) * 15;
+        
+        // Handle hour overflow
+        if (minutes === 60) {
+            minutes = 0;
+            date.setHours(hours + 1);
+        }
+        
+        date.setMinutes(minutes);
+        date.setSeconds(0);
+        
+        return date.toTimeString().slice(0, 5);
+    }
+
+    async moveEventToDate(eventId, newDate) {
+        try {
+            console.log('CalendarManager: Moving event', eventId, 'to date', newDate);
+            
+            await firebase.firestore()
+                .collection('calendar_events')
+                .doc(eventId)
+                .update({
+                    date: newDate,
+                    updatedAt: new Date()
+                });
+            
+            const index = this.events.findIndex(e => e.id === eventId);
+            if (index !== -1) {
+                this.events[index].date = newDate;
+                this.events[index].updatedAt = new Date();
+            }
+            
+            console.log('CalendarManager: Event moved successfully');
+            this.renderCalendarDays();
+        } catch (error) {
+            console.error('CalendarManager: Error moving event:', error);
+            alert('Failed to move event: ' + error.message);
+        }
     }
 
     async handleSave(e) {
