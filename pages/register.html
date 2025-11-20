@@ -110,31 +110,5 @@
     <script src="../public/js/theme-switcher.js"></script>
     <script src="../public/js/auth.js"></script>
     <script src="../public/js/utils.js"></script>
-    <script>document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const fullName = document.getElementById('fullName').value;
-            const errorDiv = document.getElementById('authError');
-
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
-            try {
-                const user = await authManager.register(email, password, 'customer');
-                // Store additional user data
-                await firebase.firestore().collection('users').doc(user.uid).update({
-                    fullName: fullName
-                });
-                window.location.href = '../pages/dashboard.html';
-            } catch (error) {
-                errorDiv.textContent = error.message;
-                errorDiv.style.display = 'block';
-            }
-        });</script>
 </body>
 </html>

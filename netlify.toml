@@ -13,7 +13,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  condition = { Status = 404, NOT = { Path = "/public/*" } }
 
 # Static asset caching
 [[headers]]
