@@ -1,0 +1,56 @@
+# Build configuration
+[build]
+  command = "echo 'Building Testra...'"
+  functions = "netlify/functions"
+  publish = "."
+
+# Environment variables (reference only - set in Netlify UI)
+[env]
+  [env.production]
+    environment = { NODE_ENV = "production" }
+
+# Redirect rules
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  condition = { Status = 404, NOT = { Path = "/public/*" } }
+
+# Static asset caching
+[[headers]]
+  for = "/public/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# Functions configuration
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["data/**"]
+
+# Form handling (optional - if you want Netlify forms)
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+# Dev settings
+[dev]
+  command = "npm start"
+  port = 8000
+  publish = "."
+  functions = "netlify/functions"
+  autoLaunch = true
