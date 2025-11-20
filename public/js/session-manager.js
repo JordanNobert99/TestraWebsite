@@ -14,8 +14,16 @@ class SessionManager {
         this.listeners = [];
         this.initialized = false;
         
-        this.init();
+        this.waitForFirebase();
         SessionManager.instance = this;
+    }
+
+    waitForFirebase() {
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth()) {
+            this.init();
+        } else {
+            setTimeout(() => this.waitForFirebase(), 100);
+        }
     }
 
     init() {
