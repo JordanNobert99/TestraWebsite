@@ -3,25 +3,48 @@ class InventoryManager {
         this.currentUser = null;
         this.items = [];
         this.editingId = null;
-        this.authGuard = null;
+        this.sessionUnsubscribe = null;
         this.init();
     }
 
     init() {
-        // Use auth guard to check if user is logged in
-        this.authGuard = new AuthGuard((user) => {
-            this.currentUser = user;
-            document.getElementById('userEmail').textContent = user.email;
-            this.loadInventory();
-            this.setupEventListeners();
-            this.setupLogout();
+        // Get or create session manager
+        const session = new SessionManager();
+        
+        // Subscribe to auth changes
+        this.sessionUnsubscribe = session.subscribe((user) => {
+            if (user) {
+                this.currentUser = user;
+                document.getElementById('userEmail').textContent = user.email;
+                this.loadInventory();
+                this.setupEventListeners();
+                this.setupLogout();
+            } else {
+                // User is not authenticated, redirect to login
+                window.location.href = '../../pages/login.html';
+            }
         });
     }
 
     setupEventListeners() {
-        document.getElementById('addItemBtn').addEventListener('click', () => this.showForm());
-        document.getElementById('cancelBtn').addEventListener('click', () => this.hideForm());
-        document.getElementById('itemForm').addEventListener('submit', (e) => this.handleSave(e));
+        const addBtn = document.getElementById('addItemBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const form = document.getElementById('itemForm');
+        
+        if (addBtn && !addBtn.dataset.initialized) {
+            addBtn.addEventListener('click', () => this.showForm());
+            addBtn.dataset.initialized = 'true';
+        }
+        
+        if (cancelBtn && !cancelBtn.dataset.initialized) {
+            cancelBtn.addEventListener('click', () => this.hideForm());
+            cancelBtn.dataset.initialized = 'true';
+        }
+        
+        if (form && !form.dataset.initialized) {
+            form.addEventListener('submit', (e) => this.handleSave(e));
+            form.dataset.initialized = 'true';
+        }
     }
 
     async loadInventory() {
@@ -70,10 +93,10 @@ class InventoryManager {
     }
 
     getStatus(item) {
-        if (item.quantity <= item.reorderLevel) {
-            return '<span class="status-low">Low Stock</span>';
-        } else if (item.quantity === 0) {
+        if (item.quantity === 0) {
             return '<span class="status-out">Out of Stock</span>';
+        } else if (item.quantity <= item.reorderLevel) {
+            return '<span class="status-low">Low Stock</span>';
         }
         return '<span class="status-ok">In Stock</span>';
     }
@@ -136,30 +159,39 @@ class InventoryManager {
         }
     }
 
-    async editItem(id) {
+    editItem(id) {
         this.showForm(id);
     }
 
-    async deleteItem(id) {
+    deleteItem(id) {
         if (confirm('Are you sure you want to delete this item?')) {
-            try {
-                await firebase.firestore()
-                    .collection('inventory')
-                    .doc(id)
-                    .delete();
-                this.loadInventory();
-            } catch (error) {
-                console.error('Error deleting item:', error);
-                alert('Failed to delete item');
-            }
+            firebase.firestore()
+                .collection('inventory')
+                .doc(id)
+                .delete()
+                .then(() => this.loadInventory())
+                .catch(error => {
+                    console.error('Error deleting item:', error);
+                    alert('Failed to delete item');
+                });
         }
     }
 
     setupLogout() {
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await firebase.auth().signOut();
-            window.location.href = '../../pages/login.html';
-        });
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn && !logoutBtn.dataset.initialized) {
+            logoutBtn.addEventListener('click', async () => {
+                const session = new SessionManager();
+                await session.logout();
+            });
+            logoutBtn.dataset.initialized = 'true';
+        }
+    }
+
+    destroy() {
+        if (this.sessionUnsubscribe) {
+            this.sessionUnsubscribe();
+        }
     }
 }
 
