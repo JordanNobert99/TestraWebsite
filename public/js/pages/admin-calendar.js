@@ -1,0 +1,339 @@
+class CalendarManager {
+    constructor() {
+        this.currentUser = null;
+        this.events = [];
+        this.editingId = null;
+        this.init();
+    }
+
+    init() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.currentUser = user;
+                console.log('CalendarManager: User logged in:', user.email);
+                document.getElementById('userEmail').textContent = user.email;
+                this.loadCalendarEvents();
+                this.setupEventListeners();
+                this.setupLogout();
+                this.initializeCalendar();
+            } else {
+                console.log('CalendarManager: User not authenticated, redirecting to login');
+                window.location.href = '../../pages/login.html';
+            }
+        });
+    }
+
+    initializeCalendar() {
+        const today = new Date();
+        document.getElementById('currentMonth').textContent = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        this.renderCalendarDays();
+    }
+
+    setupEventListeners() {
+        const addBtn = document.getElementById('addEventBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const form = document.getElementById('eventForm');
+        const prevBtn = document.getElementById('prevMonth');
+        const nextBtn = document.getElementById('nextMonth');
+
+        if (addBtn && !addBtn.dataset.initialized) {
+            addBtn.addEventListener('click', () => this.showForm());
+            addBtn.dataset.initialized = 'true';
+        }
+
+        if (cancelBtn && !cancelBtn.dataset.initialized) {
+            cancelBtn.addEventListener('click', () => this.hideForm());
+            cancelBtn.dataset.initialized = 'true';
+        }
+
+        if (form && !form.dataset.initialized) {
+            form.addEventListener('submit', (e) => this.handleSave(e));
+            form.dataset.initialized = 'true';
+        }
+
+        if (prevBtn && !prevBtn.dataset.initialized) {
+            prevBtn.addEventListener('click', () => this.previousMonth());
+            prevBtn.dataset.initialized = 'true';
+        }
+
+        if (nextBtn && !nextBtn.dataset.initialized) {
+            nextBtn.addEventListener('click', () => this.nextMonth());
+            nextBtn.dataset.initialized = 'true';
+        }
+    }
+
+    async loadCalendarEvents() {
+        try {
+            console.log('CalendarManager: Loading events for user:', this.currentUser.uid);
+            const snapshot = await firebase.firestore()
+                .collection('calendar_events')
+                .where('userId', '==', this.currentUser.uid)
+                .get();
+
+            this.events = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            console.log('CalendarManager: Loaded', this.events.length, 'events');
+            this.renderEventList();
+        } catch (error) {
+            console.error('CalendarManager: Error loading events:', error);
+        }
+    }
+
+    renderCalendarDays() {
+        // Basic calendar grid (simplified - you can enhance with a full calendar library)
+        const calendar = document.getElementById('calendarGrid');
+        if (!calendar) return;
+
+        calendar.innerHTML = '';
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = today.getMonth();
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Add empty cells for days before month starts
+        for (let i = 0; i < firstDay; i++) {
+            calendar.innerHTML += '<div class="calendar-day empty"></div>';
+        }
+
+        // Add day cells
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const dayEvents = this.events.filter(e => e.date === dateStr);
+
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day';
+            dayDiv.innerHTML = `
+                <div class="day-number">${day}</div>
+                <div class="day-events">
+                    ${dayEvents.map(e => `<div class="event-dot" title="${e.clientName}"></div>`).join('')}
+                </div>
+            `;
+
+            calendar.appendChild(dayDiv);
+        }
+    }
+
+    renderEventList() {
+        const tbody = document.getElementById('eventsTableBody');
+        const emptyRow = document.getElementById('emptyRow');
+
+        if (!tbody) return;
+
+        if (this.events.length === 0) {
+            if (emptyRow) emptyRow.style.display = 'table-row';
+            tbody.innerHTML = '';
+            return;
+        }
+
+        if (emptyRow) emptyRow.style.display = 'none';
+
+        tbody.innerHTML = this.events.map(event => `
+            <tr>
+                <td>${event.date}</td>
+                <td>${event.clientName}</td>
+                <td>${event.testType}</td>
+                <td>${event.status}</td>
+                <td>${event.noShow ? 'Yes' : 'No'}</td>
+                <td class="actions">
+                    <button class="btn-small" onclick="calendarManager.editEvent('${event.id}')">Edit</button>
+                    <button class="btn-small btn-danger" onclick="calendarManager.deleteEvent('${event.id}')">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    showForm(id = null) {
+        document.getElementById('eventForm').style.display = 'block';
+
+        if (id) {
+            this.editingId = id;
+            const event = this.events.find(e => e.id === id);
+            document.getElementById('formTitle').textContent = 'Edit Event';
+            document.getElementById('clientName').value = event.clientName;
+            document.getElementById('date').value = event.date;
+            document.getElementById('testType').value = event.testType;
+            document.getElementById('status').value = event.status;
+            document.getElementById('noShow').checked = event.noShow || false;
+        } else {
+            document.getElementById('formTitle').textContent = 'Add New Event';
+            document.getElementById('eventForm').reset();
+            this.editingId = null;
+        }
+    }
+
+    hideForm() {
+        document.getElementById('eventForm').style.display = 'none';
+        const form = document.getElementById('eventForm');
+        if (form) form.reset();
+    }
+
+    async handleSave(e) {
+        e.preventDefault();
+
+        const eventData = {
+            clientName: document.getElementById('clientName').value,
+            date: document.getElementById('date').value,
+            testType: document.getElementById('testType').value,
+            status: document.getElementById('status').value,
+            noShow: document.getElementById('noShow').checked,
+            userId: this.currentUser.uid,
+            updatedAt: new Date()
+        };
+
+        try {
+            console.log('CalendarManager: Saving event:', eventData);
+
+            if (this.editingId) {
+                console.log('CalendarManager: Updating existing event:', this.editingId);
+                await firebase.firestore()
+                    .collection('calendar_events')
+                    .doc(this.editingId)
+                    .update(eventData);
+
+                const index = this.events.findIndex(e => e.id === this.editingId);
+                if (index !== -1) {
+                    this.events[index] = { id: this.editingId, ...eventData };
+                }
+            } else {
+                console.log('CalendarManager: Adding new event');
+                eventData.createdAt = new Date();
+                const docRef = await firebase.firestore()
+                    .collection('calendar_events')
+                    .add(eventData);
+
+                this.events.push({ id: docRef.id, ...eventData });
+                console.log('CalendarManager: Event added with ID:', docRef.id);
+            }
+
+            console.log('CalendarManager: Event saved successfully');
+
+            // If event was marked as completed and not a no-show, update inventory
+            if (eventData.status === 'completed' && !eventData.noShow) {
+                await this.updateInventoryFromEvent(eventData);
+            }
+
+            this.hideForm();
+            setTimeout(() => {
+                this.renderEventList();
+                this.renderCalendarDays();
+            }, 50);
+        } catch (error) {
+            console.error('CalendarManager: Error saving event:', error);
+            alert('Failed to save event: ' + error.message);
+        }
+    }
+
+    async updateInventoryFromEvent(eventData) {
+        try {
+            console.log('CalendarManager: Updating inventory for test type:', eventData.testType);
+
+            // Define which inventory items are used for each test type
+            const testSupplies = {
+                'urine': [
+                    { name: 'Urine Test Cups', quantity: 1 }
+                ],
+                'hair': [
+                    { name: 'Hair Test Vials', quantity: 1 }
+                ],
+                'saliva': [
+                    { name: 'Saliva Test Strips', quantity: 1 }
+                ],
+                'blood': [
+                    { name: 'Blood Test Vials', quantity: 2 },
+                    { name: 'Blood Test Needles', quantity: 1 }
+                ],
+                'breath': [
+                    { name: 'Breathalyzer Cartridges', quantity: 1 }
+                ]
+            };
+
+            const supplies = testSupplies[eventData.testType.toLowerCase()] || [];
+
+            // Update each inventory item
+            for (const supply of supplies) {
+                const inventorySnapshot = await firebase.firestore()
+                    .collection('inventory')
+                    .where('userId', '==', this.currentUser.uid)
+                    .where('itemName', '==', supply.name)
+                    .get();
+
+                if (!inventorySnapshot.empty) {
+                    const docId = inventorySnapshot.docs[0].id;
+                    const currentQuantity = inventorySnapshot.docs[0].data().quantity;
+                    const newQuantity = Math.max(0, currentQuantity - supply.quantity);
+
+                    await firebase.firestore()
+                        .collection('inventory')
+                        .doc(docId)
+                        .update({
+                            quantity: newQuantity,
+                            updatedAt: new Date()
+                        });
+
+                    console.log(`CalendarManager: Updated ${supply.name} from ${currentQuantity} to ${newQuantity}`);
+                }
+            }
+        } catch (error) {
+            console.error('CalendarManager: Error updating inventory:', error);
+            // Don't throw - let the event be saved even if inventory update fails
+        }
+    }
+
+    editEvent(id) {
+        this.showForm(id);
+    }
+
+    async deleteEvent(id) {
+        if (confirm('Are you sure you want to delete this event?')) {
+            try {
+                console.log('CalendarManager: Deleting event:', id);
+                await firebase.firestore()
+                    .collection('calendar_events')
+                    .doc(id)
+                    .delete();
+
+                this.events = this.events.filter(e => e.id !== id);
+
+                console.log('CalendarManager: Event deleted successfully');
+                this.renderEventList();
+                this.renderCalendarDays();
+            } catch (error) {
+                console.error('CalendarManager: Error deleting event:', error);
+                alert('Failed to delete event: ' + error.message);
+            }
+        }
+    }
+
+    previousMonth() {
+        console.log('CalendarManager: Previous month clicked');
+    }
+
+    nextMonth() {
+        console.log('CalendarManager: Next month clicked');
+    }
+
+    setupLogout() {
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', async () => {
+                try {
+                    console.log('CalendarManager: Logout clicked');
+                    await firebase.auth().signOut();
+                } catch (error) {
+                    console.error('CalendarManager: Error logging out:', error);
+                }
+            });
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('CalendarManager: DOM ready, initializing');
+    window.calendarManager = new CalendarManager();
+});
