@@ -47,10 +47,10 @@
                 <button id="addEventBtn" class="btn-primary">+ Add Event</button>
             </div>
 
-            <!-- Add/Edit Form -->
-            <div id="eventForm" class="admin-form" style="display: none;">
+            <!-- Add/Edit Form Modal -->
+            <div id="eventFormContainer" class="admin-form" style="display: none;">
                 <h2 id="formTitle">Add New Event</h2>
-                <form id="eventForm">
+                <form id="eventFormElement">
                     <div class="form-row">
                         <div class="form-group">
                             <label for="clientName">Client Name</label>
@@ -85,7 +85,7 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group checkbox-group">
                         <label for="noShow">
                             <input type="checkbox" id="noShow">
                             No Show
@@ -102,10 +102,22 @@
             <!-- Calendar View -->
             <div class="calendar-section">
                 <div class="calendar-header">
-                    <button id="prevMonth" class="btn-secondary">&lt; Previous</button>
+                    <button id="prevMonth" class="btn-nav-btn">&larr;</button>
                     <h2 id="currentMonth"></h2>
-                    <button id="nextMonth" class="btn-secondary">Next &gt;</button>
+                    <button id="nextMonth" class="btn-nav-btn">&rarr;</button>
                 </div>
+
+                <!-- Day Headers -->
+                <div class="calendar-weekdays">
+                    <div class="weekday">Sun</div>
+                    <div class="weekday">Mon</div>
+                    <div class="weekday">Tue</div>
+                    <div class="weekday">Wed</div>
+                    <div class="weekday">Thu</div>
+                    <div class="weekday">Fri</div>
+                    <div class="weekday">Sat</div>
+                </div>
+
                 <div class="calendar-grid" id="calendarGrid"></div>
             </div>
 

@@ -3,6 +3,7 @@ class CalendarManager {
         this.currentUser = null;
         this.events = [];
         this.editingId = null;
+        this.currentDate = new Date();
         this.init();
     }
 
@@ -15,7 +16,7 @@ class CalendarManager {
                 this.loadCalendarEvents();
                 this.setupEventListeners();
                 this.setupLogout();
-                this.initializeCalendar();
+                this.renderCalendarDays();
             } else {
                 console.log('CalendarManager: User not authenticated, redirecting to login');
                 window.location.href = '../../pages/login.html';
@@ -23,29 +24,23 @@ class CalendarManager {
         });
     }
 
-    initializeCalendar() {
-        const today = new Date();
-        document.getElementById('currentMonth').textContent = today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        this.renderCalendarDays();
-    }
-
     setupEventListeners() {
         const addBtn = document.getElementById('addEventBtn');
         const cancelBtn = document.getElementById('cancelBtn');
-        const form = document.getElementById('eventForm');
+        const form = document.getElementById('eventFormElement');
         const prevBtn = document.getElementById('prevMonth');
         const nextBtn = document.getElementById('nextMonth');
-
+        
         if (addBtn && !addBtn.dataset.initialized) {
             addBtn.addEventListener('click', () => this.showForm());
             addBtn.dataset.initialized = 'true';
         }
-
+        
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideForm());
             cancelBtn.dataset.initialized = 'true';
         }
-
+        
         if (form && !form.dataset.initialized) {
             form.addEventListener('submit', (e) => this.handleSave(e));
             form.dataset.initialized = 'true';
@@ -83,38 +78,59 @@ class CalendarManager {
     }
 
     renderCalendarDays() {
-        // Basic calendar grid (simplified - you can enhance with a full calendar library)
         const calendar = document.getElementById('calendarGrid');
         if (!calendar) return;
-
+        
         calendar.innerHTML = '';
-
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = today.getMonth();
-
+        
+        const year = this.currentDate.getFullYear();
+        const month = this.currentDate.getMonth();
+        
+        // Update month/year header
+        document.getElementById('currentMonth').textContent = 
+            this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        // Add empty cells for days before month starts
-        for (let i = 0; i < firstDay; i++) {
-            calendar.innerHTML += '<div class="calendar-day empty"></div>';
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+        
+        // Add previous month's days
+        for (let i = firstDay - 1; i >= 0; i--) {
+            const day = daysInPrevMonth - i;
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day other-month';
+            dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
+            calendar.appendChild(dayDiv);
         }
-
-        // Add day cells
+        
+        // Add current month's days
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayEvents = this.events.filter(e => e.date === dateStr);
-
+            
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day';
             dayDiv.innerHTML = `
                 <div class="day-number">${day}</div>
                 <div class="day-events">
-                    ${dayEvents.map(e => `<div class="event-dot" title="${e.clientName}"></div>`).join('')}
+                    ${dayEvents.map(e => `
+                        <div class="event-item" title="${e.clientName} - ${e.testType}">
+                            ${e.clientName}
+                        </div>
+                    `).join('')}
                 </div>
             `;
-
+            
+            calendar.appendChild(dayDiv);
+        }
+        
+        // Add next month's days
+        const totalCells = calendar.children.length + daysInMonth;
+        const remainingCells = 42 - totalCells; // 6 rows * 7 days
+        for (let day = 1; day <= remainingCells; day++) {
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'calendar-day other-month';
+            dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
             calendar.appendChild(dayDiv);
         }
     }
@@ -125,20 +141,23 @@ class CalendarManager {
 
         if (!tbody) return;
 
-        if (this.events.length === 0) {
+        // Sort events by date
+        const sortedEvents = [...this.events].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        if (sortedEvents.length === 0) {
             if (emptyRow) emptyRow.style.display = 'table-row';
             tbody.innerHTML = '';
             return;
         }
 
         if (emptyRow) emptyRow.style.display = 'none';
-
-        tbody.innerHTML = this.events.map(event => `
+        
+        tbody.innerHTML = sortedEvents.map(event => `
             <tr>
                 <td>${event.date}</td>
                 <td>${event.clientName}</td>
                 <td>${event.testType}</td>
-                <td>${event.status}</td>
+                <td><span class="status-badge status-${event.status}">${event.status}</span></td>
                 <td>${event.noShow ? 'Yes' : 'No'}</td>
                 <td class="actions">
                     <button class="btn-small" onclick="calendarManager.editEvent('${event.id}')">Edit</button>
@@ -149,8 +168,8 @@ class CalendarManager {
     }
 
     showForm(id = null) {
-        document.getElementById('eventForm').style.display = 'block';
-
+        document.getElementById('eventFormContainer').style.display = 'block';
+        
         if (id) {
             this.editingId = id;
             const event = this.events.find(e => e.id === id);
@@ -162,15 +181,14 @@ class CalendarManager {
             document.getElementById('noShow').checked = event.noShow || false;
         } else {
             document.getElementById('formTitle').textContent = 'Add New Event';
-            document.getElementById('eventForm').reset();
+            document.getElementById('eventFormElement').reset();
             this.editingId = null;
         }
     }
 
     hideForm() {
-        document.getElementById('eventForm').style.display = 'none';
-        const form = document.getElementById('eventForm');
-        if (form) form.reset();
+        document.getElementById('eventFormContainer').style.display = 'none';
+        document.getElementById('eventFormElement').reset();
     }
 
     async handleSave(e) {
@@ -188,14 +206,14 @@ class CalendarManager {
 
         try {
             console.log('CalendarManager: Saving event:', eventData);
-
+            
             if (this.editingId) {
                 console.log('CalendarManager: Updating existing event:', this.editingId);
                 await firebase.firestore()
                     .collection('calendar_events')
                     .doc(this.editingId)
                     .update(eventData);
-
+                
                 const index = this.events.findIndex(e => e.id === this.editingId);
                 if (index !== -1) {
                     this.events[index] = { id: this.editingId, ...eventData };
@@ -206,13 +224,13 @@ class CalendarManager {
                 const docRef = await firebase.firestore()
                     .collection('calendar_events')
                     .add(eventData);
-
+                
                 this.events.push({ id: docRef.id, ...eventData });
                 console.log('CalendarManager: Event added with ID:', docRef.id);
             }
 
             console.log('CalendarManager: Event saved successfully');
-
+            
             // If event was marked as completed and not a no-show, update inventory
             if (eventData.status === 'completed' && !eventData.noShow) {
                 await this.updateInventoryFromEvent(eventData);
@@ -232,8 +250,7 @@ class CalendarManager {
     async updateInventoryFromEvent(eventData) {
         try {
             console.log('CalendarManager: Updating inventory for test type:', eventData.testType);
-
-            // Define which inventory items are used for each test type
+            
             const testSupplies = {
                 'urine': [
                     { name: 'Urine Test Cups', quantity: 1 }
@@ -255,7 +272,6 @@ class CalendarManager {
 
             const supplies = testSupplies[eventData.testType.toLowerCase()] || [];
 
-            // Update each inventory item
             for (const supply of supplies) {
                 const inventorySnapshot = await firebase.firestore()
                     .collection('inventory')
@@ -281,7 +297,6 @@ class CalendarManager {
             }
         } catch (error) {
             console.error('CalendarManager: Error updating inventory:', error);
-            // Don't throw - let the event be saved even if inventory update fails
         }
     }
 
@@ -297,9 +312,9 @@ class CalendarManager {
                     .collection('calendar_events')
                     .doc(id)
                     .delete();
-
+                
                 this.events = this.events.filter(e => e.id !== id);
-
+                
                 console.log('CalendarManager: Event deleted successfully');
                 this.renderEventList();
                 this.renderCalendarDays();
@@ -311,11 +326,13 @@ class CalendarManager {
     }
 
     previousMonth() {
-        console.log('CalendarManager: Previous month clicked');
+        this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        this.renderCalendarDays();
     }
 
     nextMonth() {
-        console.log('CalendarManager: Next month clicked');
+        this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        this.renderCalendarDays();
     }
 
     setupLogout() {

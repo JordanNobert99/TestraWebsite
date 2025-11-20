@@ -169,10 +169,11 @@
 /* Calendar Section */
 .calendar-section {
     background: var(--bg-secondary);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 2rem;
     margin-bottom: 2rem;
     border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .calendar-header {
@@ -180,59 +181,137 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 2rem;
+    gap: 1rem;
 }
 
 .calendar-header h2 {
     margin: 0;
-    min-width: 200px;
+    min-width: 300px;
     text-align: center;
+    font-size: 1.5rem;
+}
+
+.btn-nav-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.25rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.btn-nav-btn:hover {
+    background: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+    margin-bottom: 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px 8px 0 0;
+}
+
+.weekday {
+    padding: 1rem;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    border-right: 1px solid var(--border-color);
+}
+
+.weekday:last-child {
+    border-right: none;
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
+    gap: 0;
     background: var(--border-color);
-    padding: 1px;
-    border-radius: 8px;
+    border-radius: 0 0 8px 8px;
     overflow: hidden;
+    border: 1px solid var(--border-color);
 }
 
 .calendar-day {
     background: var(--bg-primary);
     padding: 1rem;
-    min-height: 120px;
+    min-height: 140px;
     display: flex;
     flex-direction: column;
+    border-right: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 
-.calendar-day.empty {
+.calendar-day:hover:not(.other-month) {
     background: var(--bg-tertiary);
+}
+
+.calendar-day:nth-child(7n) {
+    border-right: none;
+}
+
+.calendar-day.other-month {
+    background: var(--bg-tertiary);
+    opacity: 0.5;
 }
 
 .day-number {
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
 }
 
 .day-events {
     display: flex;
-    gap: 0.25rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
 }
 
-.event-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+.event-item {
     background: var(--primary-color);
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.event-item:hover {
+    background: var(--primary-hover);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .events-section {
     background: var(--bg-secondary);
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 2rem;
     border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.events-section h2 {
+    margin-top: 0;
+}
+
+.events-table-wrapper {
+    overflow-x: auto;
 }
 
 .events-table {
@@ -241,13 +320,18 @@
 }
 
 .events-table thead {
-    background: var(--bg-tertiary);
+    background: var(--primary-color);
+    color: white;
 }
 
-.events-table th,
-.events-table td {
+.events-table th {
     padding: 1rem;
     text-align: left;
+    font-weight: 600;
+}
+
+.events-table td {
+    padding: 1rem;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -255,8 +339,78 @@
     background: var(--bg-tertiary);
 }
 
-.empty-state {
-    text-align: center;
-    color: var(--text-secondary);
-    padding: 2rem !important;
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-scheduled {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.status-completed {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-cancelled {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+@media (max-width: 768px) {
+    .calendar-header {
+        flex-wrap: wrap;
+    }
+
+    .calendar-header h2 {
+        min-width: 100%;
+        order: 2;
+    }
+
+    .calendar-day {
+        min-height: 100px;
+        padding: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .day-number {
+        margin-bottom: 0.5rem;
+    }
+
+    .event-item {
+        font-size: 0.65rem;
+        padding: 0.25rem;
+    }
+
+    .events-table {
+        font-size: 0.85rem;
+    }
+
+    .events-table th,
+    .events-table td {
+        padding: 0.75rem;
+    }
 }
