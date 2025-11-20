@@ -578,7 +578,7 @@ class CalendarManager {
         // Position menu BELOW the event with a small offset
         contextMenu.style.position = 'fixed';
         contextMenu.style.left = (rect.left + window.scrollX) + 'px';
-        contextMenu.style.top = (rect.top + window.scrollY + menuHeight + 5) + 'px';
+        contextMenu.style.top = (rect.top + window.scrollY + menuHeight) + 'px';
         contextMenu.style.display = 'block';
         
         this.contextMenuEventId = eventId;
