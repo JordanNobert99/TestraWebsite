@@ -4,6 +4,19 @@ class HomePageManager {
     }
 
     init() {
+        // Wait for Firebase to be initialized
+        this.waitForFirebase();
+    }
+
+    waitForFirebase() {
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth()) {
+            this.setupAuthListener();
+        } else {
+            setTimeout(() => this.waitForFirebase(), 100);
+        }
+    }
+
+    setupAuthListener() {
         // Directly use Firebase's onAuthStateChanged
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
