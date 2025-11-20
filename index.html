@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testra - Testing, Design & Web Services</title>
+    <link rel="stylesheet" href="public/css/variables.css">
+    <link rel="stylesheet" href="public/css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <img src="public/images/logo.svg" alt="Testra Logo" class="logo">
+                <span class="logo-text">Testra</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="pages/contact.html">Contact</a></li>
+                <li><a href="pages/login.html" class="btn-nav-login">Login</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <button class="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Professional Services for Your Business</h1>
+            <p>Drug Testing • Web Design • Graphic Design • IT Solutions</p>
+            <a href="pages/contact.html" class="btn-primary">Get Started</a>
+        </div>
+    </header>
+
+    <section id="services" class="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="services-grid">
+                <a href="pages/services/drug-testing.html" class="service-card">
+                    <img src="public/images/service-icons/drug-testing.svg" alt="Drug Testing" class="service-icon">
+                    <h3>Drug & Alcohol Testing</h3>
+                    <p>Professional testing services for employers and organizations</p>
+                    <span class="service-arrow">→</span>
+                </a>
+                <a href="pages/services/web-design.html" class="service-card">
+                    <img src="public/images/service-icons/web-design.svg" alt="Web Design" class="service-icon">
+                    <h3>Custom Web Design</h3>
+                    <p>Build your website with our intuitive online builder</p>
+                    <span class="service-arrow">→</span>
+                </a>
+                <a href="pages/services/graphic-design.html" class="service-card">
+                    <img src="public/images/service-icons/graphic-design.svg" alt="Graphic Design" class="service-icon">
+                    <h3>Graphic Design</h3>
+                    <p>Professional branding and design solutions</p>
+                    <span class="service-arrow">→</span>
+                </a>
+                <a href="pages/services/it-services.html" class="service-card">
+                    <img src="public/images/service-icons/it-services.svg" alt="IT Services" class="service-icon">
+                    <h3>IT Services</h3>
+                    <p>Technical support and IT solutions</p>
+                    <span class="service-arrow">→</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2>About Testra</h2>
+            <p>We provide comprehensive business solutions tailored to your needs. With expertise in drug testing, web development, graphic design, and IT support, we're your one-stop shop for professional services.</p>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Testra</h4>
+                    <p>Professional business services</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="pages/services/drug-testing.html">Drug Testing</a></li>
+                        <li><a href="pages/services/web-design.html">Web Design</a></li>
+                        <li><a href="pages/services/graphic-design.html">Graphic Design</a></li>
+                        <li><a href="pages/services/it-services.html">IT Services</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="pages/contact.html">Contact</a></li>
+                        <li><a href="pages/login.html">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Testra. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js"></script>
+    <script src="public/js/config.js"></script>
+    <script src="public/js/theme-switcher.js"></script>
+    <script src="public/js/auth.js"></script>
+    <script src="public/js/utils.js"></script>
+</body>
+</html>

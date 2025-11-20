@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Testra</title>
+    <link rel="stylesheet" href="../public/css/variables.css">
+    <link rel="stylesheet" href="../public/css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <a href="../index.html">
+                    <img src="../public/images/logo.svg" alt="Testra Logo" class="logo">
+                    <span class="logo-text">Testra</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../index.html#services">Services</a></li>
+                <li><a href="../index.html#about">About</a></li>
+                <li><a href="login.html" class="btn-nav-login">Login</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <button class="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="contact-container">
+        <div class="container">
+            <div class="contact-header">
+                <h1>Get In Touch</h1>
+                <p>Have questions? We'd love to hear from you. Send us a message and we'll get back to you as soon as possible.</p>
+            </div>
+
+            <div class="contact-content">
+                <form id="contactForm" class="contact-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text"
+                                   id="name"
+                                   name="name"
+                                   placeholder="Your name"
+                                   required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactEmail">Email Address</label>
+                            <input type="email"
+                                   id="contactEmail"
+                                   name="email"
+                                   placeholder="your@email.com"
+                                   required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service">Which service are you interested in?</label>
+                        <select id="service" name="service" required>
+                            <option value="">Select a service</option>
+                            <option value="drug-testing">Drug & Alcohol Testing</option>
+                            <option value="web-design">Web Design</option>
+                            <option value="graphic-design">Graphic Design</option>
+                            <option value="it-services">IT Services</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text"
+                               id="subject"
+                               name="subject"
+                               placeholder="What is this about?"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message"
+                                  name="message"
+                                  rows="6"
+                                  placeholder="Tell us more about your inquiry..."
+                                  required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-full">Send Message</button>
+                </form>
+
+                <div id="contactSuccess" class="contact-success" style="display: none;">
+                    <p>✓ Thank you for your message! We'll get back to you soon.</p>
+                </div>
+
+                <div id="contactError" class="contact-error" style="display: none;"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Testra. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="../public/js/config.js"></script>
+    <script src="../public/js/theme-switcher.js"></script>
+    <script src="../public/js/utils.js"></script>
+    <script>document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                name: document.getElementById('name').value,
+                email: document.getElementById('contactEmail').value,
+                service: document.getElementById('service').value,
+                subject: document.getElementById('subject').value,
+                message: document.getElementById('message').value,
+                submittedAt: new Date()
+            };
+
+            try {
+                // Send to backend function
+                const response = await fetch('/.netlify/functions/contactForm', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) throw new Error('Failed to send message');
+
+                document.getElementById('contactForm').style.display = 'none';
+                document.getElementById('contactSuccess').style.display = 'block';
+            } catch (error) {
+                document.getElementById('contactError').textContent = error.message;
+                document.getElementById('contactError').style.display = 'block';
+            }
+        });</script>
+</body>
+</html>
