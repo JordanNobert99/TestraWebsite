@@ -48,16 +48,23 @@ class InventoryManager {
     async loadInventory() {
         try {
             console.log('InventoryManager: Loading inventory for user:', this.currentUser.uid);
+            // Simplified query - just filter by userId, don't order by createdAt
             const snapshot = await firebase.firestore()
                 .collection('inventory')
                 .where('userId', '==', this.currentUser.uid)
-                .orderBy('createdAt', 'desc')
                 .get();
 
             this.items = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             }));
+
+            // Sort in memory instead
+            this.items.sort((a, b) => {
+                const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt);
+                const timeB = b.createdAt?.toDate?.() || new Date(b.createdAt);
+                return timeB - timeA; // Descending order
+            });
 
             console.log('InventoryManager: Loaded', this.items.length, 'items');
             this.renderTable();
