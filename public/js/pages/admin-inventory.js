@@ -48,7 +48,6 @@ class InventoryManager {
     async loadInventory() {
         try {
             console.log('InventoryManager: Loading inventory for user:', this.currentUser.uid);
-            // Get all inventory items for this user (no orderBy needed)
             const snapshot = await firebase.firestore()
                 .collection('inventory')
                 .where('userId', '==', this.currentUser.uid)
@@ -59,11 +58,11 @@ class InventoryManager {
                 ...doc.data()
             }));
 
-            // Sort in memory instead
+            // Sort in memory
             this.items.sort((a, b) => {
                 const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt);
                 const timeB = b.createdAt?.toDate?.() || new Date(b.createdAt);
-                return timeB - timeA; // Descending order
+                return timeB - timeA;
             });
 
             console.log('InventoryManager: Loaded', this.items.length, 'items');
@@ -77,7 +76,6 @@ class InventoryManager {
         const tbody = document.getElementById('inventoryTableBody');
         const emptyRow = document.getElementById('emptyRow');
 
-        // Safety checks
         if (!tbody || !emptyRow) {
             console.error('InventoryManager: Table elements not found');
             return;
@@ -85,7 +83,7 @@ class InventoryManager {
 
         if (this.items.length === 0) {
             emptyRow.style.display = 'table-row';
-            tbody.innerHTML = ''; // Clear the table body
+            tbody.innerHTML = '';
             return;
         }
 
@@ -160,18 +158,33 @@ class InventoryManager {
                     .collection('inventory')
                     .doc(this.editingId)
                     .update(itemData);
+                
+                // Update local array
+                const index = this.items.findIndex(i => i.id === this.editingId);
+                if (index !== -1) {
+                    this.items[index] = { id: this.editingId, ...itemData };
+                }
             } else {
                 console.log('InventoryManager: Adding new item');
                 itemData.createdAt = new Date();
-                await firebase.firestore()
+                const docRef = await firebase.firestore()
                     .collection('inventory')
                     .add(itemData);
+                
+                // Add to local array
+                this.items.push({ id: docRef.id, ...itemData });
             }
+
+            // Sort and re-render without reloading
+            this.items.sort((a, b) => {
+                const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt);
+                const timeB = b.createdAt?.toDate?.() || new Date(b.createdAt);
+                return timeB - timeA;
+            });
 
             console.log('InventoryManager: Item saved successfully');
             this.hideForm();
-            // Reload after form is hidden
-            setTimeout(() => window.location.reload(), 300);
+            this.renderTable();
         } catch (error) {
             console.error('InventoryManager: Error saving item:', error);
             alert('Failed to save item: ' + error.message);
@@ -191,9 +204,11 @@ class InventoryManager {
                     .doc(id)
                     .delete();
                 
+                // Remove from local array
+                this.items = this.items.filter(item => item.id !== id);
+                
                 console.log('InventoryManager: Item deleted successfully');
-                // Reload after deletion
-                setTimeout(() => window.location.reload(), 300);
+                this.renderTable();
             } catch (error) {
                 console.error('InventoryManager: Error deleting item:', error);
                 alert('Failed to delete item: ' + error.message);
