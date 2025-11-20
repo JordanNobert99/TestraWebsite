@@ -16,6 +16,7 @@ class SessionManager {
         this.currentUser = null;
         this.listeners = [];
         this.initialized = false;
+        this.authStateCallbacks = []; // Queue for auth state changes
         
         this.waitForFirebase();
         SessionManager.instance = this;
@@ -40,8 +41,10 @@ class SessionManager {
             this.currentUser = user;
             this.initialized = true;
             
+            console.log('SessionManager: Current listeners:', this.listeners.length);
             console.log('SessionManager: Notifying', this.listeners.length, 'listeners');
-            // Notify all listeners
+            
+            // Notify all current listeners
             this.listeners.forEach((callback, index) => {
                 console.log('SessionManager: Calling listener', index);
                 try {
@@ -58,20 +61,24 @@ class SessionManager {
      * Returns unsubscribe function
      */
     subscribe(callback) {
-        console.log('SessionManager: subscribe() called, listeners before:', this.listeners.length);
+        console.log('SessionManager: subscribe() called, total listeners before:', this.listeners.length);
         
         // Add listener to array
         this.listeners.push(callback);
-        console.log('SessionManager: Listener added, listeners after:', this.listeners.length);
+        console.log('SessionManager: Listener added, total listeners after:', this.listeners.length);
         
         console.log('SessionManager: Initialized?', this.initialized, 'CurrentUser?', this.currentUser ? this.currentUser.email : 'null');
         
-        // Immediately call if already initialized
+        // Immediately call if already initialized (auth state is known)
         if (this.initialized) {
-            console.log('SessionManager: Already initialized, immediately calling callback with:', this.currentUser ? this.currentUser.email : 'null');
-            setTimeout(() => callback(this.currentUser), 0);
+            console.log('SessionManager: Already initialized, immediately calling callback');
+            // Use setTimeout to ensure it's async
+            setTimeout(() => {
+                console.log('SessionManager: Executing immediate callback with user:', this.currentUser ? this.currentUser.email : 'null');
+                callback(this.currentUser);
+            }, 0);
         } else {
-            console.log('SessionManager: Not yet initialized, waiting for onAuthStateChanged');
+            console.log('SessionManager: Not yet initialized, callback will be called when auth state is determined');
         }
         
         // Return unsubscribe function
@@ -99,11 +106,14 @@ class SessionManager {
      * Logout
      */
     async logout() {
+        console.log('SessionManager: logout() called');
         await firebase.auth().signOut();
     }
 }
 
 // Initialize singleton on page load
+console.log('SessionManager file: Document readyState:', document.readyState);
+
 if (document.readyState === 'loading') {
     console.log('SessionManager: Document loading, setting up DOMContentLoaded listener');
     document.addEventListener('DOMContentLoaded', () => {
