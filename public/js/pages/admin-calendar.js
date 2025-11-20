@@ -65,17 +65,22 @@ class CalendarManager {
         }
 
         if (deleteEventBtn && !deleteEventBtn.dataset.initialized) {
-            deleteEventBtn.addEventListener('click', () => this.deleteEvent(this.contextMenuEventId));
+            deleteEventBtn.addEventListener('click', () => {
+                this.deleteEvent(this.contextMenuEventId);
+            });
             deleteEventBtn.dataset.initialized = 'true';
         }
 
         // Close context menu when clicking elsewhere
-        document.addEventListener('click', (e) => {
-            const contextMenu = document.getElementById('contextMenu');
-            if (contextMenu && !e.target.closest('.event-item') && !e.target.closest('.context-menu')) {
-                this.hideContextMenu();
-            }
-        });
+        if (!document.body.dataset.contextMenuInitialized) {
+            document.addEventListener('click', (e) => {
+                const contextMenu = document.getElementById('contextMenu');
+                if (contextMenu && !e.target.closest('.event-item') && !e.target.closest('.context-menu')) {
+                    this.hideContextMenu();
+                }
+            });
+            document.body.dataset.contextMenuInitialized = 'true';
+        }
     }
 
     async loadCalendarEvents() {
@@ -127,21 +132,47 @@ class CalendarManager {
         // Add current month's days
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const dayEvents = this.events.filter(e => e.date === dateStr);
+            const dayEvents = this.events
+                .filter(e => e.date === dateStr)
+                .sort((a, b) => {
+                    const timeA = a.time || '00:00';
+                    const timeB = b.time || '00:00';
+                    return timeA.localeCompare(timeB);
+                });
             
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day';
             dayDiv.dataset.date = dateStr;
+            
+            let eventsHTML = dayEvents.map(e => {
+                const displayTime = e.time ? e.time : 'No time';
+                return `
+                    <div class="event-item" data-event-id="${e.id}">
+                        <div class="event-time">${displayTime}</div>
+                        <div class="event-client">${e.clientName}</div>
+                        <div class="event-test">${e.testType}</div>
+                        <div class="event-status status-${e.status}">${e.status}</div>
+                    </div>
+                `;
+            }).join('');
+
+            if (dayEvents.length > 3) {
+                eventsHTML = dayEvents.slice(0, 3).map(e => {
+                    const displayTime = e.time ? e.time : 'No time';
+                    return `
+                        <div class="event-item" data-event-id="${e.id}">
+                            <div class="event-time">${displayTime}</div>
+                            <div class="event-client">${e.clientName}</div>
+                        </div>
+                    `;
+                }).join('');
+                eventsHTML += `<div class="event-more">+${dayEvents.length - 3} more</div>`;
+            }
+            
             dayDiv.innerHTML = `
                 <div class="day-number">${day}</div>
                 <div class="day-events">
-                    ${dayEvents.map(e => `
-                        <div class="event-item" data-event-id="${e.id}" title="${e.clientName} - ${e.testType}">
-                            <div class="event-client">${e.clientName}</div>
-                            <div class="event-test">${e.testType}</div>
-                            <div class="event-status">${e.status}</div>
-                        </div>
-                    `).join('')}
+                    ${eventsHTML}
                 </div>
             `;
             
@@ -173,14 +204,18 @@ class CalendarManager {
         document.querySelectorAll('.event-item').forEach(item => {
             item.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const eventId = item.dataset.eventId;
-                this.editEvent(eventId);
+                // Only edit if not right-clicking
+                if (e.button === 0) {
+                    const eventId = item.dataset.eventId;
+                    this.editEvent(eventId);
+                }
             });
 
             item.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 const eventId = item.dataset.eventId;
+                console.log('Right-click on event:', eventId);
                 this.showContextMenu(e, eventId);
             });
         });
@@ -196,6 +231,7 @@ class CalendarManager {
             document.getElementById('modalTitle').textContent = 'Edit Event';
             document.getElementById('clientName').value = event.clientName;
             document.getElementById('date').value = event.date;
+            document.getElementById('time').value = event.time || '';
             document.getElementById('testType').value = event.testType;
             document.getElementById('status').value = event.status;
             document.getElementById('noShow').checked = event.noShow || false;
@@ -227,6 +263,7 @@ class CalendarManager {
         contextMenu.style.left = event.pageX + 'px';
         contextMenu.style.top = event.pageY + 'px';
         this.contextMenuEventId = eventId;
+        console.log('Context menu shown for event:', eventId);
     }
 
     hideContextMenu() {
@@ -241,6 +278,7 @@ class CalendarManager {
         const eventData = {
             clientName: document.getElementById('clientName').value,
             date: document.getElementById('date').value,
+            time: document.getElementById('time').value,
             testType: document.getElementById('testType').value,
             status: document.getElementById('status').value,
             noShow: document.getElementById('noShow').checked,

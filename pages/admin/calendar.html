@@ -70,6 +70,10 @@
 
                         <div class="form-row">
                             <div class="form-group">
+                                <label for="time">Time</label>
+                                <input type="time" id="time" required>
+                            </div>
+                            <div class="form-group">
                                 <label for="testType">Test Type</label>
                                 <select id="testType" required>
                                     <option value="">Select Test Type</option>
@@ -80,6 +84,9 @@
                                     <option value="breath">Breath Test</option>
                                 </select>
                             </div>
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select id="status" required>
@@ -89,13 +96,12 @@
                                     <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="form-group checkbox-group">
-                            <label for="noShow">
-                                <input type="checkbox" id="noShow">
-                                No Show
-                            </label>
+                            <div class="form-group checkbox-group">
+                                <label for="noShow">
+                                    <input type="checkbox" id="noShow">
+                                    No Show
+                                </label>
+                            </div>
                         </div>
 
                         <div class="form-actions">
