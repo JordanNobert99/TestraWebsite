@@ -76,17 +76,26 @@ class InventoryManager {
         const tbody = document.getElementById('inventoryTableBody');
         const emptyRow = document.getElementById('emptyRow');
 
-        if (!tbody || !emptyRow) {
-            console.error('InventoryManager: Table elements not found');
+        // Safety checks with better logging
+        if (!tbody) {
+            console.error('InventoryManager: inventoryTableBody element not found');
+            return;
+        }
+        if (!emptyRow) {
+            console.error('InventoryManager: emptyRow element not found');
             return;
         }
 
+        console.log('InventoryManager: renderTable - items count:', this.items.length);
+
         if (this.items.length === 0) {
+            console.log('InventoryManager: No items, showing empty state');
             emptyRow.style.display = 'table-row';
             tbody.innerHTML = '';
             return;
         }
 
+        console.log('InventoryManager: Rendering', this.items.length, 'items');
         emptyRow.style.display = 'none';
         tbody.innerHTML = this.items.map(item => `
             <tr>
@@ -102,6 +111,8 @@ class InventoryManager {
                 </td>
             </tr>
         `).join('');
+        
+        console.log('InventoryManager: Table rendered successfully');
     }
 
     getStatus(item) {
@@ -134,7 +145,11 @@ class InventoryManager {
 
     hideForm() {
         document.getElementById('inventoryForm').style.display = 'none';
-        document.getElementById('itemForm').reset();
+        // Reset only the form, not the entire form container
+        const form = document.getElementById('itemForm');
+        if (form) {
+            form.reset();
+        }
     }
 
     async handleSave(e) {
@@ -173,18 +188,26 @@ class InventoryManager {
                 
                 // Add to local array
                 this.items.push({ id: docRef.id, ...itemData });
+                console.log('InventoryManager: Item added with ID:', docRef.id);
             }
 
-            // Sort and re-render without reloading
+            // Sort in memory
             this.items.sort((a, b) => {
                 const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt);
                 const timeB = b.createdAt?.toDate?.() || new Date(b.createdAt);
                 return timeB - timeA;
             });
 
-            console.log('InventoryManager: Item saved successfully');
+            console.log('InventoryManager: Item saved successfully, total items now:', this.items.length);
+            
+            // Hide form BEFORE rendering table
             this.hideForm();
-            this.renderTable();
+            
+            // Give DOM time to update
+            setTimeout(() => {
+                console.log('InventoryManager: About to render table');
+                this.renderTable();
+            }, 50);
         } catch (error) {
             console.error('InventoryManager: Error saving item:', error);
             alert('Failed to save item: ' + error.message);
