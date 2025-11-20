@@ -39,7 +39,7 @@ class RegisterManager {
             });
             
             // Redirect to dashboard
-            window.location.href = 'dashboard.html';
+            window.location.href = './dashboard.html';
         } catch (error) {
             this.showError(this.getErrorMessage(error.code));
         }
