@@ -7,8 +7,19 @@ class ContactManager {
     }
 
     init() {
-        if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+        // Wait for Firebase to be ready
+        this.waitForFirebase(() => {
+            if (this.form) {
+                this.form.addEventListener('submit', (e) => this.handleSubmit(e));
+            }
+        });
+    }
+
+    waitForFirebase(callback) {
+        if (typeof firebase !== 'undefined' && firebase.firestore) {
+            callback();
+        } else {
+            setTimeout(() => this.waitForFirebase(callback), 100);
         }
     }
 
@@ -32,7 +43,7 @@ class ContactManager {
             this.form.style.display = 'none';
             this.successDiv.style.display = 'block';
             
-            // Optional: Reset form after 5 seconds
+            // Reset form after 5 seconds
             setTimeout(() => {
                 this.form.style.display = 'block';
                 this.successDiv.style.display = 'none';

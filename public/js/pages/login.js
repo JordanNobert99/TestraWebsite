@@ -6,8 +6,19 @@ class LoginManager {
     }
 
     init() {
-        if (this.form) {
-            this.form.addEventListener('submit', (e) => this.handleLogin(e));
+        // Wait for Firebase to be ready
+        this.waitForFirebase(() => {
+            if (this.form) {
+                this.form.addEventListener('submit', (e) => this.handleLogin(e));
+            }
+        });
+    }
+
+    waitForFirebase(callback) {
+        if (typeof firebase !== 'undefined' && firebase.auth) {
+            callback();
+        } else {
+            setTimeout(() => this.waitForFirebase(callback), 100);
         }
     }
 
