@@ -33,12 +33,13 @@ class CalendarManager {
         const form = document.getElementById('eventFormElement');
         const prevBtn = document.getElementById('prevMonth');
         const nextBtn = document.getElementById('nextMonth');
+        const todayBtn = document.getElementById('todayBtn');
         const modalOverlay = document.getElementById('modalOverlay');
         const deleteEventBtn = document.getElementById('deleteEventBtn');
         const monthViewBtn = document.getElementById('monthViewBtn');
         const weekViewBtn = document.getElementById('weekViewBtn');
         const timeSelect = document.getElementById('time');
-        
+
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideModal());
             cancelBtn.dataset.initialized = 'true';
@@ -48,7 +49,7 @@ class CalendarManager {
             closeModalBtn.addEventListener('click', () => this.hideModal());
             closeModalBtn.dataset.initialized = 'true';
         }
-        
+
         if (form && !form.dataset.initialized) {
             form.addEventListener('submit', (e) => this.handleSave(e));
             form.dataset.initialized = 'true';
@@ -62,6 +63,11 @@ class CalendarManager {
         if (nextBtn && !nextBtn.dataset.initialized) {
             nextBtn.addEventListener('click', () => this.nextPeriod());
             nextBtn.dataset.initialized = 'true';
+        }
+
+        if (todayBtn && !todayBtn.dataset.initialized) {
+            todayBtn.addEventListener('click', () => this.goToToday());
+            todayBtn.dataset.initialized = 'true';
         }
 
         if (modalOverlay && !modalOverlay.dataset.initialized) {
@@ -88,7 +94,7 @@ class CalendarManager {
         }
 
         if (timeSelect && !timeSelect.dataset.initialized) {
-            timeSelect.addEventListener('change', () => {});
+            timeSelect.addEventListener('change', () => { });
             timeSelect.dataset.initialized = 'true';
         }
 
@@ -99,6 +105,11 @@ class CalendarManager {
             });
             document.body.dataset.globalClickHandler = 'true';
         }
+    }
+
+    goToToday() {
+        this.currentDate = new Date();
+        this.renderCalendar();
     }
 
     generateTimeOptions() {
@@ -116,7 +127,7 @@ class CalendarManager {
         const timeSelect = document.getElementById('time');
         const times = this.generateTimeOptions();
         const currentValue = timeSelect.value;
-        
+
         timeSelect.innerHTML = '<option value="">Select Time</option>';
         times.forEach(time => {
             const option = document.createElement('option');
@@ -124,7 +135,7 @@ class CalendarManager {
             option.textContent = time;
             timeSelect.appendChild(option);
         });
-        
+
         if (currentValue) {
             timeSelect.value = currentValue;
         }
@@ -162,20 +173,20 @@ class CalendarManager {
         const calendar = document.getElementById('calendarGrid');
         const weekdaysHeader = document.getElementById('calendarWeekdays');
         if (!calendar || !weekdaysHeader) return;
-        
+
         weekdaysHeader.style.display = 'grid';
         calendar.innerHTML = '';
-        
+
         const year = this.currentDate.getFullYear();
         const month = this.currentDate.getMonth();
-        
-        document.getElementById('currentMonth').textContent = 
+
+        document.getElementById('currentMonth').textContent =
             this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        
+
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const daysInPrevMonth = new Date(year, month, 0).getDate();
-        
+
         for (let i = firstDay - 1; i >= 0; i--) {
             const day = daysInPrevMonth - i;
             const dayDiv = document.createElement('div');
@@ -183,7 +194,10 @@ class CalendarManager {
             dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
             calendar.appendChild(dayDiv);
         }
-        
+
+        const today = new Date();
+        const todayStr = this.formatDate(today);
+
         for (let day = 1; day <= daysInMonth; day++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             const dayEvents = this.events
@@ -193,14 +207,17 @@ class CalendarManager {
                     const timeB = b.time || '00:00';
                     return timeA.localeCompare(timeB);
                 });
-            
+
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day';
+            if (dateStr === todayStr) {
+                dayDiv.classList.add('today');
+            }
             dayDiv.dataset.date = dateStr;
-            
+
             let eventsHTML = '';
             const displayCount = dayEvents.length > 5 ? 5 : dayEvents.length;
-            
+
             eventsHTML = dayEvents.slice(0, displayCount).map(e => {
                 const displayTime = e.time ? e.time : '00:00';
                 return `
@@ -215,14 +232,14 @@ class CalendarManager {
             if (dayEvents.length > 5) {
                 eventsHTML += `<div class="event-more">+${dayEvents.length - 5} more</div>`;
             }
-            
+
             dayDiv.innerHTML = `
                 <div class="day-number">${day}</div>
                 <div class="day-events">
                     ${eventsHTML}
                 </div>
             `;
-            
+
             dayDiv.addEventListener('click', (e) => {
                 if (!e.target.closest('.event-item')) {
                     this.showModalForDate(dateStr);
@@ -245,10 +262,10 @@ class CalendarManager {
                     this.moveEventToDate(this.draggedEvent, dateStr);
                 }
             });
-            
+
             calendar.appendChild(dayDiv);
         }
-        
+
         const totalCells = calendar.children.length + daysInMonth;
         const remainingCells = 42 - totalCells;
         for (let day = 1; day <= remainingCells; day++) {
@@ -265,19 +282,22 @@ class CalendarManager {
         const calendar = document.getElementById('calendarGrid');
         const weekdaysHeader = document.getElementById('calendarWeekdays');
         if (!calendar || !weekdaysHeader) return;
-        
+
         calendar.innerHTML = '';
         weekdaysHeader.innerHTML = '';
-        
+
         const startOfWeek = this.getStartOfWeek(this.currentDate);
         const weekDays = [];
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-        
+
+        const today = new Date();
+        const todayStr = this.formatDate(today);
+
         for (let i = 0; i < 7; i++) {
             const date = new Date(startOfWeek);
             date.setDate(date.getDate() + i);
             weekDays.push(date);
-            
+
             const dayName = dayNames[date.getDay()];
             const dayNum = date.getDate();
             const header = document.createElement('div');
@@ -285,13 +305,13 @@ class CalendarManager {
             header.textContent = `${dayName} ${dayNum}`;
             weekdaysHeader.appendChild(header);
         }
-        
+
         const monthYear = this.currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        document.getElementById('currentMonth').textContent = 
+        document.getElementById('currentMonth').textContent =
             `${monthYear} - Week of ${weekDays[0].toLocaleDateString()}`;
-        
+
         calendar.classList.add('week-view');
-        
+
         for (const date of weekDays) {
             const dateStr = this.formatDate(date);
             const dayEvents = this.events
@@ -301,11 +321,14 @@ class CalendarManager {
                     const timeB = b.time || '00:00';
                     return timeA.localeCompare(timeB);
                 });
-            
+
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day week-day';
+            if (dateStr === todayStr) {
+                dayDiv.classList.add('today');
+            }
             dayDiv.dataset.date = dateStr;
-            
+
             const eventsHTML = dayEvents.map(e => {
                 const displayTime = e.time ? e.time : '00:00';
                 return `
@@ -316,9 +339,9 @@ class CalendarManager {
                     </div>
                 `;
             }).join('');
-            
+
             dayDiv.innerHTML = `<div class="day-events">${eventsHTML}</div>`;
-            
+
             dayDiv.addEventListener('click', (e) => {
                 if (!e.target.closest('.event-item')) {
                     this.showModalForDate(dateStr);
@@ -341,7 +364,7 @@ class CalendarManager {
                     this.moveEventToDate(this.draggedEvent, dateStr);
                 }
             });
-            
+
             calendar.appendChild(dayDiv);
         }
 
@@ -361,15 +384,15 @@ class CalendarManager {
 
     switchView(view) {
         this.currentView = view;
-        
+
         document.querySelectorAll('.view-btn').forEach(btn => {
             btn.classList.remove('active');
         });
         document.querySelector(`[data-view="${view}"]`).classList.add('active');
-        
+
         const calendar = document.getElementById('calendarGrid');
         calendar.classList.remove('week-view');
-        
+
         this.renderCalendar();
     }
 
@@ -407,7 +430,7 @@ class CalendarManager {
         document.getElementById('modalOverlay').style.display = 'block';
         document.getElementById('eventModal').style.display = 'block';
         this.populateTimeSelect();
-        
+
         if (id) {
             this.editingId = id;
             const event = this.events.find(e => e.id === id);
@@ -431,7 +454,7 @@ class CalendarManager {
         document.getElementById('modalTitle').textContent = 'Add New Event';
         document.getElementById('eventFormElement').reset();
         document.getElementById('date').value = dateStr;
-        
+
         this.populateTimeSelect();
         const now = new Date();
         const roundedTime = this.roundToNextQuarter(now);
@@ -463,17 +486,17 @@ class CalendarManager {
     roundToNextQuarter(date) {
         const hours = date.getHours();
         let minutes = date.getMinutes();
-        
+
         minutes = Math.ceil(minutes / 15) * 15;
-        
+
         if (minutes === 60) {
             minutes = 0;
             date.setHours(hours + 1);
         }
-        
+
         date.setMinutes(minutes);
         date.setSeconds(0);
-        
+
         return date.toTimeString().slice(0, 5);
     }
 
@@ -486,13 +509,13 @@ class CalendarManager {
                     date: newDate,
                     updatedAt: new Date()
                 });
-            
+
             const index = this.events.findIndex(e => e.id === eventId);
             if (index !== -1) {
                 this.events[index].date = newDate;
                 this.events[index].updatedAt = new Date();
             }
-            
+
             this.renderCalendar();
         } catch (error) {
             console.error('CalendarManager: Error moving event:', error);
@@ -520,7 +543,7 @@ class CalendarManager {
                     .collection('calendar_events')
                     .doc(this.editingId)
                     .update(eventData);
-                
+
                 const index = this.events.findIndex(e => e.id === this.editingId);
                 if (index !== -1) {
                     this.events[index] = { id: this.editingId, ...eventData };
@@ -530,10 +553,10 @@ class CalendarManager {
                 const docRef = await firebase.firestore()
                     .collection('calendar_events')
                     .add(eventData);
-                
+
                 this.events.push({ id: docRef.id, ...eventData });
             }
-            
+
             if (eventData.status === 'completed' && !eventData.noShow) {
                 await this.updateInventoryFromEvent(eventData);
             }
@@ -600,9 +623,9 @@ class CalendarManager {
                     .collection('calendar_events')
                     .doc(id)
                     .delete();
-                
+
                 this.events = this.events.filter(e => e.id !== id);
-                
+
                 this.hideContextMenu();
                 this.renderCalendar();
             } catch (error) {

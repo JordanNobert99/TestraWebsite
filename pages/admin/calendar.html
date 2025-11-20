@@ -122,12 +122,17 @@
             <!-- Calendar View -->
             <div class="calendar-section">
                 <div class="calendar-header">
-                    <button id="prevMonth" class="btn-nav-btn">&larr;</button>
-                    <h2 id="currentMonth"></h2>
-                    <button id="nextMonth" class="btn-nav-btn">&rarr;</button>
-                    <div class="view-toggle">
-                        <button id="monthViewBtn" class="view-btn active" data-view="month">Month</button>
-                        <button id="weekViewBtn" class="view-btn" data-view="week">Week</button>
+                    <div class="nav-controls">
+                        <button id="prevMonth" class="btn-nav-btn">&larr;</button>
+                        <h2 id="currentMonth"></h2>
+                        <button id="nextMonth" class="btn-nav-btn">&rarr;</button>
+                    </div>
+                    <div class="view-controls">
+                        <button id="todayBtn" class="btn-today">Today</button>
+                        <div class="view-toggle">
+                            <button id="monthViewBtn" class="view-btn active" data-view="month">Month</button>
+                            <button id="weekViewBtn" class="view-btn" data-view="week">Week</button>
+                        </div>
                     </div>
                 </div>
 
