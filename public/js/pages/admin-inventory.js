@@ -48,7 +48,7 @@ class InventoryManager {
     async loadInventory() {
         try {
             console.log('InventoryManager: Loading inventory for user:', this.currentUser.uid);
-            // Simplified query - just filter by userId, don't order by createdAt
+            // Get all inventory items for this user (no orderBy needed)
             const snapshot = await firebase.firestore()
                 .collection('inventory')
                 .where('userId', '==', this.currentUser.uid)

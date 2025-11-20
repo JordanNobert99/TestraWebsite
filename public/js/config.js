@@ -15,8 +15,3 @@ firebase.initializeApp(firebaseConfig);
 // Export for use in other modules
 window.firebaseAuth = firebase.auth();
 window.firebaseDB = firebase.firestore();
-
-// Only export storage if the script is loaded
-if (typeof firebase.storage === 'function') {
-    window.firebaseStorage = firebase.storage();
-}
