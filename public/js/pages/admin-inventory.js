@@ -3,24 +3,22 @@ class InventoryManager {
         this.currentUser = null;
         this.items = [];
         this.editingId = null;
-        this.sessionUnsubscribe = null;
         this.init();
     }
 
     init() {
-        // Get or create session manager
-        const session = new SessionManager();
-        
-        // Subscribe to auth changes
-        this.sessionUnsubscribe = session.subscribe((user) => {
+        // Directly use Firebase's onAuthStateChanged
+        firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 this.currentUser = user;
+                console.log('InventoryManager: User logged in:', user.email);
                 document.getElementById('userEmail').textContent = user.email;
                 this.loadInventory();
                 this.setupEventListeners();
                 this.setupLogout();
             } else {
                 // User is not authenticated, redirect to login
+                console.log('InventoryManager: User not authenticated, redirecting to login');
                 window.location.href = '../../pages/login.html';
             }
         });
@@ -49,6 +47,7 @@ class InventoryManager {
 
     async loadInventory() {
         try {
+            console.log('InventoryManager: Loading inventory for user:', this.currentUser.uid);
             const snapshot = await firebase.firestore()
                 .collection('inventory')
                 .where('userId', '==', this.currentUser.uid)
@@ -60,9 +59,10 @@ class InventoryManager {
                 ...doc.data()
             }));
 
+            console.log('InventoryManager: Loaded', this.items.length, 'items');
             this.renderTable();
         } catch (error) {
-            console.error('Error loading inventory:', error);
+            console.error('InventoryManager: Error loading inventory:', error);
         }
     }
 
@@ -139,23 +139,27 @@ class InventoryManager {
         };
 
         try {
+            console.log('InventoryManager: Saving item:', itemData);
             if (this.editingId) {
+                console.log('InventoryManager: Updating existing item:', this.editingId);
                 await firebase.firestore()
                     .collection('inventory')
                     .doc(this.editingId)
                     .update(itemData);
             } else {
+                console.log('InventoryManager: Adding new item');
                 itemData.createdAt = new Date();
                 await firebase.firestore()
                     .collection('inventory')
                     .add(itemData);
             }
 
+            console.log('InventoryManager: Item saved successfully');
             this.hideForm();
             this.loadInventory();
         } catch (error) {
-            console.error('Error saving item:', error);
-            alert('Failed to save item');
+            console.error('InventoryManager: Error saving item:', error);
+            alert('Failed to save item: ' + error.message);
         }
     }
 
@@ -171,7 +175,7 @@ class InventoryManager {
                 .delete()
                 .then(() => this.loadInventory())
                 .catch(error => {
-                    console.error('Error deleting item:', error);
+                    console.error('InventoryManager: Error deleting item:', error);
                     alert('Failed to delete item');
                 });
         }
@@ -179,22 +183,20 @@ class InventoryManager {
 
     setupLogout() {
         const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn && !logoutBtn.dataset.initialized) {
+        if (logoutBtn) {
             logoutBtn.addEventListener('click', async () => {
-                const session = new SessionManager();
-                await session.logout();
+                try {
+                    console.log('InventoryManager: Logout clicked');
+                    await firebase.auth().signOut();
+                } catch (error) {
+                    console.error('InventoryManager: Error logging out:', error);
+                }
             });
-            logoutBtn.dataset.initialized = 'true';
-        }
-    }
-
-    destroy() {
-        if (this.sessionUnsubscribe) {
-            this.sessionUnsubscribe();
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('InventoryManager: DOM ready, initializing');
     window.inventoryManager = new InventoryManager();
 });
