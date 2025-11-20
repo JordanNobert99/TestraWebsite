@@ -1,0 +1,14 @@
+{
+  "name": "testra",
+  "version": "1.0.0",
+  "description": "Testra - Professional business services",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo Building Testra..."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {}
+}

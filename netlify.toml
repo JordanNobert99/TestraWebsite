@@ -1,6 +1,5 @@
 # Build configuration
 [build]
-  command = "echo Building Testra..."
   functions = "netlify/functions"
   publish = "."
 
