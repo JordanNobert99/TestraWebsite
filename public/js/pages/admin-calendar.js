@@ -38,6 +38,7 @@ class CalendarManager {
         const deleteEventBtn = document.getElementById('deleteEventBtn');
         const monthViewBtn = document.getElementById('monthViewBtn');
         const weekViewBtn = document.getElementById('weekViewBtn');
+        const contextMenu = document.getElementById('contextMenu');
 
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideModal());
@@ -92,10 +93,20 @@ class CalendarManager {
             weekViewBtn.dataset.initialized = 'true';
         }
 
+        // Context menu click handler - prevent closing when clicking menu items
+        if (contextMenu && !contextMenu.dataset.initialized) {
+            contextMenu.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
+            contextMenu.dataset.initialized = 'true';
+        }
+
         // Global click handler to close context menu
         if (!document.body.dataset.globalClickHandler) {
             document.addEventListener('click', (e) => {
-                this.hideContextMenu();
+                if (!e.target.closest('.context-menu')) {
+                    this.hideContextMenu();
+                }
             });
             document.body.dataset.globalClickHandler = 'true';
         }
@@ -158,8 +169,11 @@ class CalendarManager {
     getEventClasses(event) {
         let classes = 'event-item';
         
+        // Determine event type (with fallback to drug-testing for older events)
+        const eventType = event.eventType || 'drug-testing';
+        
         // Add event type class for base color
-        if (event.eventType === 'drug-testing') {
+        if (eventType === 'drug-testing') {
             if (event.noShow) {
                 classes += ' status-no-show';
             } else if (event.status === 'scheduled') {
@@ -168,13 +182,19 @@ class CalendarManager {
                 classes += ' status-completed';
             } else if (event.status === 'cancelled') {
                 classes += ' status-cancelled';
+            } else {
+                // Fallback color for undefined status
+                classes += ' status-scheduled';
             }
-        } else if (event.eventType === 'consultation') {
+        } else if (eventType === 'consultation') {
             classes += ' type-consultation';
-        } else if (event.eventType === 'follow-up') {
+        } else if (eventType === 'follow-up') {
             classes += ' type-followup';
-        } else if (event.eventType === 'other') {
+        } else if (eventType === 'other') {
             classes += ' type-other';
+        } else {
+            // Fallback for unknown event types
+            classes += ' status-scheduled';
         }
 
         if (this.isEventPast(event.date, event.time)) {
@@ -435,6 +455,7 @@ class CalendarManager {
                 e.preventDefault();
                 e.stopPropagation();
                 const eventId = item.dataset.eventId;
+                console.log('Right-click on event:', eventId);
                 this.showContextMenu(e, item);
             });
 
