@@ -169,7 +169,9 @@ class InventoryManager {
             }
 
             console.log('InventoryManager: Item saved successfully');
-            window.location.reload(); // Reload the page
+            this.hideForm();
+            // Reload after form is hidden
+            setTimeout(() => window.location.reload(), 300);
         } catch (error) {
             console.error('InventoryManager: Error saving item:', error);
             alert('Failed to save item: ' + error.message);
@@ -190,7 +192,8 @@ class InventoryManager {
                     .delete();
                 
                 console.log('InventoryManager: Item deleted successfully');
-                window.location.reload(); // Reload the page
+                // Reload after deletion
+                setTimeout(() => window.location.reload(), 300);
             } catch (error) {
                 console.error('InventoryManager: Error deleting item:', error);
                 alert('Failed to delete item: ' + error.message);
