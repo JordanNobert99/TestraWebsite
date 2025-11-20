@@ -1,0 +1,132 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Web Design - Testra</title>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../public/css/variables.css">
+    <link rel="stylesheet" href="../../public/css/base.css">
+    <link rel="stylesheet" href="../../public/css/navbar.css">
+    <link rel="stylesheet" href="../../public/css/buttons.css">
+    <link rel="stylesheet" href="../../public/css/forms.css">
+    <link rel="stylesheet" href="../../public/css/cards.css">
+    <link rel="stylesheet" href="../../public/css/sections.css">
+    <link rel="stylesheet" href="../../public/css/animations.css">
+    <link rel="stylesheet" href="../../public/css/responsive.css">
+    <link rel="stylesheet" href="../../public/css/service-pages.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <a href="../../index.html">
+                    <img src="../../public/images/logo.svg" alt="Testra Logo" class="logo">
+                    <span class="logo-text">Testra</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html#services">Services</a></li>
+                <li><a href="../../index.html#about">About</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+                <li><a href="../login.html" class="btn-nav-login">Login</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <button class="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Custom Web Design</h1>
+            <p>Build your online presence with our intuitive website builder</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="service-detail">
+            <div class="container">
+                <div class="service-intro">
+                    <h2>Modern Websites Made Easy</h2>
+                    <p>Create a professional website without coding knowledge. Our drag-and-drop builder lets you design, customize, and launch your site in minutes.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🎨</span>
+                        <h3>Drag & Drop Builder</h3>
+                        <p>Easy-to-use interface. No coding required. Design like a pro.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📱</span>
+                        <h3>Mobile Responsive</h3>
+                        <p>Your site looks perfect on all devices - desktop, tablet, and mobile.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">⚡</span>
+                        <h3>Fast & Optimized</h3>
+                        <p>Lightning-fast loading speeds and optimized performance out of the box.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔍</span>
+                        <h3>SEO Ready</h3>
+                        <p>Built-in SEO tools to help your site rank higher in search results.</p>
+                    </div>
+                </div>
+
+                <div class="builder-cta">
+                    <h2>Ready to Build?</h2>
+                    <p>Create your website now or get a custom design from our experts.</p>
+                    <div class="cta-buttons">
+                        <a href="../website-builder.html" class="btn-primary">Start Building</a>
+                        <a href="../contact.html?service=web-design" class="btn-secondary">Request Custom Design</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Testra</h4>
+                    <p>Professional business services</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="drug-testing.html">Drug Testing</a></li>
+                        <li><a href="web-design.html">Web Design</a></li>
+                        <li><a href="graphic-design.html">Graphic Design</a></li>
+                        <li><a href="it-services.html">IT Services</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../contact.html">Contact</a></li>
+                        <li><a href="../login.html">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Testra. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="../../public/js/config.js"></script>
+    <script src="../../public/js/theme-switcher.js"></script>
+    <script src="../../public/js/utils.js"></script>
+</body>
+</html>

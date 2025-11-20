@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphic Design - Testra</title>
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="../../public/css/variables.css">
+    <link rel="stylesheet" href="../../public/css/base.css">
+    <link rel="stylesheet" href="../../public/css/navbar.css">
+    <link rel="stylesheet" href="../../public/css/buttons.css">
+    <link rel="stylesheet" href="../../public/css/forms.css">
+    <link rel="stylesheet" href="../../public/css/cards.css">
+    <link rel="stylesheet" href="../../public/css/sections.css">
+    <link rel="stylesheet" href="../../public/css/animations.css">
+    <link rel="stylesheet" href="../../public/css/responsive.css">
+    <link rel="stylesheet" href="../../public/css/service-pages.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-logo">
+                <a href="../../index.html">
+                    <img src="../../public/images/logo.svg" alt="Testra Logo" class="logo">
+                    <span class="logo-text">Testra</span>
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="../../index.html#services">Services</a></li>
+                <li><a href="../../index.html#about">About</a></li>
+                <li><a href="../contact.html">Contact</a></li>
+                <li><a href="../login.html" class="btn-nav-login">Login</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                <span class="theme-icon">🌙</span>
+            </button>
+            <button class="nav-mobile-toggle" id="mobileMenuToggle" aria-label="Toggle mobile menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="container">
+            <h1>Professional Graphic Design</h1>
+            <p>Creative branding and design solutions for your business</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="service-detail">
+            <div class="container">
+                <div class="service-intro">
+                    <h2>Design That Makes an Impact</h2>
+                    <p>Stand out from the competition with custom graphic design tailored to your brand. From logos to marketing materials, we create designs that tell your story.</p>
+                </div>
+
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🎯</span>
+                        <h3>Brand Identity</h3>
+                        <p>Cohesive branding across all your marketing materials and platforms.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🖼️</span>
+                        <h3>Logo Design</h3>
+                        <p>Memorable logos that represent your brand's values and vision.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📄</span>
+                        <h3>Marketing Materials</h3>
+                        <p>Flyers, brochures, business cards, and more - professionally designed.</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">✨</span>
+                        <h3>Custom Illustrations</h3>
+                        <p>Unique, original artwork tailored to your brand and message.</p>
+                    </div>
+                </div>
+
+                <div class="pricing-section">
+                    <h2>Let's Create Something Amazing</h2>
+                    <p>Contact us to discuss your graphic design needs and get a personalized quote.</p>
+                    <a href="../contact.html?service=graphic-design" class="btn-primary">Request Design Services</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Testra</h4>
+                    <p>Professional business services</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="drug-testing.html">Drug Testing</a></li>
+                        <li><a href="web-design.html">Web Design</a></li>
+                        <li><a href="graphic-design.html">Graphic Design</a></li>
+                        <li><a href="it-services.html">IT Services</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="../contact.html">Contact</a></li>
+                        <li><a href="../login.html">Login</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Testra. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+    <script src="../../public/js/config.js"></script>
+    <script src="../../public/js/theme-switcher.js"></script>
+    <script src="../../public/js/utils.js"></script>
+</body>
+</html>
