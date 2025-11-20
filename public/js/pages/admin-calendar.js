@@ -25,16 +25,10 @@ class CalendarManager {
     }
 
     setupEventListeners() {
-        const addBtn = document.getElementById('addEventBtn');
         const cancelBtn = document.getElementById('cancelBtn');
         const form = document.getElementById('eventFormElement');
         const prevBtn = document.getElementById('prevMonth');
         const nextBtn = document.getElementById('nextMonth');
-        
-        if (addBtn && !addBtn.dataset.initialized) {
-            addBtn.addEventListener('click', () => this.showForm());
-            addBtn.dataset.initialized = 'true';
-        }
         
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideForm());
@@ -71,7 +65,7 @@ class CalendarManager {
             }));
 
             console.log('CalendarManager: Loaded', this.events.length, 'events');
-            this.renderEventList();
+            this.renderCalendarDays();
         } catch (error) {
             console.error('CalendarManager: Error loading events:', error);
         }
@@ -110,16 +104,28 @@ class CalendarManager {
             
             const dayDiv = document.createElement('div');
             dayDiv.className = 'calendar-day';
+            dayDiv.dataset.date = dateStr;
             dayDiv.innerHTML = `
                 <div class="day-number">${day}</div>
                 <div class="day-events">
                     ${dayEvents.map(e => `
-                        <div class="event-item" title="${e.clientName} - ${e.testType}">
+                        <div class="event-item" data-event-id="${e.id}" title="${e.clientName} - ${e.testType}">
                             ${e.clientName}
                         </div>
                     `).join('')}
                 </div>
             `;
+            
+            // Add click listener to day
+            dayDiv.addEventListener('click', (e) => {
+                // Only open form if clicking the day itself, not on an event
+                if (e.target.closest('.event-item')) {
+                    const eventId = e.target.closest('.event-item').dataset.eventId;
+                    this.editEvent(eventId);
+                } else {
+                    this.showFormForDate(dateStr);
+                }
+            });
             
             calendar.appendChild(dayDiv);
         }
@@ -133,38 +139,6 @@ class CalendarManager {
             dayDiv.innerHTML = `<div class="day-number">${day}</div>`;
             calendar.appendChild(dayDiv);
         }
-    }
-
-    renderEventList() {
-        const tbody = document.getElementById('eventsTableBody');
-        const emptyRow = document.getElementById('emptyRow');
-
-        if (!tbody) return;
-
-        // Sort events by date
-        const sortedEvents = [...this.events].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-        if (sortedEvents.length === 0) {
-            if (emptyRow) emptyRow.style.display = 'table-row';
-            tbody.innerHTML = '';
-            return;
-        }
-
-        if (emptyRow) emptyRow.style.display = 'none';
-        
-        tbody.innerHTML = sortedEvents.map(event => `
-            <tr>
-                <td>${event.date}</td>
-                <td>${event.clientName}</td>
-                <td>${event.testType}</td>
-                <td><span class="status-badge status-${event.status}">${event.status}</span></td>
-                <td>${event.noShow ? 'Yes' : 'No'}</td>
-                <td class="actions">
-                    <button class="btn-small" onclick="calendarManager.editEvent('${event.id}')">Edit</button>
-                    <button class="btn-small btn-danger" onclick="calendarManager.deleteEvent('${event.id}')">Delete</button>
-                </td>
-            </tr>
-        `).join('');
     }
 
     showForm(id = null) {
@@ -184,6 +158,14 @@ class CalendarManager {
             document.getElementById('eventFormElement').reset();
             this.editingId = null;
         }
+    }
+
+    showFormForDate(dateStr) {
+        document.getElementById('eventFormContainer').style.display = 'block';
+        document.getElementById('formTitle').textContent = 'Add New Event';
+        document.getElementById('eventFormElement').reset();
+        document.getElementById('date').value = dateStr;
+        this.editingId = null;
     }
 
     hideForm() {
@@ -238,7 +220,6 @@ class CalendarManager {
 
             this.hideForm();
             setTimeout(() => {
-                this.renderEventList();
                 this.renderCalendarDays();
             }, 50);
         } catch (error) {
@@ -316,7 +297,6 @@ class CalendarManager {
                 this.events = this.events.filter(e => e.id !== id);
                 
                 console.log('CalendarManager: Event deleted successfully');
-                this.renderEventList();
                 this.renderCalendarDays();
             } catch (error) {
                 console.error('CalendarManager: Error deleting event:', error);

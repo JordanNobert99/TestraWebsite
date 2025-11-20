@@ -44,7 +44,6 @@
         <div class="container">
             <div class="admin-header">
                 <h1>Drug Test Calendar</h1>
-                <button id="addEventBtn" class="btn-primary">+ Add Event</button>
             </div>
 
             <!-- Add/Edit Form Modal -->
@@ -119,30 +118,6 @@
                 </div>
 
                 <div class="calendar-grid" id="calendarGrid"></div>
-            </div>
-
-            <!-- Events Table -->
-            <div class="events-section">
-                <h2>Upcoming Tests</h2>
-                <div class="events-table-wrapper">
-                    <table class="events-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Client Name</th>
-                                <th>Test Type</th>
-                                <th>Status</th>
-                                <th>No Show</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="eventsTableBody">
-                            <tr id="emptyRow">
-                                <td colspan="6" class="empty-state">No events scheduled.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </main>
