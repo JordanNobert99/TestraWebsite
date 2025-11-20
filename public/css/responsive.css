@@ -1,0 +1,84 @@
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.25rem; }
+
+    .navbar .container {
+        padding: 1rem 20px;
+    }
+
+    .nav-links {
+        display: none;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background-color: var(--bg-secondary);
+        flex-direction: column;
+        gap: 0;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .nav-links.active {
+        display: flex;
+    }
+
+    .nav-links li {
+        padding: 0.75rem 0;
+    }
+
+    .nav-mobile-toggle {
+        display: flex;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 4rem 0;
+    }
+
+    .hero h1 {
+        font-size: 1.75rem;
+    }
+
+    .hero p {
+        font-size: 1rem;
+    }
+
+    .services-grid,
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .nav-links {
+        gap: 0;
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    button {
+        font-size: 1rem;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        padding: 0.65rem;
+    }
+}

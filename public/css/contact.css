@@ -1,0 +1,19 @@
+/* Contact Page */
+.contact-container {
+    min-height: calc(100vh - 140px);
+    padding: 4rem 0;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.contact-header h1 {
+    margin-bottom: 1rem;
+}
+
+.contact-content {
+    max-width: 600px;
+    margin: 0 auto;
+}

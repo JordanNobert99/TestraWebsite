@@ -1,0 +1,90 @@
+/* Form Styles */
+.contact-form,
+.auth-form {
+    max-width: 500px;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-checkbox,
+.form-remember {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.form-checkbox input,
+.form-remember input {
+    width: auto;
+    cursor: pointer;
+}
+
+.form-checkbox label,
+.form-remember label {
+    margin: 0;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+/* Form Messages */
+.auth-error,
+.contact-error {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+    border: 1px solid #fecaca;
+}
+
+.contact-success {
+    background-color: #dcfce7;
+    color: #166534;
+    padding: 1rem;
+    border-radius: 6px;
+    border: 1px solid #bbf7d0;
+    text-align: center;
+}
