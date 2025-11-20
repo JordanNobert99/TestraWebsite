@@ -16,7 +16,6 @@ class SessionManager {
         this.currentUser = null;
         this.listeners = [];
         this.initialized = false;
-        this.authStateCallbacks = []; // Queue for auth state changes
         
         this.waitForFirebase();
         SessionManager.instance = this;
@@ -61,24 +60,22 @@ class SessionManager {
      * Returns unsubscribe function
      */
     subscribe(callback) {
-        console.log('SessionManager: subscribe() called, total listeners before:', this.listeners.length);
+        console.log('SessionManager: subscribe() called');
         
-        // Add listener to array
+        // Add listener to array FIRST
         this.listeners.push(callback);
-        console.log('SessionManager: Listener added, total listeners after:', this.listeners.length);
+        console.log('SessionManager: Listener added, total listeners:', this.listeners.length);
         
         console.log('SessionManager: Initialized?', this.initialized, 'CurrentUser?', this.currentUser ? this.currentUser.email : 'null');
         
-        // Immediately call if already initialized (auth state is known)
+        // CRITICAL: If already initialized, call callback immediately
+        // This handles the case where onAuthStateChanged already fired
         if (this.initialized) {
-            console.log('SessionManager: Already initialized, immediately calling callback');
-            // Use setTimeout to ensure it's async
-            setTimeout(() => {
-                console.log('SessionManager: Executing immediate callback with user:', this.currentUser ? this.currentUser.email : 'null');
-                callback(this.currentUser);
-            }, 0);
+            console.log('SessionManager: Already initialized, calling callback immediately with:', this.currentUser ? this.currentUser.email : 'null');
+            // Call synchronously since state is already known
+            callback(this.currentUser);
         } else {
-            console.log('SessionManager: Not yet initialized, callback will be called when auth state is determined');
+            console.log('SessionManager: Not yet initialized, waiting for onAuthStateChanged');
         }
         
         // Return unsubscribe function
