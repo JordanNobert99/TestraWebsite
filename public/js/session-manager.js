@@ -44,7 +44,11 @@ class SessionManager {
             // Notify all listeners
             this.listeners.forEach((callback, index) => {
                 console.log('SessionManager: Calling listener', index);
-                callback(user);
+                try {
+                    callback(user);
+                } catch (error) {
+                    console.error('SessionManager: Error calling listener', index, error);
+                }
             });
         });
     }
@@ -54,24 +58,25 @@ class SessionManager {
      * Returns unsubscribe function
      */
     subscribe(callback) {
-        console.log('SessionManager: subscribe() called');
+        console.log('SessionManager: subscribe() called, listeners before:', this.listeners.length);
+        
+        // Add listener to array
         this.listeners.push(callback);
+        console.log('SessionManager: Listener added, listeners after:', this.listeners.length);
         
         console.log('SessionManager: Initialized?', this.initialized, 'CurrentUser?', this.currentUser ? this.currentUser.email : 'null');
         
-        // Immediately call if already initialized with a user
-        if (this.initialized && this.currentUser) {
-            console.log('SessionManager: Immediately calling callback with current user');
-            callback(this.currentUser);
-        } else if (this.initialized && !this.currentUser) {
-            // User is logged out
-            console.log('SessionManager: Immediately calling callback with null (user logged out)');
-            callback(null);
+        // Immediately call if already initialized
+        if (this.initialized) {
+            console.log('SessionManager: Already initialized, immediately calling callback with:', this.currentUser ? this.currentUser.email : 'null');
+            setTimeout(() => callback(this.currentUser), 0);
+        } else {
+            console.log('SessionManager: Not yet initialized, waiting for onAuthStateChanged');
         }
-        // If not initialized yet, wait for onAuthStateChanged to fire
         
         // Return unsubscribe function
         return () => {
+            console.log('SessionManager: Unsubscribe called');
             this.listeners = this.listeners.filter(cb => cb !== callback);
         };
     }
