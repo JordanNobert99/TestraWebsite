@@ -30,36 +30,38 @@ class RegisterManager {
         const confirmPassword = document.getElementById('confirmPassword').value;
         const fullName = document.getElementById('fullName').value;
         
-        // Validate passwords match
         if (password !== confirmPassword) {
             this.showError('Passwords do not match');
             return;
         }
         
         try {
-            console.log('Creating user with email:', email);
-            
-            // Create user in Firebase
+            console.log('Step 1: Creating auth user with email:', email);
             const result = await firebase.auth().createUserWithEmailAndPassword(email, password);
-            console.log('User created successfully:', result.user.uid);
+            console.log('Step 2: Auth user created, UID:', result.user.uid);
             
-            // Store user data in Firestore
-            console.log('Attempting to write to Firestore...');
-            await firebase.firestore().collection('users').doc(result.user.uid).set({
+            console.log('Step 3: Starting Firestore write...');
+            const userRef = firebase.firestore().collection('users').doc(result.user.uid);
+            
+            await userRef.set({
                 email: email,
                 fullName: fullName,
                 role: 'customer',
-                createdAt: new Date(),
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 emailVerified: false
             });
-            console.log('Firestore write successful');
+            
+            console.log('Step 4: Firestore write successful!');
             
             // Redirect to dashboard
             window.location.href = './dashboard.html';
         } catch (error) {
-            console.error('Full error object:', error);
-            console.error('Error code:', error.code);
-            console.error('Error message:', error.message);
+            console.error('=== FULL ERROR ===');
+            console.error('Error Code:', error.code);
+            console.error('Error Message:', error.message);
+            console.error('Full Error:', error);
+            console.error('=================');
+            
             this.showError(this.getErrorMessage(error.code, error.message));
         }
     }
@@ -76,14 +78,13 @@ class RegisterManager {
             'auth/weak-password': 'Password must be at least 6 characters',
             'auth/operation-not-allowed': 'Registration is currently disabled',
             'auth/too-many-requests': 'Too many registration attempts. Please try again later.',
-            'permission-denied': 'Database permission error - check Firestore rules',
-            'failed-precondition': 'Database not initialized properly'
+            'permission-denied': 'Firestore permission denied - check security rules',
+            'failed-precondition': 'Firestore database not ready'
         };
-        return errors[code] || `Registration failed: ${message}`;
+        return errors[code] || `Error: ${message}`;
     }
 }
 
-// Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     new RegisterManager();
 });
