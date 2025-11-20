@@ -36,22 +36,25 @@ class SessionManager {
         console.log('SessionManager: init() called, setting up onAuthStateChanged');
         firebase.auth().onAuthStateChanged((user) => {
             console.log('SessionManager: onAuthStateChanged fired, user:', user ? user.email : 'null');
+            console.log('SessionManager: Setting initialized to true');
             
             this.currentUser = user;
             this.initialized = true;
             
-            console.log('SessionManager: Current listeners:', this.listeners.length);
+            console.log('SessionManager: Current listeners before notification:', this.listeners.length);
             console.log('SessionManager: Notifying', this.listeners.length, 'listeners');
             
             // Notify all current listeners
             this.listeners.forEach((callback, index) => {
-                console.log('SessionManager: Calling listener', index);
+                console.log('SessionManager: Calling listener', index, 'with user:', user ? user.email : 'null');
                 try {
                     callback(user);
                 } catch (error) {
                     console.error('SessionManager: Error calling listener', index, error);
                 }
             });
+            
+            console.log('SessionManager: Done notifying listeners');
         });
     }
 
@@ -60,22 +63,19 @@ class SessionManager {
      * Returns unsubscribe function
      */
     subscribe(callback) {
-        console.log('SessionManager: subscribe() called');
+        console.log('SessionManager: subscribe() called, current state - initialized:', this.initialized, 'currentUser:', this.currentUser ? this.currentUser.email : 'null');
         
-        // Add listener to array FIRST
+        // Add listener to array immediately
         this.listeners.push(callback);
-        console.log('SessionManager: Listener added, total listeners:', this.listeners.length);
+        console.log('SessionManager: Callback added to listeners array. Total listeners now:', this.listeners.length);
         
-        console.log('SessionManager: Initialized?', this.initialized, 'CurrentUser?', this.currentUser ? this.currentUser.email : 'null');
-        
-        // CRITICAL: If already initialized, call callback immediately
-        // This handles the case where onAuthStateChanged already fired
+        // If already initialized, call the callback immediately with current state
         if (this.initialized) {
-            console.log('SessionManager: Already initialized, calling callback immediately with:', this.currentUser ? this.currentUser.email : 'null');
-            // Call synchronously since state is already known
+            console.log('SessionManager: IMMEDIATELY calling callback with currentUser:', this.currentUser ? this.currentUser.email : 'null');
             callback(this.currentUser);
+            console.log('SessionManager: Immediate callback execution completed');
         } else {
-            console.log('SessionManager: Not yet initialized, waiting for onAuthStateChanged');
+            console.log('SessionManager: Not initialized yet, callback will be called by onAuthStateChanged listener');
         }
         
         // Return unsubscribe function
@@ -109,15 +109,15 @@ class SessionManager {
 }
 
 // Initialize singleton on page load
-console.log('SessionManager file: Document readyState:', document.readyState);
+console.log('SessionManager file loading, document.readyState:', document.readyState);
 
 if (document.readyState === 'loading') {
-    console.log('SessionManager: Document loading, setting up DOMContentLoaded listener');
+    console.log('SessionManager: Document is loading, waiting for DOMContentLoaded');
     document.addEventListener('DOMContentLoaded', () => {
-        console.log('SessionManager: DOMContentLoaded fired, creating instance');
+        console.log('SessionManager: DOMContentLoaded event fired');
         new SessionManager();
     });
 } else {
-    console.log('SessionManager: Document already loaded, creating instance immediately');
+    console.log('SessionManager: Document already loaded');
     new SessionManager();
 }
