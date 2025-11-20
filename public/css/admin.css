@@ -459,6 +459,7 @@
     flex: 1;
 }
 
+/* Event Type Colors */
 .event-item {
     background: var(--primary-color);
     color: white;
@@ -483,6 +484,106 @@
         background: var(--primary-hover);
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         transform: translateY(-1px);
+    }
+
+/* Drug Testing Event Status Colors */
+.event-item.status-no-show {
+    background: #dc2626;
+}
+
+    .event-item.status-no-show:hover {
+        background: #b91c1c;
+    }
+
+.event-item.status-scheduled {
+    background: #3b82f6;
+}
+
+    .event-item.status-scheduled:hover {
+        background: #2563eb;
+    }
+
+.event-item.status-completed {
+    background: #10b981;
+}
+
+    .event-item.status-completed:hover {
+        background: #059669;
+    }
+
+.event-item.status-cancelled {
+    background: #8b5cf6;
+}
+
+    .event-item.status-cancelled:hover {
+        background: #7c3aed;
+    }
+
+/* Other Event Type Colors */
+.event-item.type-consultation {
+    background: #f59e0b;
+}
+
+    .event-item.type-consultation:hover {
+        background: #d97706;
+    }
+
+.event-item.type-followup {
+    background: #06b6d4;
+}
+
+    .event-item.type-followup:hover {
+        background: #0891b2;
+    }
+
+.event-item.type-other {
+    background: #6366f1;
+}
+
+    .event-item.type-other:hover {
+        background: #4f46e5;
+    }
+
+/* Past Event Styling */
+.event-item.past-event {
+    opacity: 0.5;
+    background: var(--border-color);
+    color: var(--text-secondary);
+}
+
+    .event-item.past-event:hover {
+        opacity: 0.6;
+        transform: none;
+    }
+
+    .event-item.status-no-show.past-event {
+        background: #7f1d1d;
+        opacity: 0.5;
+    }
+
+    .event-item.status-completed.past-event {
+        background: #064e3b;
+        opacity: 0.5;
+    }
+
+    .event-item.status-cancelled.past-event {
+        background: #4c1d95;
+        opacity: 0.5;
+    }
+
+    .event-item.type-consultation.past-event {
+        background: #78350f;
+        opacity: 0.5;
+    }
+
+    .event-item.type-followup.past-event {
+        background: #164e63;
+        opacity: 0.5;
+    }
+
+    .event-item.type-other.past-event {
+        background: #312e81;
+        opacity: 0.5;
     }
 
 .event-time {
@@ -518,6 +619,29 @@
     font-weight: 600;
 }
 
+.time-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-input-group select {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.time-separator {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
 @media (max-width: 768px) {
     .calendar-header {
         flex-direction: column;
@@ -542,6 +666,19 @@
 
     .btn-today {
         flex: 1;
+    }
+
+    .time-input-group {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .time-input-group select {
+        width: 100%;
+    }
+
+    .time-separator {
+        display: none;
     }
 
     .calendar-day {

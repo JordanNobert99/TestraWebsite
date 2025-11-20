@@ -70,11 +70,30 @@
 
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="time">Time</label>
-                                <select id="time" required>
-                                    <option value="">Select Time</option>
+                                <label for="eventType">Event Type</label>
+                                <select id="eventType" required>
+                                    <option value="">Select Event Type</option>
+                                    <option value="drug-testing">Drug Testing</option>
+                                    <option value="consultation">Consultation</option>
+                                    <option value="follow-up">Follow-up</option>
+                                    <option value="other">Other</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>Time</label>
+                                <div class="time-input-group">
+                                    <select id="timeHour" required>
+                                        <option value="">Hour</option>
+                                    </select>
+                                    <span class="time-separator">:</span>
+                                    <select id="timeMinute" required>
+                                        <option value="">Minute</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
                             <div class="form-group">
                                 <label for="testType">Test Type</label>
                                 <select id="testType" required>
@@ -86,9 +105,6 @@
                                     <option value="breath">Breath Test</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="form-row">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select id="status" required>
@@ -98,12 +114,13 @@
                                     <option value="cancelled">Cancelled</option>
                                 </select>
                             </div>
-                            <div class="form-group checkbox-group">
-                                <label for="noShow">
-                                    <input type="checkbox" id="noShow">
-                                    No Show
-                                </label>
-                            </div>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label for="noShow">
+                                <input type="checkbox" id="noShow">
+                                No Show
+                            </label>
                         </div>
 
                         <div class="form-actions">

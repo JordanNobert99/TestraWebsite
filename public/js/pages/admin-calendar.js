@@ -38,7 +38,6 @@ class CalendarManager {
         const deleteEventBtn = document.getElementById('deleteEventBtn');
         const monthViewBtn = document.getElementById('monthViewBtn');
         const weekViewBtn = document.getElementById('weekViewBtn');
-        const timeSelect = document.getElementById('time');
 
         if (cancelBtn && !cancelBtn.dataset.initialized) {
             cancelBtn.addEventListener('click', () => this.hideModal());
@@ -93,11 +92,6 @@ class CalendarManager {
             weekViewBtn.dataset.initialized = 'true';
         }
 
-        if (timeSelect && !timeSelect.dataset.initialized) {
-            timeSelect.addEventListener('change', () => { });
-            timeSelect.dataset.initialized = 'true';
-        }
-
         // Global click handler to close context menu
         if (!document.body.dataset.globalClickHandler) {
             document.addEventListener('click', (e) => {
@@ -107,38 +101,32 @@ class CalendarManager {
         }
     }
 
+    populateTimeDropdowns() {
+        const hourSelect = document.getElementById('timeHour');
+        const minuteSelect = document.getElementById('timeMinute');
+
+        // Populate hours
+        hourSelect.innerHTML = '<option value="">Hour</option>';
+        for (let h = 0; h < 24; h++) {
+            const option = document.createElement('option');
+            option.value = String(h).padStart(2, '0');
+            option.textContent = String(h).padStart(2, '0');
+            hourSelect.appendChild(option);
+        }
+
+        // Populate minutes in 15-minute increments
+        minuteSelect.innerHTML = '<option value="">Minute</option>';
+        for (let m = 0; m < 60; m += 15) {
+            const option = document.createElement('option');
+            option.value = String(m).padStart(2, '0');
+            option.textContent = String(m).padStart(2, '0');
+            minuteSelect.appendChild(option);
+        }
+    }
+
     goToToday() {
         this.currentDate = new Date();
         this.renderCalendar();
-    }
-
-    generateTimeOptions() {
-        const options = [];
-        for (let hour = 0; hour < 24; hour++) {
-            for (let minute = 0; minute < 60; minute += 15) {
-                const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
-                options.push(timeStr);
-            }
-        }
-        return options;
-    }
-
-    populateTimeSelect() {
-        const timeSelect = document.getElementById('time');
-        const times = this.generateTimeOptions();
-        const currentValue = timeSelect.value;
-
-        timeSelect.innerHTML = '<option value="">Select Time</option>';
-        times.forEach(time => {
-            const option = document.createElement('option');
-            option.value = time;
-            option.textContent = time;
-            timeSelect.appendChild(option);
-        });
-
-        if (currentValue) {
-            timeSelect.value = currentValue;
-        }
     }
 
     async loadCalendarEvents() {
@@ -159,6 +147,41 @@ class CalendarManager {
         } catch (error) {
             console.error('CalendarManager: Error loading events:', error);
         }
+    }
+
+    isEventPast(dateStr, timeStr) {
+        const now = new Date();
+        const eventDateTime = new Date(`${dateStr}T${timeStr || '00:00'}`);
+        return eventDateTime < now;
+    }
+
+    getEventClasses(event) {
+        let classes = 'event-item';
+        
+        // Add event type class for base color
+        if (event.eventType === 'drug-testing') {
+            if (event.noShow) {
+                classes += ' status-no-show';
+            } else if (event.status === 'scheduled') {
+                classes += ' status-scheduled';
+            } else if (event.status === 'completed') {
+                classes += ' status-completed';
+            } else if (event.status === 'cancelled') {
+                classes += ' status-cancelled';
+            }
+        } else if (event.eventType === 'consultation') {
+            classes += ' type-consultation';
+        } else if (event.eventType === 'follow-up') {
+            classes += ' type-followup';
+        } else if (event.eventType === 'other') {
+            classes += ' type-other';
+        }
+
+        if (this.isEventPast(event.date, event.time)) {
+            classes += ' past-event';
+        }
+
+        return classes;
     }
 
     renderCalendar() {
@@ -220,8 +243,9 @@ class CalendarManager {
 
             eventsHTML = dayEvents.slice(0, displayCount).map(e => {
                 const displayTime = e.time ? e.time : '00:00';
+                const eventClasses = this.getEventClasses(e);
                 return `
-                    <div class="event-item" data-event-id="${e.id}" draggable="true">
+                    <div class="${eventClasses}" data-event-id="${e.id}" draggable="true">
                         <span class="event-time">${displayTime}</span>
                         <span class="event-client">${e.clientName}</span>
                         <span class="event-test">${e.testType}</span>
@@ -331,8 +355,9 @@ class CalendarManager {
 
             const eventsHTML = dayEvents.map(e => {
                 const displayTime = e.time ? e.time : '00:00';
+                const eventClasses = this.getEventClasses(e);
                 return `
-                    <div class="event-item" data-event-id="${e.id}" draggable="true">
+                    <div class="${eventClasses}" data-event-id="${e.id}" draggable="true">
                         <span class="event-time">${displayTime}</span>
                         <span class="event-client">${e.clientName}</span>
                         <span class="event-test">${e.testType}</span>
@@ -410,7 +435,7 @@ class CalendarManager {
                 e.preventDefault();
                 e.stopPropagation();
                 const eventId = item.dataset.eventId;
-                this.showContextMenu(e, eventId);
+                this.showContextMenu(e, item);
             });
 
             item.addEventListener('dragstart', (e) => {
@@ -429,7 +454,7 @@ class CalendarManager {
     showModal(id = null) {
         document.getElementById('modalOverlay').style.display = 'block';
         document.getElementById('eventModal').style.display = 'block';
-        this.populateTimeSelect();
+        this.populateTimeDropdowns();
 
         if (id) {
             this.editingId = id;
@@ -437,7 +462,13 @@ class CalendarManager {
             document.getElementById('modalTitle').textContent = 'Edit Event';
             document.getElementById('clientName').value = event.clientName;
             document.getElementById('date').value = event.date;
-            document.getElementById('time').value = event.time || '';
+            document.getElementById('eventType').value = event.eventType || 'drug-testing';
+            
+            // Set hour and minute separately
+            const [hours, minutes] = (event.time || '00:00').split(':');
+            document.getElementById('timeHour').value = hours;
+            document.getElementById('timeMinute').value = minutes;
+            
             document.getElementById('testType').value = event.testType;
             document.getElementById('status').value = event.status;
             document.getElementById('noShow').checked = event.noShow || false;
@@ -455,10 +486,20 @@ class CalendarManager {
         document.getElementById('eventFormElement').reset();
         document.getElementById('date').value = dateStr;
 
-        this.populateTimeSelect();
+        this.populateTimeDropdowns();
+        
+        // Set to next 15-minute increment
         const now = new Date();
-        const roundedTime = this.roundToNextQuarter(now);
-        document.getElementById('time').value = roundedTime;
+        const hours = String(now.getHours()).padStart(2, '0');
+        let minutes = Math.ceil(now.getMinutes() / 15) * 15;
+        if (minutes === 60) {
+            minutes = 0;
+        }
+        minutes = String(minutes).padStart(2, '0');
+        
+        document.getElementById('timeHour').value = hours;
+        document.getElementById('timeMinute').value = minutes;
+        document.getElementById('eventType').value = 'drug-testing';
         this.editingId = null;
     }
 
@@ -469,11 +510,17 @@ class CalendarManager {
         this.hideContextMenu();
     }
 
-    showContextMenu(event, eventId) {
+    showContextMenu(event, eventElement) {
         const contextMenu = document.getElementById('contextMenu');
+        
+        const rect = eventElement.getBoundingClientRect();
+        const eventId = eventElement.dataset.eventId;
+        
+        contextMenu.style.position = 'fixed';
+        contextMenu.style.left = (rect.left + window.scrollX) + 'px';
+        contextMenu.style.top = (rect.bottom + window.scrollY + 5) + 'px';
         contextMenu.style.display = 'block';
-        contextMenu.style.left = event.pageX + 'px';
-        contextMenu.style.top = event.pageY + 'px';
+        
         this.contextMenuEventId = eventId;
     }
 
@@ -481,23 +528,6 @@ class CalendarManager {
         const contextMenu = document.getElementById('contextMenu');
         contextMenu.style.display = 'none';
         this.contextMenuEventId = null;
-    }
-
-    roundToNextQuarter(date) {
-        const hours = date.getHours();
-        let minutes = date.getMinutes();
-
-        minutes = Math.ceil(minutes / 15) * 15;
-
-        if (minutes === 60) {
-            minutes = 0;
-            date.setHours(hours + 1);
-        }
-
-        date.setMinutes(minutes);
-        date.setSeconds(0);
-
-        return date.toTimeString().slice(0, 5);
     }
 
     async moveEventToDate(eventId, newDate) {
@@ -526,10 +556,15 @@ class CalendarManager {
     async handleSave(e) {
         e.preventDefault();
 
+        const hour = document.getElementById('timeHour').value;
+        const minute = document.getElementById('timeMinute').value;
+        const time = `${hour}:${minute}`;
+
         const eventData = {
             clientName: document.getElementById('clientName').value,
             date: document.getElementById('date').value,
-            time: document.getElementById('time').value,
+            time: time,
+            eventType: document.getElementById('eventType').value,
             testType: document.getElementById('testType').value,
             status: document.getElementById('status').value,
             noShow: document.getElementById('noShow').checked,
@@ -557,7 +592,7 @@ class CalendarManager {
                 this.events.push({ id: docRef.id, ...eventData });
             }
 
-            if (eventData.status === 'completed' && !eventData.noShow) {
+            if (eventData.eventType === 'drug-testing' && eventData.status === 'completed' && !eventData.noShow) {
                 await this.updateInventoryFromEvent(eventData);
             }
 
