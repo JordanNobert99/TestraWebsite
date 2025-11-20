@@ -11,10 +11,12 @@ class DashboardManager {
         this.sessionUnsubscribe = new SessionManager().subscribe((user) => {
             if (user) {
                 this.currentUser = user;
+                console.log('DashboardManager: User logged in:', user.email);
                 this.loadUserData(user.uid);
                 this.setupLogout();
             } else {
                 // Redirect to login if not authenticated
+                console.log('DashboardManager: User not authenticated, redirecting to login');
                 window.location.href = '../pages/login.html';
             }
         });
@@ -24,11 +26,14 @@ class DashboardManager {
 
     async loadUserData(uid) {
         try {
+            console.log('DashboardManager: Loading user data for UID:', uid);
             const userDoc = await firebase.firestore().collection('users').doc(uid).get();
             
             if (userDoc.exists) {
                 const userData = userDoc.data();
+                console.log('DashboardManager: User data retrieved:', userData);
                 this.userRole = userData.role;
+                console.log('DashboardManager: User role set to:', this.userRole);
                 
                 // Update UI
                 document.getElementById('userEmail').textContent = this.currentUser.email;
@@ -36,33 +41,43 @@ class DashboardManager {
                 
                 // Show appropriate dashboard
                 this.showDashboard(this.userRole);
+            } else {
+                console.warn('DashboardManager: User document does not exist');
             }
         } catch (error) {
-            console.error('Error loading user data:', error);
+            console.error('DashboardManager: Error loading user data:', error);
         }
     }
 
     showDashboard(role) {
+        console.log('DashboardManager: showDashboard called with role:', role);
+        const adminDash = document.getElementById('adminDashboard');
+        const custDash = document.getElementById('customerDashboard');
+        
         if (role === 'admin') {
-            document.getElementById('adminDashboard').style.display = 'block';
-            document.getElementById('customerDashboard').style.display = 'none';
+            console.log('DashboardManager: Showing admin dashboard');
+            adminDash.style.display = 'block';
+            custDash.style.display = 'none';
         } else {
-            document.getElementById('customerDashboard').style.display = 'block';
-            document.getElementById('adminDashboard').style.display = 'none';
+            console.log('DashboardManager: Showing customer dashboard');
+            custDash.style.display = 'block';
+            adminDash.style.display = 'none';
         }
     }
 
     setupLogout() {
         const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
+        if (logoutBtn && !logoutBtn.dataset.initialized) {
             logoutBtn.addEventListener('click', async () => {
                 try {
+                    console.log('DashboardManager: Logout clicked');
                     await new SessionManager().logout();
                     window.location.href = '../pages/login.html';
                 } catch (error) {
-                    console.error('Error logging out:', error);
+                    console.error('DashboardManager: Error logging out:', error);
                 }
             });
+            logoutBtn.dataset.initialized = 'true';
         }
     }
 
@@ -73,5 +88,6 @@ class DashboardManager {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DashboardManager: DOM ready, initializing');
     new DashboardManager();
 });
