@@ -1,0 +1,167 @@
+/* Admin Pages Styling */
+.admin-container {
+    min-height: calc(100vh - 140px);
+    padding: 2rem 0;
+}
+
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-header h1 {
+    margin: 0;
+}
+
+/* Forms */
+.admin-form {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.admin-form h2 {
+    margin-top: 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.form-actions button {
+    flex: 1;
+}
+
+/* Tables */
+.inventory-table-wrapper {
+    overflow-x: auto;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inventory-table thead {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.inventory-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+}
+
+.inventory-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.inventory-table tbody tr:hover {
+    background-color: var(--bg-primary);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 2rem !important;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-small:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-small.btn-danger {
+    background-color: #dc2626;
+}
+
+.btn-small.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+/* Status Badges */
+.status-ok {
+    background-color: #dcfce7;
+    color: #166534;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-low {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-out {
+    background-color: #fee2e2;
+    color: #991b1b;
+    padding: 0.25rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .inventory-table {
+        font-size: 0.85rem;
+    }
+
+    .inventory-table th,
+    .inventory-table td {
+        padding: 0.75rem;
+    }
+
+    .actions {
+        flex-direction: column;
+    }
+}

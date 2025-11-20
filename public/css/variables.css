@@ -20,15 +20,15 @@
     --secondary-color: #1e40af;
 }
 
-/* Default to light theme */
+/* Default to dark theme */
 :root {
-    --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --border-color: #e5e7eb;
-    --primary-color: #2563eb;
-    --primary-hover: #1d4ed8;
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --border-color: #334155;
+    --primary-color: #3b82f6;
+    --primary-hover: #2563eb;
     --secondary-color: #1e40af;
 }
 
