@@ -3,12 +3,20 @@ class DashboardManager {
         this.currentUser = null;
         this.userRole = null;
         this.sessionUnsubscribe = null;
+        console.log('DashboardManager: Constructor called');
         this.init();
     }
 
     init() {
+        console.log('DashboardManager: init() called');
+        
         // Use SessionManager instead of direct Firebase auth
-        this.sessionUnsubscribe = new SessionManager().subscribe((user) => {
+        const sessionManager = new SessionManager();
+        console.log('DashboardManager: SessionManager created');
+        
+        this.sessionUnsubscribe = sessionManager.subscribe((user) => {
+            console.log('DashboardManager: Subscribe callback fired with user:', user ? user.email : 'null');
+            
             if (user) {
                 this.currentUser = user;
                 console.log('DashboardManager: User logged in:', user.email);
@@ -21,6 +29,7 @@ class DashboardManager {
             }
         });
         
+        console.log('DashboardManager: Subscribe callback registered');
         this.setupEventListeners();
     }
 
