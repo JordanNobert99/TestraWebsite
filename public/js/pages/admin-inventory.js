@@ -181,20 +181,21 @@ class InventoryManager {
         this.showForm(id);
     }
 
-    deleteItem(id) {
+    async deleteItem(id) {
         if (confirm('Are you sure you want to delete this item?')) {
-            firebase.firestore()
-                .collection('inventory')
-                .doc(id)
-                .delete()
-                .then(() => {
-                    console.log('InventoryManager: Item deleted successfully');
-                    this.loadInventory();
-                })
-                .catch(error => {
-                    console.error('InventoryManager: Error deleting item:', error);
-                    alert('Failed to delete item: ' + error.message);
-                });
+            try {
+                console.log('InventoryManager: Deleting item:', id);
+                await firebase.firestore()
+                    .collection('inventory')
+                    .doc(id)
+                    .delete();
+                
+                console.log('InventoryManager: Item deleted successfully');
+                await this.loadInventory();
+            } catch (error) {
+                console.error('InventoryManager: Error deleting item:', error);
+                alert('Failed to delete item: ' + error.message);
+            }
         }
     }
 
