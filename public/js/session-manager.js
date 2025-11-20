@@ -59,11 +59,16 @@ class SessionManager {
         
         console.log('SessionManager: Initialized?', this.initialized, 'CurrentUser?', this.currentUser ? this.currentUser.email : 'null');
         
-        // Immediately call if already initialized
+        // Immediately call if already initialized with a user
         if (this.initialized && this.currentUser) {
             console.log('SessionManager: Immediately calling callback with current user');
             callback(this.currentUser);
+        } else if (this.initialized && !this.currentUser) {
+            // User is logged out
+            console.log('SessionManager: Immediately calling callback with null (user logged out)');
+            callback(null);
         }
+        // If not initialized yet, wait for onAuthStateChanged to fire
         
         // Return unsubscribe function
         return () => {
