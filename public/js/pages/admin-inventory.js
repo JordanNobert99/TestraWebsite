@@ -76,27 +76,33 @@ class InventoryManager {
         const tbody = document.getElementById('inventoryTableBody');
         const emptyRow = document.getElementById('emptyRow');
 
-        // Safety checks with better logging
+        console.log('InventoryManager: renderTable - items count:', this.items.length);
+        console.log('InventoryManager: tbody found:', !!tbody);
+        console.log('InventoryManager: emptyRow found:', !!emptyRow);
+
+        // If elements don't exist, there's a DOM issue - don't proceed
         if (!tbody) {
             console.error('InventoryManager: inventoryTableBody element not found');
             return;
         }
-        if (!emptyRow) {
-            console.error('InventoryManager: emptyRow element not found');
-            return;
-        }
-
-        console.log('InventoryManager: renderTable - items count:', this.items.length);
 
         if (this.items.length === 0) {
             console.log('InventoryManager: No items, showing empty state');
-            emptyRow.style.display = 'table-row';
+            // Make sure emptyRow exists before trying to use it
+            if (emptyRow) {
+                emptyRow.style.display = 'table-row';
+            }
             tbody.innerHTML = '';
             return;
         }
 
         console.log('InventoryManager: Rendering', this.items.length, 'items');
-        emptyRow.style.display = 'none';
+        
+        // Hide empty row if it exists
+        if (emptyRow) {
+            emptyRow.style.display = 'none';
+        }
+        
         tbody.innerHTML = this.items.map(item => `
             <tr>
                 <td>${item.itemName}</td>
