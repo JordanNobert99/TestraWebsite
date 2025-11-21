@@ -207,7 +207,7 @@ class CalendarRenderer {
         }
     }
 
-    renderWeekView(weekStartDate, displayMonth) {
+    renderWeekView(weekStartDate) {
         const calendar = document.getElementById('calendarGrid');
         const weekdaysHeader = document.getElementById('calendarWeekdays');
         if (!calendar || !weekdaysHeader) return;
@@ -255,7 +255,7 @@ class CalendarRenderer {
 
         calendar.classList.add('week-view');
 
-        // Create day cells - show all 7 days regardless of month
+        // Create day cells - show all 7 days
         for (const date of weekDays) {
             const dateStr = CalendarUtils.formatDate(date);
             const dayNum = date.getDate();

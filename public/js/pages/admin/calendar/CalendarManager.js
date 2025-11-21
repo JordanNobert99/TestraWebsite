@@ -128,7 +128,7 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.renderer.renderMonthView(this.displayMonth);
         } else {
-            this.renderer.renderWeekView(this.weekStartDate, this.displayMonth);
+            this.renderer.renderWeekView(this.weekStartDate);
         }
     }
 
