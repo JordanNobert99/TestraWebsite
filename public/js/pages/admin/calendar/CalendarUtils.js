@@ -21,7 +21,12 @@ class CalendarUtils {
         const firstDayOfWeek = firstDay.getDay();
 
         // Standard calculation: ceil((day + firstDayOfWeek) / 7)
-        const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+        let weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+
+        // If week 1 doesn't start on day 1, subtract 1 from the week number
+        if (firstDayOfWeek > 0) {
+            weekNum = Math.max(1, weekNum - 1);
+        }
 
         return weekNum;
     }
@@ -35,8 +40,12 @@ class CalendarUtils {
         const firstDayOfWeek = firstDay.getDay();
 
         // Count weeks from the start of the month
-        // Week 1 starts on day 1, regardless of what day of the week it is
-        const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+        let weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+
+        // If week 1 doesn't start on day 1, subtract 1 from the week number
+        if (firstDayOfWeek > 0) {
+            weekNum = Math.max(1, weekNum - 1);
+        }
 
         return weekNum;
     }
