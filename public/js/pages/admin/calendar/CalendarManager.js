@@ -135,7 +135,22 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         } else {
-            this.currentDate.setDate(this.currentDate.getDate() - 7);
+            const startOfWeek = CalendarUtils.getStartOfWeek(this.currentDate);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+            // Get first day of current month
+            const firstDayOfMonth = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth(), 1);
+            
+            // Check if week contains the first day of the current month
+            // If yes, we're at the boundary - just change to previous month
+            if (startOfWeek.getMonth() !== this.currentDate.getMonth()) {
+                // Current week starts in previous month, so just go to previous month
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+            } else {
+                // Normal week - go back 7 days
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
+            }
         }
         this.renderCalendar();
     }
@@ -144,7 +159,20 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
         } else {
-            this.currentDate.setDate(this.currentDate.getDate() + 7);
+            const startOfWeek = CalendarUtils.getStartOfWeek(this.currentDate);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+            // Check if end of week contains first day of next month
+            const nextMonthFirstDay = new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 1);
+            
+            if (endOfWeek.getMonth() !== this.currentDate.getMonth()) {
+                // Week spans into next month - just change to next month
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+            } else {
+                // Normal week - advance 7 days
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
+            }
         }
         this.renderCalendar();
     }
