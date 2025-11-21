@@ -148,7 +148,20 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         } else {
-            this.currentDate.setDate(this.currentDate.getDate() - 7);
+            // In week view, only go back if we're not at a month boundary week
+            const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
+            const currentMonth = this.currentDate.getMonth();
+            const startMonth = startOfCurrentWeek.getMonth();
+
+            // If the week spans two months, just move to a date in the previous month within same week
+            if (currentMonth !== startMonth) {
+                // Move to last day of previous month that's in the current week
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                this.currentDate.setDate(new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate());
+            } else {
+                // Normal week going back
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
+            }
         }
         this.renderCalendar();
     }
@@ -157,7 +170,23 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
         } else {
-            this.currentDate.setDate(this.currentDate.getDate() + 7);
+            // In week view, only advance if we're not at a month boundary week
+            const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
+            const endOfCurrentWeek = new Date(startOfCurrentWeek);
+            endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
+
+            const currentMonth = this.currentDate.getMonth();
+            const endMonth = endOfCurrentWeek.getMonth();
+
+            // If the week spans two months, just move to a date in the next month within same week
+            if (currentMonth !== endMonth) {
+                // Move to first day of next month that's in the current week
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                this.currentDate.setDate(1);
+            } else {
+                // Normal week advancement
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
+            }
         }
         this.renderCalendar();
     }
@@ -169,11 +198,11 @@ class CalendarManager {
 
     switchView(view) {
         this.currentView = view;
-        
+
         // Update button states
         document.getElementById('monthViewBtn')?.classList.toggle('active', view === 'month');
         document.getElementById('weekViewBtn')?.classList.toggle('active', view === 'week');
-        
+
         this.renderCalendar();
     }
 
@@ -188,7 +217,7 @@ class CalendarManager {
                 await this.eventManager.saveEvent(eventData);
             } else {
                 await this.eventManager.saveEvent(eventData);
-                
+
                 // Update inventory if it's a drug testing event
                 if (eventData.eventType === 'drug-testing') {
                     await this.eventManager.updateInventory(eventData);
@@ -242,4 +271,4 @@ class CalendarManager {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('CalendarManager: DOM ready, initializing');
     window.calendarManager = new CalendarManager();
-})();
+});

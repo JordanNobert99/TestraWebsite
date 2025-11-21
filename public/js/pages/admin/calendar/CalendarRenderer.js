@@ -236,9 +236,7 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Get week number and display month for the current date's context
-        // This way, Oct 27-Nov 2 shows as "Oct Week 5" when currentDate is in Oct
-        // and as "Nov Week 1" when currentDate is in Nov
+        // Get week number based on currentDate's month context
         const weekNum = CalendarUtils.getWeekNumberInMonth(currentDate);
         const monthStr = currentDate.toLocaleDateString('en-US', { month: 'short' });
         const year = currentDate.getFullYear();
