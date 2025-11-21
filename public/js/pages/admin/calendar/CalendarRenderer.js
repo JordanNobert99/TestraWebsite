@@ -236,14 +236,22 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Update header with week number
-        const weekNum = CalendarUtils.getWeekNumber(currentDate);
-        const monthYear = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-        document.getElementById('currentMonth').textContent = `${monthYear} - Week ${weekNum}`;
+        // Update header with week number - uses calendar week number that spans months correctly
+        const weekNum = CalendarUtils.getCalendarWeekNumber(currentDate);
+        const startMonth = startOfWeek.toLocaleDateString('en-US', { month: 'short' });
+        const endMonth = weekDays[6].toLocaleDateString('en-US', { month: 'short' });
+        const year = currentDate.getFullYear();
+        
+        // Display both months if the week spans two months
+        const monthDisplay = startMonth === endMonth 
+            ? `${startMonth} ${year}`
+            : `${startMonth} - ${endMonth} ${year}`;
+        
+        document.getElementById('currentMonth').textContent = `${monthDisplay} - Week ${weekNum}`;
 
         calendar.classList.add('week-view');
 
-        // Create day cells - FIXED: Now passing dayNum for week view
+        // Create day cells
         for (const date of weekDays) {
             const dateStr = CalendarUtils.formatDate(date);
             const dayNum = date.getDate();
