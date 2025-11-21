@@ -8,7 +8,8 @@ class CalendarUtils {
         const d = new Date(date);
         const day = d.getDay();
         const diff = d.getDate() - day;
-        return new Date(d.setDate(diff));
+        const result = new Date(d.getFullYear(), d.getMonth(), diff);
+        return result;
     }
 
     /**
