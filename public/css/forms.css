@@ -55,13 +55,27 @@
 }
 
 .time-input-group select {
-    width: 70px;
+    width: 85px;
     flex-shrink: 0;
 }
 
 .time-separator {
     color: var(--text-secondary);
     font-weight: 600;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0;
+    font-weight: 400;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
 }
 
 .form-checkbox,
