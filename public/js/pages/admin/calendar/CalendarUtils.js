@@ -28,6 +28,44 @@ class CalendarUtils {
         return weekNum;
     }
 
+    /**
+     * Validate week number for a given date
+     * Returns true if the week number is correctly positioned
+     */
+    static validateWeekNumber(date) {
+        const weekNum = this.getWeekNumber(date);
+        const month = date.getMonth();
+        const year = date.getFullYear();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        // Maximum weeks in a month is 6 (rare edge case)
+        // Minimum is 4 (always true for any month)
+        // Most common is 4-5 weeks
+        return weekNum >= 1 && weekNum <= 6;
+    }
+
+    /**
+     * Get all dates that fall within a specific week of a month
+     */
+    static getWeekDates(date, weekNum) {
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const firstDayOfWeek = firstDay.getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        const dates = [];
+        
+        for (let day = 1; day <= daysInMonth; day++) {
+            const currentWeekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
+            if (currentWeekNum === weekNum) {
+                dates.push(new Date(year, month, day));
+            }
+        }
+        
+        return dates;
+    }
+
     static isEventPast(dateStr, timeStr) {
         const now = new Date();
         const currentDate = CalendarUtils.formatDate(now);
