@@ -236,12 +236,22 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Get week number based on displayMonth context only
-        const weekNum = CalendarUtils.getWeekNumberInMonth(displayMonth);
-        const monthStr = displayMonth.toLocaleDateString('en-US', { month: 'short' });
-        const year = displayMonth.getFullYear();
+        // Build display string from actual week dates
+        const firstDay = weekDays[0];
+        const lastDay = weekDays[6];
+        const monthStr = firstDay.toLocaleDateString('en-US', { month: 'short' });
+        const year = firstDay.getFullYear();
         
-        document.getElementById('currentMonth').textContent = `${monthStr} ${year} - Week ${weekNum}`;
+        // If week spans multiple months, show both
+        if (firstDay.getMonth() !== lastDay.getMonth()) {
+            const endMonthStr = lastDay.toLocaleDateString('en-US', { month: 'short' });
+            const endYear = lastDay.getFullYear();
+            document.getElementById('currentMonth').textContent = 
+                `${monthStr} ${firstDay.getDate()} - ${endMonthStr} ${lastDay.getDate()}, ${year}`;
+        } else {
+            document.getElementById('currentMonth').textContent = 
+                `${monthStr} ${firstDay.getDate()} - ${lastDay.getDate()}, ${year}`;
+        }
 
         calendar.classList.add('week-view');
 
