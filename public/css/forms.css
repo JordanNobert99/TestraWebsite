@@ -51,11 +51,12 @@
 .time-input-group {
     display: flex;
     align-items: center;
+    justify-items: center;
     gap: 0.5rem;
 }
 
 .time-input-group select {
-    width: 100px;
+    width: 120px;
     flex-shrink: 0;
 }
 
