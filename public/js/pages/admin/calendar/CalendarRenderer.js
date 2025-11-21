@@ -263,12 +263,36 @@ class CalendarRenderer {
             if (daysInFirstMonth > daysInSecondMonth) {
                 const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = firstDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+                // Check if this month's day 1 is in the week
+                let hasDay1 = false;
+                for (const day of weekDays) {
+                    if (day.getMonth() === firstDay.getMonth() && day.getDate() === 1) {
+                        hasDay1 = true;
+                        break;
+                    }
+                }
+                let weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+                // Only apply the subtraction if day 1 is in this week
+                if (!hasDay1) {
+                    weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+                }
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             } else {
                 const monthStr = lastDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = lastDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
+                // Check if this month's day 1 is in the week
+                let hasDay1 = false;
+                for (const day of weekDays) {
+                    if (day.getMonth() === lastDay.getMonth() && day.getDate() === 1) {
+                        hasDay1 = true;
+                        break;
+                    }
+                }
+                let weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
+                // Only apply the subtraction if day 1 is in this week
+                if (!hasDay1) {
+                    weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
+                }
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             }
         }
