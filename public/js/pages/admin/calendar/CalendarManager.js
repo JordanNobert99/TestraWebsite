@@ -148,27 +148,24 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         } else {
-            // Get current week
+            // Get current week bounds
             const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            // Get what WOULD be the previous week (7 days back)
-            const potentialPrevStart = new Date(startOfCurrentWeek);
-            potentialPrevStart.setDate(potentialPrevStart.getDate() - 7);
-            const potentialPrevEnd = new Date(potentialPrevStart);
-            potentialPrevEnd.setDate(potentialPrevEnd.getDate() + 6);
+            // Get what would be previous week bounds
+            const startOfPrevWeek = new Date(startOfCurrentWeek);
+            startOfPrevWeek.setDate(startOfPrevWeek.getDate() - 7);
+            const endOfPrevWeek = new Date(startOfPrevWeek);
+            endOfPrevWeek.setDate(endOfPrevWeek.getDate() + 6);
 
-            // Check if current and potential previous week have the SAME calendar dates
-            const isSameWeek = (
-                startOfCurrentWeek.getDate() === potentialPrevStart.getDate() &&
-                endOfCurrentWeek.getDate() === potentialPrevEnd.getDate()
-            );
+            // Format dates to compare full date (YYYY-MM-DD)
+            const currentWeekString = `${CalendarUtils.formatDate(startOfCurrentWeek)}_${CalendarUtils.formatDate(endOfCurrentWeek)}`;
+            const prevWeekString = `${CalendarUtils.formatDate(startOfPrevWeek)}_${CalendarUtils.formatDate(endOfPrevWeek)}`;
 
-            if (isSameWeek && startOfCurrentWeek.getMonth() !== potentialPrevStart.getMonth()) {
-                // Same 7 calendar days but different months - just change month context
+            if (currentWeekString === prevWeekString) {
+                // Same 7 calendar days - just change month context
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                // Keep the same day of month so we stay in the same week
             } else {
                 // Different weeks - move back 7 days
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
@@ -181,33 +178,35 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
         } else {
-            // Get current week
             const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            // Get what WOULD be the next week (7 days ahead)
-            const potentialNextStart = new Date(startOfCurrentWeek);
-            potentialNextStart.setDate(potentialNextStart.getDate() + 7);
-            const potentialNextEnd = new Date(potentialNextStart);
-            potentialNextEnd.setDate(potentialNextEnd.getDate() + 6);
+            const startOfNextWeek = new Date(startOfCurrentWeek);
+            startOfNextWeek.setDate(startOfNextWeek.getDate() + 7);
+            const endOfNextWeek = new Date(startOfNextWeek);
+            endOfNextWeek.setDate(endOfNextWeek.getDate() + 6);
 
-            // Check if current and potential next week have the SAME calendar dates
-            const isSameWeek = (
-                startOfCurrentWeek.getDate() === potentialNextStart.getDate() &&
-                endOfCurrentWeek.getDate() === potentialNextEnd.getDate()
-            );
+            const currentWeekString = `${startOfCurrentWeek.toISOString().split('T')[0]}_${endOfCurrentWeek.toISOString().split('T')[0]}`;
+            const nextWeekString = `${startOfNextWeek.toISOString().split('T')[0]}_${endOfNextWeek.toISOString().split('T')[0]}`;
 
-            if (isSameWeek && startOfCurrentWeek.getMonth() !== potentialNextStart.getMonth()) {
-                // Same 7 calendar days but different months - just change month context
+            console.log('CURRENT WEEK:', currentWeekString);
+            console.log('NEXT WEEK:', nextWeekString);
+            console.log('MATCH:', currentWeekString === nextWeekString);
+
+            if (currentWeekString === nextWeekString) {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                // Keep the same day of month so we stay in the same week
+                console.log('MONTH CHANGED ONLY');
             } else {
-                // Different weeks - move ahead 7 days
                 this.currentDate.setDate(this.currentDate.getDate() + 7);
+                console.log('ADVANCED 7 DAYS');
             }
         }
         this.renderCalendar();
+        console.log('startOfCurrentWeek:', startOfCurrentWeek);
+        console.log('CalendarUtils.formatDate(startOfCurrentWeek):', CalendarUtils.formatDate(startOfCurrentWeek));
+        console.log('endOfCurrentWeek:', endOfCurrentWeek);
+        console.log('CalendarUtils.formatDate(endOfCurrentWeek):', CalendarUtils.formatDate(endOfCurrentWeek));
     }
 
     handleToday() {
