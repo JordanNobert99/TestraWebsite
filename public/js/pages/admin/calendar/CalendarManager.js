@@ -208,6 +208,7 @@ class CalendarManager {
             try {
                 await this.eventManager.deleteEvent(eventId);
                 this.contextMenu.hide();
+                this.modalManager.hideModal();
                 this.renderCalendar();
             } catch (error) {
                 console.error('CalendarManager: Error deleting event:', error);

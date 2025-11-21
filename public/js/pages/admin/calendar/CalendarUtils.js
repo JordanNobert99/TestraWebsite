@@ -12,17 +12,18 @@ class CalendarUtils {
     }
 
     static getWeekNumber(date) {
-        const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
-        const firstMonday = new Date(firstDay);
-        firstMonday.setDate(firstDay.getDate() + (8 - firstDay.getDay()) % 7);
+        const year = date.getFullYear();
+        const month = date.getMonth();
+        const day = date.getDate();
         
-        const diffTime = Math.abs(date - firstDay);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // Get the first day of the month
+        const firstDay = new Date(year, month, 1);
+        const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday
         
-        let weekNum = Math.floor(diffDays / 7) + 1;
-        if (weekNum > 4) {
-            weekNum = 4;
-        }
+        // Calculate which week of the month this date falls into
+        // Week 1 starts on the first Sunday (or first day if it's Sunday)
+        const adjustedDate = day + firstDayOfWeek;
+        const weekNum = Math.ceil(adjustedDate / 7);
         
         return weekNum;
     }
