@@ -152,23 +152,17 @@ class CalendarManager {
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const testDatePrevMonth = new Date(this.currentDate);
-            testDatePrevMonth.setMonth(testDatePrevMonth.getMonth() - 1);
-            
-            const startOfTestWeek = CalendarUtils.getStartOfWeek(testDatePrevMonth);
-            const endOfTestWeek = new Date(startOfTestWeek);
-            endOfTestWeek.setDate(endOfTestWeek.getDate() + 6);
+            const startMonth = startOfCurrentWeek.getMonth();
+            const endMonth = endOfCurrentWeek.getMonth();
+            const startYear = startOfCurrentWeek.getFullYear();
+            const endYear = endOfCurrentWeek.getFullYear();
 
-            // Use CalendarUtils.formatDate for consistency (local time only)
-            const currentWeekString = `${CalendarUtils.formatDate(startOfCurrentWeek)}_${CalendarUtils.formatDate(endOfCurrentWeek)}`;
-            const testWeekString = `${CalendarUtils.formatDate(startOfTestWeek)}_${CalendarUtils.formatDate(endOfTestWeek)}`;
-
-            if (currentWeekString === testWeekString) {
+            if ((startMonth !== endMonth || startYear !== endYear) && startOfCurrentWeek.getMonth() === this.currentDate.getMonth()) {
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                console.log('MONTH CHANGED ONLY:', currentWeekString);
+                console.log('MONTH CHANGED ONLY - boundary week');
             } else {
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
-                console.log('WENT BACK 7 DAYS:', currentWeekString, '→', testWeekString);
+                console.log('WENT BACK 7 DAYS - normal week');
             }
         }
         this.renderCalendar();
@@ -182,23 +176,17 @@ class CalendarManager {
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const testDateNextMonth = new Date(this.currentDate);
-            testDateNextMonth.setMonth(testDateNextMonth.getMonth() + 1);
-            
-            const startOfTestWeek = CalendarUtils.getStartOfWeek(testDateNextMonth);
-            const endOfTestWeek = new Date(startOfTestWeek);
-            endOfTestWeek.setDate(endOfTestWeek.getDate() + 6);
+            const startMonth = startOfCurrentWeek.getMonth();
+            const endMonth = endOfCurrentWeek.getMonth();
+            const startYear = startOfCurrentWeek.getFullYear();
+            const endYear = endOfCurrentWeek.getFullYear();
 
-            // Use CalendarUtils.formatDate for consistency (local time only)
-            const currentWeekString = `${CalendarUtils.formatDate(startOfCurrentWeek)}_${CalendarUtils.formatDate(endOfCurrentWeek)}`;
-            const testWeekString = `${CalendarUtils.formatDate(startOfTestWeek)}_${CalendarUtils.formatDate(endOfTestWeek)}`;
-
-            if (currentWeekString === testWeekString) {
+            if ((startMonth !== endMonth || startYear !== endYear) && endOfCurrentWeek.getMonth() === this.currentDate.getMonth()) {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                console.log('MONTH CHANGED ONLY:', currentWeekString);
+                console.log('MONTH CHANGED ONLY - boundary week');
             } else {
                 this.currentDate.setDate(this.currentDate.getDate() + 7);
-                console.log('ADVANCED 7 DAYS:', currentWeekString, '→', testWeekString);
+                console.log('ADVANCED 7 DAYS - normal week');
             }
         }
         this.renderCalendar();
