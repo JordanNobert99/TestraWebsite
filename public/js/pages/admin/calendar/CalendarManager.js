@@ -148,18 +148,27 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         } else {
-            // In week view, only go back if we're not at a month boundary week
+            // Get the current week's start and end
             const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
-            const currentMonth = this.currentDate.getMonth();
-            const startMonth = startOfCurrentWeek.getMonth();
+            const endOfCurrentWeek = new Date(startOfCurrentWeek);
+            endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            // If the week spans two months, just move to a date in the previous month within same week
-            if (currentMonth !== startMonth) {
-                // Move to last day of previous month that's in the current week
+            // Get the previous week's start and end
+            const startOfPrevWeek = new Date(startOfCurrentWeek);
+            startOfPrevWeek.setDate(startOfPrevWeek.getDate() - 7);
+            const endOfPrevWeek = new Date(startOfPrevWeek);
+            endOfPrevWeek.setDate(endOfPrevWeek.getDate() + 6);
+
+            // Check if current week and previous week have the same calendar days
+            // (this happens when a week spans two months)
+            const currentWeekString = `${startOfCurrentWeek.getDate()}-${endOfCurrentWeek.getDate()}`;
+            const prevWeekString = `${startOfPrevWeek.getDate()}-${endOfPrevWeek.getDate()}`;
+
+            if (currentWeekString === prevWeekString && startOfCurrentWeek.getMonth() !== startOfPrevWeek.getMonth()) {
+                // Same 7 days but different month - just change the month context
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                this.currentDate.setDate(new Date(this.currentDate.getFullYear(), this.currentDate.getMonth() + 1, 0).getDate());
             } else {
-                // Normal week going back
+                // Different week - advance 7 days back
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
             }
         }
@@ -170,21 +179,27 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
         } else {
-            // In week view, only advance if we're not at a month boundary week
+            // Get the current week's start and end
             const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const currentMonth = this.currentDate.getMonth();
-            const endMonth = endOfCurrentWeek.getMonth();
+            // Get the next week's start and end
+            const startOfNextWeek = new Date(startOfCurrentWeek);
+            startOfNextWeek.setDate(startOfNextWeek.getDate() + 7);
+            const endOfNextWeek = new Date(startOfNextWeek);
+            endOfNextWeek.setDate(endOfNextWeek.getDate() + 6);
 
-            // If the week spans two months, just move to a date in the next month within same week
-            if (currentMonth !== endMonth) {
-                // Move to first day of next month that's in the current week
+            // Check if current week and next week have the same calendar days
+            // (this happens when a week spans two months)
+            const currentWeekString = `${startOfCurrentWeek.getDate()}-${endOfCurrentWeek.getDate()}`;
+            const nextWeekString = `${startOfNextWeek.getDate()}-${endOfNextWeek.getDate()}`;
+
+            if (currentWeekString === nextWeekString && endOfCurrentWeek.getMonth() !== endOfNextWeek.getMonth()) {
+                // Same 7 days but different month - just change the month context
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                this.currentDate.setDate(1);
             } else {
-                // Normal week advancement
+                // Different week - advance 7 days forward
                 this.currentDate.setDate(this.currentDate.getDate() + 7);
             }
         }
