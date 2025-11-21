@@ -17,23 +17,13 @@ class CalendarUtils {
         const month = date.getMonth();
         const day = date.getDate();
 
-        // Get the Sunday of the week this date falls into
-        const weekStart = CalendarUtils.getStartOfWeek(date);
-        
-        // Count how many Sundays have occurred in this month before this date's week started
-        let weekNum = 1;
-        
-        // Start from the first day of the month
-        let countDate = new Date(year, month, 1);
-        
-        // Count Sundays until we reach the start of this date's week
-        while (countDate < weekStart) {
-            if (countDate.getDay() === 0 && countDate.getMonth() === month) {
-                weekNum++;
-            }
-            countDate.setDate(countDate.getDate() + 1);
-        }
-        
+        const firstDay = new Date(year, month, 1);
+        const firstDayOfWeek = firstDay.getDay();
+
+        // Standard week calculation: which week of the month is this day in?
+        // Days 1-7 (adjusted for starting day) = week 1, 8-14 = week 2, etc
+        const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+
         return weekNum;
     }
 
