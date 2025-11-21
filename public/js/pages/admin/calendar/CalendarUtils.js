@@ -23,8 +23,14 @@ class CalendarUtils {
         // Standard calculation: ceil((day + firstDayOfWeek) / 7)
         let weekNum = Math.ceil((day + firstDayOfWeek) / 7);
 
-        // If week 1 doesn't start on day 1, subtract 1 from the week number
-        if (firstDayOfWeek > 0) {
+        // Only subtract 1 if:
+        // 1. Week 1 doesn't start on day 1 (firstDayOfWeek > 0)
+        // 2. This date is in the first week (weekNum === 1)
+        // 3. There IS a previous week that belongs entirely to the previous month
+        if (firstDayOfWeek > 0 && weekNum === 1) {
+            // Check if there's a full week before day 1
+            // If firstDayOfWeek > 0, days before the 1st are from previous month
+            // and they fill a complete week back from Sunday
             weekNum = Math.max(1, weekNum - 1);
         }
 
