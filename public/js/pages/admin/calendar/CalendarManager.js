@@ -135,20 +135,7 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         } else {
-            const startOfWeek = CalendarUtils.getStartOfWeek(this.currentDate);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-            // Check if this week spans into the previous month
-            const weekSpansMonths = startOfWeek.getMonth() !== endOfWeek.getMonth();
-
-            if (weekSpansMonths) {
-                // Don't go back 7 days - just change the month so the week number updates
-                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-            } else {
-                // Normal week - go back 7 days
-                this.currentDate.setDate(this.currentDate.getDate() - 7);
-            }
+            this.currentDate.setDate(this.currentDate.getDate() - 7);
         }
         this.renderCalendar();
     }
@@ -157,20 +144,7 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
         } else {
-            const startOfWeek = CalendarUtils.getStartOfWeek(this.currentDate);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-            // Check if this week spans into the next month
-            const weekSpansMonths = startOfWeek.getMonth() !== endOfWeek.getMonth();
-
-            if (weekSpansMonths) {
-                // Don't advance 7 days - just change the month so the week number updates
-                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-            } else {
-                // Normal week - advance 7 days
-                this.currentDate.setDate(this.currentDate.getDate() + 7);
-            }
+            this.currentDate.setDate(this.currentDate.getDate() + 7);
         }
         this.renderCalendar();
     }
