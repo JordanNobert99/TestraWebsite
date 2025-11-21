@@ -156,9 +156,10 @@ class CalendarManager {
             const weekSpansTwoMonths = startOfCurrentWeek.getMonth() !== endOfCurrentWeek.getMonth();
 
             if (weekSpansTwoMonths) {
-                // Just change the month - we're already viewing the boundary week
-                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                console.log('MONTH CHANGED ONLY - already on boundary week');
+                // Move to a date in the previous month WITHIN the same week
+                // This keeps the 7 calendar days the same but changes the month context
+                this.currentDate.setDate(this.currentDate.getDate() - 1);
+                console.log('MONTH CHANGED ONLY - moved 1 day into prev month');
             } else {
                 // Normal week - go back 7 days
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
@@ -180,9 +181,10 @@ class CalendarManager {
             const weekSpansTwoMonths = startOfCurrentWeek.getMonth() !== endOfCurrentWeek.getMonth();
 
             if (weekSpansTwoMonths) {
-                // Just change the month - we're already viewing the boundary week
-                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                console.log('MONTH CHANGED ONLY - already on boundary week');
+                // Move to a date in the next month WITHIN the same week
+                // This keeps the 7 calendar days the same but changes the month context
+                this.currentDate.setDate(this.currentDate.getDate() + 1);
+                console.log('MONTH CHANGED ONLY - moved 1 day into next month');
             } else {
                 // Normal week - advance 7 days
                 this.currentDate.setDate(this.currentDate.getDate() + 7);
