@@ -245,7 +245,7 @@ class CalendarRenderer {
             // Week is entirely within one month
             const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
             const year = firstDay.getFullYear();
-            const weekNum = CalendarUtils.getWeekNumberForMonth(firstDay, firstDay);
+            const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
             headerText = `${monthStr} ${year} - Week ${weekNum}`;
         } else {
             // Week spans two months - count which has more days
@@ -263,12 +263,12 @@ class CalendarRenderer {
             if (daysInFirstMonth > daysInSecondMonth) {
                 const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = firstDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberForMonth(firstDay, firstDay);
+                const weekNum = CalendarUtils.getWeekNumberInMonthByStartDate(startOfWeek, firstDay);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             } else {
                 const monthStr = lastDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = lastDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberForMonth(lastDay, lastDay);
+                const weekNum = CalendarUtils.getWeekNumberInMonthByStartDate(startOfWeek, lastDay);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             }
         }

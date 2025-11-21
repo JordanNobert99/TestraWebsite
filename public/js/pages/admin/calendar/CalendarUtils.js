@@ -29,14 +29,44 @@ class CalendarUtils {
     static getWeekNumberForMonth(date, referenceMonth) {
         const year = date.getFullYear();
         const month = referenceMonth.getMonth();
+        const day = date.getDate();
 
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        // Use IDENTICAL logic to getWeekNumberInMonth
-        const weekNum = Math.ceil((date.getDate() + firstDayOfWeek) / 7);
+        // Count weeks from the start of the month
+        // Week 1 starts on day 1, regardless of what day of the week it is
+        const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
 
         return weekNum;
+    }
+
+    static getWeekNumberInMonthByStartDate(weekStartDate, referenceMonth) {
+        // Find which week this Sunday belongs to in the reference month
+        // by counting from the month's first day
+        const year = referenceMonth.getFullYear();
+        const month = referenceMonth.getMonth();
+        const firstDay = new Date(year, month, 1);
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // Get any date in the week to find the week number
+        const testDate = new Date(weekStartDate);
+        if (testDate.getMonth() === month) {
+            // Use the date from this month
+            const weekNum = Math.ceil((testDate.getDate() + firstDayOfWeek) / 7);
+            return weekNum;
+        } else {
+            // Use the first date from the reference month in this week
+            for (let i = 0; i < 7; i++) {
+                const checkDate = new Date(weekStartDate);
+                checkDate.setDate(checkDate.getDate() + i);
+                if (checkDate.getMonth() === month) {
+                    const weekNum = Math.ceil((checkDate.getDate() + firstDayOfWeek) / 7);
+                    return weekNum;
+                }
+            }
+        }
+        return 1;
     }
 
     static getISOWeekNumber(date) {
