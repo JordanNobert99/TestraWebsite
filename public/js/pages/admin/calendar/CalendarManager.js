@@ -1,4 +1,4 @@
-// Main calendar manager orchestrating all components
+﻿// Main calendar manager orchestrating all components
 class CalendarManager {
     constructor() {
         this.currentUser = null;
@@ -152,24 +152,23 @@ class CalendarManager {
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const startOfPrevWeek = new Date(startOfCurrentWeek);
-            startOfPrevWeek.setDate(startOfPrevWeek.getDate() - 7);
-            const endOfPrevWeek = new Date(startOfPrevWeek);
-            endOfPrevWeek.setDate(endOfPrevWeek.getDate() + 6);
+            const testDatePrevMonth = new Date(this.currentDate);
+            testDatePrevMonth.setMonth(testDatePrevMonth.getMonth() - 1);
+            
+            const startOfTestWeek = CalendarUtils.getStartOfWeek(testDatePrevMonth);
+            const endOfTestWeek = new Date(startOfTestWeek);
+            endOfTestWeek.setDate(endOfTestWeek.getDate() + 6);
 
-            const currentWeekString = `${startOfCurrentWeek.toISOString().split('T')[0]}_${endOfCurrentWeek.toISOString().split('T')[0]}`;
-            const prevWeekString = `${startOfPrevWeek.toISOString().split('T')[0]}_${endOfPrevWeek.toISOString().split('T')[0]}`;
+            // Use CalendarUtils.formatDate for consistency (local time only)
+            const currentWeekString = `${CalendarUtils.formatDate(startOfCurrentWeek)}_${CalendarUtils.formatDate(endOfCurrentWeek)}`;
+            const testWeekString = `${CalendarUtils.formatDate(startOfTestWeek)}_${CalendarUtils.formatDate(endOfTestWeek)}`;
 
-            console.log('CURRENT WEEK:', currentWeekString);
-            console.log('PREV WEEK:', prevWeekString);
-            console.log('MATCH:', currentWeekString === prevWeekString);
-
-            if (currentWeekString === prevWeekString) {
+            if (currentWeekString === testWeekString) {
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                console.log('MONTH CHANGED ONLY');
+                console.log('MONTH CHANGED ONLY:', currentWeekString);
             } else {
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
-                console.log('ADVANCED 7 DAYS BACK');
+                console.log('WENT BACK 7 DAYS:', currentWeekString, '→', testWeekString);
             }
         }
         this.renderCalendar();
@@ -183,24 +182,23 @@ class CalendarManager {
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const startOfNextWeek = new Date(startOfCurrentWeek);
-            startOfNextWeek.setDate(startOfNextWeek.getDate() + 7);
-            const endOfNextWeek = new Date(startOfNextWeek);
-            endOfNextWeek.setDate(endOfNextWeek.getDate() + 6);
+            const testDateNextMonth = new Date(this.currentDate);
+            testDateNextMonth.setMonth(testDateNextMonth.getMonth() + 1);
+            
+            const startOfTestWeek = CalendarUtils.getStartOfWeek(testDateNextMonth);
+            const endOfTestWeek = new Date(startOfTestWeek);
+            endOfTestWeek.setDate(endOfTestWeek.getDate() + 6);
 
-            const currentWeekString = `${startOfCurrentWeek.toISOString().split('T')[0]}_${endOfCurrentWeek.toISOString().split('T')[0]}`;
-            const nextWeekString = `${startOfNextWeek.toISOString().split('T')[0]}_${endOfNextWeek.toISOString().split('T')[0]}`;
+            // Use CalendarUtils.formatDate for consistency (local time only)
+            const currentWeekString = `${CalendarUtils.formatDate(startOfCurrentWeek)}_${CalendarUtils.formatDate(endOfCurrentWeek)}`;
+            const testWeekString = `${CalendarUtils.formatDate(startOfTestWeek)}_${CalendarUtils.formatDate(endOfTestWeek)}`;
 
-            console.log('CURRENT WEEK:', currentWeekString);
-            console.log('NEXT WEEK:', nextWeekString);
-            console.log('MATCH:', currentWeekString === nextWeekString);
-
-            if (currentWeekString === nextWeekString) {
+            if (currentWeekString === testWeekString) {
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                console.log('MONTH CHANGED ONLY');
+                console.log('MONTH CHANGED ONLY:', currentWeekString);
             } else {
                 this.currentDate.setDate(this.currentDate.getDate() + 7);
-                console.log('ADVANCED 7 DAYS');
+                console.log('ADVANCED 7 DAYS:', currentWeekString, '→', testWeekString);
             }
         }
         this.renderCalendar();
