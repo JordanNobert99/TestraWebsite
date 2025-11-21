@@ -55,6 +55,13 @@ class CalendarManager {
             if (e.target.id === 'modalOverlay') this.modalManager.hideModal();
         });
 
+        // Delete button in modal
+        document.getElementById('deleteEventModalBtn')?.addEventListener('click', () => {
+            if (this.modalManager.editingId) {
+                this.handleDeleteEvent(this.modalManager.editingId);
+            }
+        });
+
         // Event form submission
         document.getElementById('eventFormElement')?.addEventListener('submit', (e) => this.handleSaveEvent(e));
 
@@ -73,22 +80,22 @@ class CalendarManager {
 
             // Event click
             const eventElement = e.target.closest('.event-item');
-            if (eventElement) {
+            if (eventElement && e.button === 0) {
                 const eventId = eventElement.dataset.eventId;
                 const event = this.eventManager.events.find(e => e.id === eventId);
                 if (event) {
                     this.modalManager.showModal(event);
                 }
             }
+        });
 
-            // Context menu
-            if (e.button === 2) {
+        // Right-click context menu on events
+        document.addEventListener('contextmenu', (e) => {
+            const eventElement = e.target.closest('.event-item');
+            if (eventElement) {
                 e.preventDefault();
-                const eventElement = e.target.closest('.event-item');
-                if (eventElement) {
-                    const eventId = eventElement.dataset.eventId;
-                    this.contextMenu.show(e.pageX, e.pageY, eventId, () => this.handleDeleteEvent(eventId));
-                }
+                const eventId = eventElement.dataset.eventId;
+                this.contextMenu.show(e.pageX, e.pageY, eventId, (id) => this.handleDeleteEvent(id));
             }
         });
 

@@ -29,9 +29,28 @@ class CalendarUtils {
 
     static isEventPast(dateStr, timeStr) {
         const now = new Date();
-        const eventTime = (timeStr && timeStr.trim()) ? timeStr : '23:59';
-        const eventDateTime = new Date(`${dateStr}T${eventTime}`);
-        return eventDateTime < now;
+        const currentDate = CalendarUtils.formatDate(now);
+        
+        // If the event date is in the future, it's not past
+        if (dateStr > currentDate) {
+            return false;
+        }
+        
+        // If the event date is in the past, it's past
+        if (dateStr < currentDate) {
+            return true;
+        }
+        
+        // Same day - check time
+        if (dateStr === currentDate) {
+            if (!timeStr || !timeStr.trim()) {
+                return false; // No time specified, not past
+            }
+            const eventDateTime = new Date(`${dateStr}T${timeStr}`);
+            return eventDateTime < now;
+        }
+        
+        return false;
     }
 
     static generateTimeOptions() {
