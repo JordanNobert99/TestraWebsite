@@ -20,10 +20,9 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday
         
-        // Week 1 always starts from day 1 of the month
-        // Calculate which week this date falls into
-        // Formula: (day - 1 + firstDayOfWeek) / 7, rounded up
-        const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
+        // Find what week the first day of the month falls into
+        // Then calculate which week our date is in relative to that
+        const weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
         
         return weekNum;
     }
