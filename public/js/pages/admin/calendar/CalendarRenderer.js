@@ -263,36 +263,28 @@ class CalendarRenderer {
             if (daysInFirstMonth > daysInSecondMonth) {
                 const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = firstDay.getFullYear();
-                // Check if this month's day 1 is in the week
-                let hasDay1 = false;
+                // Find a date from this month to calculate week number
+                let dateInMonth = firstDay;
                 for (const day of weekDays) {
-                    if (day.getMonth() === firstDay.getMonth() && day.getDate() === 1) {
-                        hasDay1 = true;
+                    if (day.getMonth() === firstDay.getMonth()) {
+                        dateInMonth = day;
                         break;
                     }
                 }
-                let weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
-                // Only apply the subtraction if day 1 is in this week
-                if (!hasDay1) {
-                    weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
-                }
+                const weekNum = CalendarUtils.getWeekNumberInMonth(dateInMonth);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             } else {
                 const monthStr = lastDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = lastDay.getFullYear();
-                // Check if this month's day 1 is in the week
-                let hasDay1 = false;
+                // Find a date from this month to calculate week number
+                let dateInMonth = lastDay;
                 for (const day of weekDays) {
-                    if (day.getMonth() === lastDay.getMonth() && day.getDate() === 1) {
-                        hasDay1 = true;
+                    if (day.getMonth() === lastDay.getMonth()) {
+                        dateInMonth = day;
                         break;
                     }
                 }
-                let weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
-                // Only apply the subtraction if day 1 is in this week
-                if (!hasDay1) {
-                    weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
-                }
+                const weekNum = CalendarUtils.getWeekNumberInMonth(dateInMonth);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             }
         }
