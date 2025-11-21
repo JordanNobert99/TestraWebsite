@@ -20,7 +20,16 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        const weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
+        let weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
+
+        // Bandaid: If this month's first week is also last month's last week, subtract 1
+        const firstWeekStart = CalendarUtils.getStartOfWeek(firstDay);
+        const firstWeekStartMonth = firstWeekStart.getMonth();
+        
+        if (firstWeekStartMonth !== month) {
+            // First week spans into previous month, so subtract 1 from all week numbers
+            weekNum = weekNum - 1;
+        }
 
         return weekNum;
     }
@@ -32,7 +41,16 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        const weekNum = Math.floor((date.getDate() - 1 + firstDayOfWeek) / 7) + 1;
+        let weekNum = Math.floor((date.getDate() - 1 + firstDayOfWeek) / 7) + 1;
+
+        // Bandaid: If this month's first week is also last month's last week, subtract 1
+        const firstWeekStart = CalendarUtils.getStartOfWeek(firstDay);
+        const firstWeekStartMonth = firstWeekStart.getMonth();
+        
+        if (firstWeekStartMonth !== month) {
+            // First week spans into previous month, so subtract 1 from all week numbers
+            weekNum = weekNum - 1;
+        }
 
         return weekNum;
     }
