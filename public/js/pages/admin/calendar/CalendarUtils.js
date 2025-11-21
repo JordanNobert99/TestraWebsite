@@ -20,8 +20,7 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        // Standard week calculation: which week of the month is this day in?
-        // Days 1-7 (adjusted for starting day) = week 1, 8-14 = week 2, etc
+        // Standard calculation: ceil((day + firstDayOfWeek) / 7)
         const weekNum = Math.ceil((day + firstDayOfWeek) / 7);
 
         return weekNum;
@@ -34,19 +33,10 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        let weekNum = Math.floor((date.getDate() - 1 + firstDayOfWeek) / 7) + 1;
+        // Use IDENTICAL logic to getWeekNumberInMonth
+        const weekNum = Math.ceil((date.getDate() + firstDayOfWeek) / 7);
 
-        // Bandaid: Check if this specific date's week starts in the previous month
-        const dateWeekStart = CalendarUtils.getStartOfWeek(date);
-        const dateWeekStartMonth = dateWeekStart.getMonth();
-        
-        // Only subtract 1 if this specific date's week starts in the previous month
-        if (dateWeekStartMonth !== month && dateWeekStartMonth === month - 1) {
-            weekNum = weekNum - 1;
-        }
-
-        // Never allow week 0
-        return Math.max(1, weekNum);
+        return weekNum;
     }
 
     static getISOWeekNumber(date) {
