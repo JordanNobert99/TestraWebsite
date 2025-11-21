@@ -243,10 +243,12 @@ class CalendarRenderer {
 
         calendar.classList.add('week-view');
 
-        // Create day cells
+        // Create day cells - FIXED: Now passing dayNum for week view
         for (const date of weekDays) {
             const dateStr = CalendarUtils.formatDate(date);
-            const dayDiv = this._createDayElement(dateStr, null, dateStr === todayStr, true);
+            const dayNum = date.getDate();
+            const isToday = dateStr === todayStr;
+            const dayDiv = this._createDayElement(dateStr, dayNum, isToday, true);
             calendar.appendChild(dayDiv);
         }
     }
@@ -268,6 +270,7 @@ class CalendarRenderer {
             eventsHTML += `<div class="event-more">+${dayEvents.length - 5} more</div>`;
         }
 
+        // FIXED: Now always shows day number if provided
         if (dayNum) {
             dayDiv.innerHTML = `
                 <div class="day-number">${dayNum}</div>
