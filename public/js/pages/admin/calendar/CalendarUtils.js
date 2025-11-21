@@ -20,17 +20,18 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        let weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
-
-        // Only subtract 1 if this specific date's week starts in the PREVIOUS month
-        const dateWeekStart = CalendarUtils.getStartOfWeek(date);
-        if (dateWeekStart.getMonth() !== month) {
-            // This date's week started in previous month
-            weekNum = weekNum - 1;
+        // Count how many complete weeks have started in this month BEFORE this date
+        let weekNum = 1;
+        let currentDate = new Date(year, month, 1);
+        
+        while (currentDate.getDate() < day) {
+            if (currentDate.getDay() === 0) {
+                weekNum++;
+            }
+            currentDate.setDate(currentDate.getDate() + 1);
         }
 
-        // Never allow week 0 or negative
-        return Math.max(1, weekNum);
+        return weekNum;
     }
 
     static getWeekNumberForMonth(date, referenceMonth) {
