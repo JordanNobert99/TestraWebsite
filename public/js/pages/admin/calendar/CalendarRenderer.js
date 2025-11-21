@@ -263,12 +263,12 @@ class CalendarRenderer {
             if (daysInFirstMonth > daysInSecondMonth) {
                 const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = firstDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberInMonthByStartDate(startOfWeek, firstDay);
+                const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             } else {
                 const monthStr = lastDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = lastDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberInMonthByStartDate(startOfWeek, lastDay);
+                const weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             }
         }
