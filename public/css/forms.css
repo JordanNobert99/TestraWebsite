@@ -48,6 +48,22 @@
     gap: 1.5rem;
 }
 
+.time-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.time-input-group select {
+    width: 70px;
+    flex-shrink: 0;
+}
+
+.time-separator {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
 .form-checkbox,
 .form-remember {
     display: flex;
