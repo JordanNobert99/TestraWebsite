@@ -136,19 +136,10 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.displayMonth.setMonth(this.displayMonth.getMonth() - 1);
         } else {
-            const startOfWeek = CalendarUtils.getStartOfWeek(this.weekStartDate);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-            // Check if week spans into previous month
-            if (startOfWeek.getMonth() !== this.displayMonth.getMonth()) {
-                // Week starts in previous month - change display month only
-                this.displayMonth.setMonth(this.displayMonth.getMonth() - 1);
-            } else {
-                // Normal week - go back 7 days AND update display month
-                this.weekStartDate.setDate(this.weekStartDate.getDate() - 7);
-                this.displayMonth = new Date(this.weekStartDate);
-            }
+            // Always go back 7 days
+            this.weekStartDate.setDate(this.weekStartDate.getDate() - 7);
+            // Derive displayMonth from weekStartDate
+            this.displayMonth = new Date(this.weekStartDate);
         }
         this.renderCalendar();
     }
@@ -157,19 +148,10 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.displayMonth.setMonth(this.displayMonth.getMonth() + 1);
         } else {
-            const startOfWeek = CalendarUtils.getStartOfWeek(this.weekStartDate);
-            const endOfWeek = new Date(startOfWeek);
-            endOfWeek.setDate(endOfWeek.getDate() + 6);
-
-            // Check if week spans into next month
-            if (endOfWeek.getMonth() !== this.displayMonth.getMonth()) {
-                // Week ends in next month - change display month only
-                this.displayMonth.setMonth(this.displayMonth.getMonth() + 1);
-            } else {
-                // Normal week - advance 7 days AND update display month
-                this.weekStartDate.setDate(this.weekStartDate.getDate() + 7);
-                this.displayMonth = new Date(this.weekStartDate);
-            }
+            // Always advance 7 days
+            this.weekStartDate.setDate(this.weekStartDate.getDate() + 7);
+            // Derive displayMonth from weekStartDate
+            this.displayMonth = new Date(this.weekStartDate);
         }
         this.renderCalendar();
     }
