@@ -11,7 +11,11 @@ class CalendarUtils {
         return new Date(d.setDate(diff));
     }
 
-    static getWeekNumber(date) {
+    /**
+     * Get week number within a month (1-6)
+     * Used for month view week identification
+     */
+    static getWeekNumberInMonth(date) {
         const year = date.getFullYear();
         const month = date.getMonth();
         const day = date.getDate();
@@ -29,11 +33,35 @@ class CalendarUtils {
     }
 
     /**
+     * Get ISO week number (1-53) - consistent across month boundaries
+     * This is used for week view to properly handle weeks spanning two months
+     */
+    static getISOWeekNumber(date) {
+        const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        const dayNum = d.getUTCDay() || 7; // Monday is 1, Sunday is 7
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    }
+
+    /**
+     * Get calendar week number (for display purposes)
+     * Shows which week of the year, accounting for month boundaries
+     */
+    static getCalendarWeekNumber(date) {
+        const startOfYear = new Date(date.getFullYear(), 0, 1);
+        const startOfWeek = this.getStartOfWeek(startOfYear);
+        const currentWeekStart = this.getStartOfWeek(date);
+        const weeksDiff = Math.round((currentWeekStart - startOfWeek) / (7 * 24 * 60 * 60 * 1000));
+        return weeksDiff + 1;
+    }
+
+    /**
      * Validate week number for a given date
      * Returns true if the week number is correctly positioned
      */
     static validateWeekNumber(date) {
-        const weekNum = this.getWeekNumber(date);
+        const weekNum = this.getWeekNumberInMonth(date);
         const month = date.getMonth();
         const year = date.getFullYear();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
