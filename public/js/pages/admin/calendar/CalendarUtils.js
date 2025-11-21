@@ -20,19 +20,10 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay(); // 0 = Sunday
         
-        // Find the first Sunday of the month (start of week 1)
-        const daysUntilFirstSunday = (7 - firstDayOfWeek) % 7;
-        const firstSundayDate = firstDay.getDate() + daysUntilFirstSunday;
-        
-        // If the month starts on Sunday, week 1 starts on day 1
-        // Otherwise, days before the first Sunday are also part of week 1
-        if (day < firstSundayDate) {
-            return 1; // Before first Sunday, still week 1
-        }
-        
-        // Calculate which week after the first Sunday
-        const daysSinceFirstSunday = day - firstSundayDate;
-        const weekNum = Math.floor(daysSinceFirstSunday / 7) + 2;
+        // Week 1 always includes day 1 of the month
+        // Calculate which week this day falls into based on the first day's position
+        // Every 7 days increments the week number
+        const weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
         
         return weekNum;
     }
