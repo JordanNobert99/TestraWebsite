@@ -20,16 +20,10 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        // Count how many complete weeks have started in this month BEFORE this date
-        let weekNum = 1;
-        let currentDate = new Date(year, month, 1);
-        
-        while (currentDate.getDate() < day) {
-            if (currentDate.getDay() === 0) {
-                weekNum++;
-            }
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
+        // Simple: which week does this day fall into based on the month's starting day
+        // If month starts on Monday (1), then days 1-7 are week 1, 8-14 are week 2, etc
+        // If month starts on Sunday (0), then days 1-7 are week 1, 8-14 are week 2, etc
+        const weekNum = Math.floor((day + firstDayOfWeek - 1) / 7) + 1;
 
         return weekNum;
     }
