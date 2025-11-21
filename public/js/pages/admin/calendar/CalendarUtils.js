@@ -22,16 +22,18 @@ class CalendarUtils {
 
         let weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
 
-        // Bandaid: If this month's first week is also last month's last week, subtract 1
-        const firstWeekStart = CalendarUtils.getStartOfWeek(firstDay);
-        const firstWeekStartMonth = firstWeekStart.getMonth();
+        // Bandaid: Check if the FIRST day of the month starts in the previous month's week
+        // Only apply the -1 adjustment to dates that are in a week spanning two months
+        const dateWeekStart = CalendarUtils.getStartOfWeek(date);
+        const dateWeekStartMonth = dateWeekStart.getMonth();
         
-        if (firstWeekStartMonth !== month) {
-            // First week spans into previous month, so subtract 1 from all week numbers
+        // Only subtract 1 if this specific date's week starts in the previous month
+        if (dateWeekStartMonth !== month && dateWeekStartMonth === month - 1) {
             weekNum = weekNum - 1;
         }
 
-        return weekNum;
+        // Never allow week 0
+        return Math.max(1, weekNum);
     }
 
     static getWeekNumberForMonth(date, referenceMonth) {
@@ -43,16 +45,17 @@ class CalendarUtils {
 
         let weekNum = Math.floor((date.getDate() - 1 + firstDayOfWeek) / 7) + 1;
 
-        // Bandaid: If this month's first week is also last month's last week, subtract 1
-        const firstWeekStart = CalendarUtils.getStartOfWeek(firstDay);
-        const firstWeekStartMonth = firstWeekStart.getMonth();
+        // Bandaid: Check if this specific date's week starts in the previous month
+        const dateWeekStart = CalendarUtils.getStartOfWeek(date);
+        const dateWeekStartMonth = dateWeekStart.getMonth();
         
-        if (firstWeekStartMonth !== month) {
-            // First week spans into previous month, so subtract 1 from all week numbers
+        // Only subtract 1 if this specific date's week starts in the previous month
+        if (dateWeekStartMonth !== month && dateWeekStartMonth === month - 1) {
             weekNum = weekNum - 1;
         }
 
-        return weekNum;
+        // Never allow week 0
+        return Math.max(1, weekNum);
     }
 
     static getISOWeekNumber(date) {
