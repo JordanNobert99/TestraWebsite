@@ -148,27 +148,28 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
         } else {
-            // Get current week bounds
             const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            // Get what would be previous week bounds
             const startOfPrevWeek = new Date(startOfCurrentWeek);
             startOfPrevWeek.setDate(startOfPrevWeek.getDate() - 7);
             const endOfPrevWeek = new Date(startOfPrevWeek);
             endOfPrevWeek.setDate(endOfPrevWeek.getDate() + 6);
 
-            // Format dates to compare full date (YYYY-MM-DD)
-            const currentWeekString = `${CalendarUtils.formatDate(startOfCurrentWeek)}_${CalendarUtils.formatDate(endOfCurrentWeek)}`;
-            const prevWeekString = `${CalendarUtils.formatDate(startOfPrevWeek)}_${CalendarUtils.formatDate(endOfPrevWeek)}`;
+            const currentWeekString = `${startOfCurrentWeek.toISOString().split('T')[0]}_${endOfCurrentWeek.toISOString().split('T')[0]}`;
+            const prevWeekString = `${startOfPrevWeek.toISOString().split('T')[0]}_${endOfPrevWeek.toISOString().split('T')[0]}`;
+
+            console.log('CURRENT WEEK:', currentWeekString);
+            console.log('PREV WEEK:', prevWeekString);
+            console.log('MATCH:', currentWeekString === prevWeekString);
 
             if (currentWeekString === prevWeekString) {
-                // Same 7 calendar days - just change month context
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                console.log('MONTH CHANGED ONLY');
             } else {
-                // Different weeks - move back 7 days
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
+                console.log('ADVANCED 7 DAYS BACK');
             }
         }
         this.renderCalendar();
@@ -203,10 +204,6 @@ class CalendarManager {
             }
         }
         this.renderCalendar();
-        console.log('startOfCurrentWeek:', startOfCurrentWeek);
-        console.log('CalendarUtils.formatDate(startOfCurrentWeek):', CalendarUtils.formatDate(startOfCurrentWeek));
-        console.log('endOfCurrentWeek:', endOfCurrentWeek);
-        console.log('CalendarUtils.formatDate(endOfCurrentWeek):', CalendarUtils.formatDate(endOfCurrentWeek));
     }
 
     handleToday() {
