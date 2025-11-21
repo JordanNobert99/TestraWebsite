@@ -2,24 +2,43 @@
 class ContextMenu {
     constructor() {
         this.eventId = null;
+        this.onDeleteCallback = null;
+        this.setupContextMenuListener();
     }
 
-    show(eventElement) {
+    setupContextMenuListener() {
+        // Hide context menu when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.context-menu')) {
+                this.hide();
+            }
+        });
+
+        // Handle delete button click
+        document.getElementById('deleteEventBtn')?.addEventListener('click', () => {
+            if (this.onDeleteCallback && this.eventId) {
+                this.onDeleteCallback(this.eventId);
+            }
+        });
+    }
+
+    show(x, y, eventId, onDeleteCallback) {
         const contextMenu = document.getElementById('contextMenu');
-        const rect = eventElement.getBoundingClientRect();
+        
+        this.eventId = eventId;
+        this.onDeleteCallback = onDeleteCallback;
         
         contextMenu.style.position = 'fixed';
-        contextMenu.style.left = rect.left + 'px';
-        contextMenu.style.top = rect.bottom + 'px';
+        contextMenu.style.left = x + 'px';
+        contextMenu.style.top = y + 'px';
         contextMenu.style.display = 'block';
-        
-        this.eventId = eventElement.dataset.eventId;
     }
 
     hide() {
         const contextMenu = document.getElementById('contextMenu');
         contextMenu.style.display = 'none';
         this.eventId = null;
+        this.onDeleteCallback = null;
     }
 
     getEventId() {

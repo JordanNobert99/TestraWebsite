@@ -29,7 +29,8 @@ class CalendarUtils {
 
     static isEventPast(dateStr, timeStr) {
         const now = new Date();
-        const eventDateTime = new Date(`${dateStr}T${timeStr || '00:00'}`);
+        const eventTime = (timeStr && timeStr.trim()) ? timeStr : '23:59';
+        const eventDateTime = new Date(`${dateStr}T${eventTime}`);
         return eventDateTime < now;
     }
 

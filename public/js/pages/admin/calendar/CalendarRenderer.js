@@ -110,11 +110,11 @@ class CalendarRenderer {
         const testTypeAbbrev = this.getTestTypeAbbrev(event.testType);
         const displayTime = event.time ? event.time : '—';
         const eventTypeLabel = this.getEventTypeLabel(event.eventType);
-        const isPast = CalendarUtils.isEventPast(event.date, event.time);
+        const classes = this.getEventClasses(event);
         const tooltip = this.createEventTooltip(event);
 
         return `
-            <div class="event-item" data-event-id="${event.id}" draggable="true" title="${event.clientName}">
+            <div class="${classes}" data-event-id="${event.id}" draggable="true" title="${event.clientName}">
                 <div class="event-indicator" style="background-color: ${statusColor};" title="${event.status || 'scheduled'}"></div>
                 <div class="event-body">
                     <div class="event-time">${displayTime}</div>
