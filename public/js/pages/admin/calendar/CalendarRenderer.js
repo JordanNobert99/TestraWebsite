@@ -242,15 +242,35 @@ class CalendarRenderer {
         const monthStr = firstDay.toLocaleDateString('en-US', { month: 'short' });
         const year = firstDay.getFullYear();
         
-        // If week spans multiple months, show both
+        // Get week number for the month(s) this week spans
+        let weekNumDisplay = '';
+        if (firstDay.getMonth() === lastDay.getMonth()) {
+            // Week is entirely within one month
+            const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+            weekNumDisplay = ` - Week ${weekNum}`;
+        } else {
+            // Week spans two months - show week number for the month with more days
+            const daysInFirst = 7 - firstDay.getDate() + 1;
+            const daysInSecond = lastDay.getDate();
+            if (daysInFirst >= daysInSecond) {
+                const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+                weekNumDisplay = ` - ${monthStr} Week ${weekNum}`;
+            } else {
+                const weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
+                const endMonthStr = lastDay.toLocaleDateString('en-US', { month: 'short' });
+                weekNumDisplay = ` - ${endMonthStr} Week ${weekNum}`;
+            }
+        }
+        
+        // If week spans multiple months, show both months
         if (firstDay.getMonth() !== lastDay.getMonth()) {
             const endMonthStr = lastDay.toLocaleDateString('en-US', { month: 'short' });
             const endYear = lastDay.getFullYear();
             document.getElementById('currentMonth').textContent = 
-                `${monthStr} ${firstDay.getDate()} - ${endMonthStr} ${lastDay.getDate()}, ${year}`;
+                `${monthStr} ${firstDay.getDate()} - ${endMonthStr} ${lastDay.getDate()}, ${year}${weekNumDisplay}`;
         } else {
             document.getElementById('currentMonth').textContent = 
-                `${monthStr} ${firstDay.getDate()} - ${lastDay.getDate()}, ${year}`;
+                `${monthStr} ${firstDay.getDate()} - ${lastDay.getDate()}, ${year}${weekNumDisplay}`;
         }
 
         calendar.classList.add('week-view');
