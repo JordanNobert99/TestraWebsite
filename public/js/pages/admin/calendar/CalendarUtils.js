@@ -74,7 +74,7 @@ class CalendarUtils {
         const dates = [];
 
         for (let day = 1; day <= daysInMonth; day++) {
-            const currentWeekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
+            const currentWeekNum = Math.ceil((day + firstDayOfWeek) / 7);
             if (currentWeekNum === weekNum) {
                 dates.push(new Date(year, month, day));
             }
