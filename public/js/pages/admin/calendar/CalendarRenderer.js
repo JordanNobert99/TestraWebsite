@@ -236,7 +236,7 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Build display string - just month and week number
+        // Determine which month has more days in this week
         const firstDay = weekDays[0];
         const lastDay = weekDays[6];
         
@@ -245,22 +245,22 @@ class CalendarRenderer {
             // Week is entirely within one month
             const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
             const year = firstDay.getFullYear();
-            const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+            const weekNum = CalendarUtils.getWeekNumberForMonth(firstDay, firstDay);
             headerText = `${monthStr} ${year} - Week ${weekNum}`;
         } else {
-            // Week spans two months - show week number for the month with more days
+            // Week spans two months - count which has more days
             const daysInFirst = 7 - firstDay.getDate() + 1;
             const daysInSecond = lastDay.getDate();
             
-            if (daysInFirst >= daysInSecond) {
+            if (daysInFirst > daysInSecond) {
                 const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = firstDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
+                const weekNum = CalendarUtils.getWeekNumberForMonth(firstDay, firstDay);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             } else {
                 const monthStr = lastDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = lastDay.getFullYear();
-                const weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
+                const weekNum = CalendarUtils.getWeekNumberForMonth(lastDay, lastDay);
                 headerText = `${monthStr} ${year} - Week ${weekNum}`;
             }
         }
