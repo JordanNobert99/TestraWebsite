@@ -222,42 +222,50 @@ class CalendarRenderer {
         const today = new Date();
         const todayStr = CalendarUtils.formatDate(today);
 
-        // Build display string from actual week dates
+        // Create week day headers
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(startOfWeek);
+            date.setDate(date.getDate() + i);
+            weekDays.push(date);
+
+            const dayName = dayNames[date.getDay()];
+            const dayNum = date.getDate();
+            const header = document.createElement('div');
+            header.className = 'weekday';
+            header.textContent = `${dayName} ${dayNum}`;
+            weekdaysHeader.appendChild(header);
+        }
+
+        // Build display string - just month and week number
         const firstDay = weekDays[0];
         const lastDay = weekDays[6];
-        const monthStr = firstDay.toLocaleDateString('en-US', { month: 'short' });
-        const year = firstDay.getFullYear();
         
-        // Get week number for the month(s) this week spans
-        let weekNumDisplay = '';
+        let headerText = '';
         if (firstDay.getMonth() === lastDay.getMonth()) {
             // Week is entirely within one month
+            const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
+            const year = firstDay.getFullYear();
             const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
-            weekNumDisplay = ` - Week ${weekNum}`;
+            headerText = `${monthStr} ${year} - Week ${weekNum}`;
         } else {
             // Week spans two months - show week number for the month with more days
             const daysInFirst = 7 - firstDay.getDate() + 1;
             const daysInSecond = lastDay.getDate();
+            
             if (daysInFirst >= daysInSecond) {
+                const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
+                const year = firstDay.getFullYear();
                 const weekNum = CalendarUtils.getWeekNumberInMonth(firstDay);
-                weekNumDisplay = ` - ${monthStr} Week ${weekNum}`;
+                headerText = `${monthStr} ${year} - Week ${weekNum}`;
             } else {
+                const monthStr = lastDay.toLocaleDateString('en-US', { month: 'long' });
+                const year = lastDay.getFullYear();
                 const weekNum = CalendarUtils.getWeekNumberInMonth(lastDay);
-                const endMonthStr = lastDay.toLocaleDateString('en-US', { month: 'short' });
-                weekNumDisplay = ` - ${endMonthStr} Week ${weekNum}`;
+                headerText = `${monthStr} ${year} - Week ${weekNum}`;
             }
         }
         
-        // If week spans multiple months, show both months
-        if (firstDay.getMonth() !== lastDay.getMonth()) {
-            const endMonthStr = lastDay.toLocaleDateString('en-US', { month: 'short' });
-            const endYear = lastDay.getFullYear();
-            document.getElementById('currentMonth').textContent = 
-                `${monthStr} ${firstDay.getDate()} - ${endMonthStr} ${lastDay.getDate()}, ${year}${weekNumDisplay}`;
-        } else {
-            document.getElementById('currentMonth').textContent = 
-                `${monthStr} ${firstDay.getDate()} - ${lastDay.getDate()}, ${year}${weekNumDisplay}`;
-        }
+        document.getElementById('currentMonth').textContent = headerText;
 
         calendar.classList.add('week-view');
 
