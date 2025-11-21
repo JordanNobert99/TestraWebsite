@@ -26,8 +26,17 @@ class CalendarUtils {
         // Only subtract 1 if:
         // 1. Week 1 doesn't start on day 1 (firstDayOfWeek > 0)
         // 2. We calculated week 2 or higher (weekNum >= 2)
+        // 3. The first week has MORE days from previous month than current month
         if (firstDayOfWeek > 0 && weekNum >= 2) {
-            weekNum = Math.max(1, weekNum - 1);
+            // Days from previous month in week 1: firstDayOfWeek
+            // Days from current month in week 1: 7 - firstDayOfWeek
+            const daysFromPrevMonth = firstDayOfWeek;
+            const daysFromCurrMonth = 7 - firstDayOfWeek;
+            
+            // Only subtract if previous month has more days in week 1
+            if (daysFromPrevMonth > daysFromCurrMonth) {
+                weekNum = Math.max(1, weekNum - 1);
+            }
         }
 
         return weekNum;
