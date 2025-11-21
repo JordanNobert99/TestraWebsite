@@ -55,7 +55,7 @@
 }
 
 .time-input-group select {
-    width: 85px;
+    width: 100px;
     flex-shrink: 0;
 }
 
