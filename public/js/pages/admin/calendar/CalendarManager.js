@@ -2,7 +2,8 @@
 class CalendarManager {
     constructor() {
         this.currentUser = null;
-        this.currentDate = new Date();
+        this.weekStartDate = new Date();  // Actual Sunday of the week being displayed
+        this.displayMonth = new Date();   // Which month's context to show in header
         this.currentView = 'week';
         this.draggedEvent = null;
 
@@ -125,34 +126,57 @@ class CalendarManager {
 
     renderCalendar() {
         if (this.currentView === 'month') {
-            this.renderer.renderMonthView(this.currentDate);
+            this.renderer.renderMonthView(this.displayMonth);
         } else {
-            this.renderer.renderWeekView(this.currentDate);
+            this.renderer.renderWeekView(this.weekStartDate, this.displayMonth);
         }
     }
 
     handlePrevMonth() {
         if (this.currentView === 'month') {
-            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+            this.displayMonth.setMonth(this.displayMonth.getMonth() - 1);
         } else {
-            // Always go back exactly 7 days
-            this.currentDate.setDate(this.currentDate.getDate() - 7);
+            const startOfWeek = CalendarUtils.getStartOfWeek(this.weekStartDate);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+            // Check if week spans into previous month
+            if (startOfWeek.getMonth() !== this.displayMonth.getMonth()) {
+                // Week starts in previous month - change display month only
+                this.displayMonth.setMonth(this.displayMonth.getMonth() - 1);
+            } else {
+                // Normal week - go back 7 days AND update display month
+                this.weekStartDate.setDate(this.weekStartDate.getDate() - 7);
+                this.displayMonth = new Date(this.weekStartDate);
+            }
         }
         this.renderCalendar();
     }
 
     handleNextMonth() {
         if (this.currentView === 'month') {
-            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+            this.displayMonth.setMonth(this.displayMonth.getMonth() + 1);
         } else {
-            // Always advance exactly 7 days
-            this.currentDate.setDate(this.currentDate.getDate() + 7);
+            const startOfWeek = CalendarUtils.getStartOfWeek(this.weekStartDate);
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(endOfWeek.getDate() + 6);
+
+            // Check if week spans into next month
+            if (endOfWeek.getMonth() !== this.displayMonth.getMonth()) {
+                // Week ends in next month - change display month only
+                this.displayMonth.setMonth(this.displayMonth.getMonth() + 1);
+            } else {
+                // Normal week - advance 7 days AND update display month
+                this.weekStartDate.setDate(this.weekStartDate.getDate() + 7);
+                this.displayMonth = new Date(this.weekStartDate);
+            }
         }
         this.renderCalendar();
     }
 
     handleToday() {
-        this.currentDate = new Date();
+        this.weekStartDate = new Date();
+        this.displayMonth = new Date();
         this.renderCalendar();
     }
 

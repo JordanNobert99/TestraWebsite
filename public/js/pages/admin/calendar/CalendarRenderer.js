@@ -207,7 +207,7 @@ class CalendarRenderer {
         }
     }
 
-    renderWeekView(currentDate) {
+    renderWeekView(weekStartDate, displayMonth) {
         const calendar = document.getElementById('calendarGrid');
         const weekdaysHeader = document.getElementById('calendarWeekdays');
         if (!calendar || !weekdaysHeader) return;
@@ -215,7 +215,7 @@ class CalendarRenderer {
         calendar.innerHTML = '';
         weekdaysHeader.innerHTML = '';
 
-        const startOfWeek = CalendarUtils.getStartOfWeek(currentDate);
+        const startOfWeek = CalendarUtils.getStartOfWeek(weekStartDate);
         const weekDays = [];
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -236,12 +236,10 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Get week number based on currentDate's month context
-        // This ensures Oct 26-Nov 1 shows as "Oct Week 5" when currentDate is in Oct
-        // and as "Nov Week 1" when currentDate is in Nov
-        const weekNum = CalendarUtils.getWeekNumberInMonth(currentDate);
-        const monthStr = currentDate.toLocaleDateString('en-US', { month: 'short' });
-        const year = currentDate.getFullYear();
+        // Get week number based on displayMonth context only
+        const weekNum = CalendarUtils.getWeekNumberInMonth(displayMonth);
+        const monthStr = displayMonth.toLocaleDateString('en-US', { month: 'short' });
+        const year = displayMonth.getFullYear();
         
         document.getElementById('currentMonth').textContent = `${monthStr} ${year} - Week ${weekNum}`;
 
