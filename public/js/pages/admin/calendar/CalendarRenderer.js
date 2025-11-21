@@ -222,20 +222,6 @@ class CalendarRenderer {
         const today = new Date();
         const todayStr = CalendarUtils.formatDate(today);
 
-        // Create week day headers
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startOfWeek);
-            date.setDate(date.getDate() + i);
-            weekDays.push(date);
-
-            const dayName = dayNames[date.getDay()];
-            const dayNum = date.getDate();
-            const header = document.createElement('div');
-            header.className = 'weekday';
-            header.textContent = `${dayName} ${dayNum}`;
-            weekdaysHeader.appendChild(header);
-        }
-
         // Build display string from actual week dates
         const firstDay = weekDays[0];
         const lastDay = weekDays[6];
