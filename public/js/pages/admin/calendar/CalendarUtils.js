@@ -20,14 +20,12 @@ class CalendarUtils {
         const firstDay = new Date(year, month, 1);
         const firstDayOfWeek = firstDay.getDay();
 
-        // Check if the first day of the month is NOT a Sunday
-        // If so, it's part of the previous month's last week
-        const firstDayIsPartOfPrevWeek = firstDayOfWeek !== 0;
-
         let weekNum = Math.floor((day - 1 + firstDayOfWeek) / 7) + 1;
 
-        // If the first day is part of previous month's week, shift all week numbers down by 1
-        if (firstDayIsPartOfPrevWeek) {
+        // Only subtract 1 if this specific date's week starts in the PREVIOUS month
+        const dateWeekStart = CalendarUtils.getStartOfWeek(date);
+        if (dateWeekStart.getMonth() !== month) {
+            // This date's week started in previous month
             weekNum = weekNum - 1;
         }
 
