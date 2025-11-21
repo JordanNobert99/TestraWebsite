@@ -485,10 +485,10 @@
 
 /* Enhanced Event Items */
 .event-item {
-    background: var(--bg-secondary);
+    background: transparent;
     color: var(--text-primary);
     padding: 0.5rem 0.6rem;
-    border-radius: 6px;
+    border-radius: 0;
     font-size: 0.75rem;
     cursor: grab;
     transition: all 0.2s ease;
@@ -517,6 +517,7 @@
     border-radius: 2px;
     flex-shrink: 0;
     transition: all 0.2s ease;
+    display: none;
 }
 
 .event-item:hover .event-indicator {
@@ -650,50 +651,36 @@
     font-weight: 600;
 }
 
-/* Status-specific event styling */
+/* Status-specific event styling - LEFT BORDER ONLY */
 .event-item.status-no-show {
     border-left: 4px solid #dc2626;
-    background: rgba(220, 38, 38, 0.12);
-    opacity: 1;
 }
 
 .event-item.status-scheduled {
     border-left: 4px solid #3b82f6;
-    background: rgba(59, 130, 246, 0.12);
-    opacity: 1;
 }
 
 .event-item.status-completed {
     border-left: 4px solid #10b981;
-    background: rgba(16, 185, 129, 0.12);
-    opacity: 1;
 }
 
 .event-item.status-cancelled {
     border-left: 4px solid #8b5cf6;
-    background: rgba(139, 92, 246, 0.12);
-    opacity: 1;
 }
 
 .event-item.type-consultation {
     border-left: 4px solid #f59e0b;
-    background: rgba(245, 158, 11, 0.12);
-    opacity: 1;
 }
 
 .event-item.type-followup {
     border-left: 4px solid #06b6d4;
-    background: rgba(6, 182, 212, 0.12);
-    opacity: 1;
 }
 
 .event-item.type-other {
     border-left: 4px solid #6366f1;
-    background: rgba(99, 102, 241, 0.12);
-    opacity: 1;
 }
 
-/* Past event styling - reduce opacity for past events */
+/* Past event styling */
 .event-item.past-event {
     opacity: 0.5;
 }
