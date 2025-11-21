@@ -459,252 +459,245 @@
     flex: 1;
 }
 
-/* Event Type Colors */
+/* Enhanced Event Items */
 .event-item {
-    background: var(--primary-color);
-    color: white;
-    padding: 0.3rem 0.4rem;
-    border-radius: 3px;
-    font-size: 0.65rem;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    padding: 0.5rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
     cursor: grab;
     transition: all 0.2s ease;
-    display: inline-flex;
-    gap: 0.35rem;
+    display: flex;
+    gap: 0.4rem;
     overflow: hidden;
     user-select: none;
+    border: 1px solid var(--border-color);
+    position: relative;
+    margin-bottom: 0.3rem;
+}
+
+.event-item:active {
+    cursor: grabbing;
+}
+
+.event-item:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    z-index: 10;
+}
+
+.event-indicator {
+    width: 4px;
+    height: 100%;
+    border-radius: 2px;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.event-item:hover .event-indicator {
+    width: 6px;
+}
+
+.event-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.event-time {
+    font-weight: 700;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    color: var(--text-primary);
+}
+
+.event-name {
+    font-weight: 600;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-primary);
+}
+
+.event-meta {
+    display: flex;
+    gap: 0.3rem;
     flex-wrap: wrap;
     align-items: center;
 }
 
-    .event-item:active {
-        cursor: grabbing;
-    }
-
-    .event-item:hover {
-        background: var(--primary-hover);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        transform: translateY(-1px);
-    }
-
-/* Drug Testing Event Status Colors */
-.event-item.status-no-show {
-    background: #dc2626;
+.event-type {
+    background: rgba(var(--primary-color-rgb, 59, 130, 246), 0.15);
+    color: var(--primary-color);
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    white-space: nowrap;
 }
 
-    .event-item.status-no-show:hover {
-        background: #b91c1c;
+.event-test-abbrev {
+    background: rgba(249, 158, 11, 0.2);
+    color: #92400e;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.event-no-show-badge {
+    background: rgba(220, 38, 38, 0.2);
+    color: #dc2626;
+    padding: 0.1rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.65rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Event Tooltip */
+.event-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    min-width: 220px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1001;
+    white-space: normal;
+    font-size: 0.85rem;
+    animation: tooltipFadeIn 0.2s ease;
+}
+
+@keyframes tooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
     }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.event-item:hover .event-tooltip {
+    display: block;
+}
+
+.tooltip-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    align-items: flex-start;
+}
+
+.tooltip-row:last-child {
+    margin-bottom: 0;
+}
+
+.tooltip-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    min-width: 60px;
+    font-size: 0.8rem;
+}
+
+.tooltip-value {
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    word-break: break-word;
+}
+
+.tooltip-warning {
+    padding: 0.5rem;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 4px;
+    color: #dc2626;
+    font-weight: 600;
+}
+
+/* Status-specific event styling */
+.event-item.status-no-show {
+    border-left: 3px solid #dc2626;
+}
 
 .event-item.status-scheduled {
-    background: #3b82f6;
+    border-left: 3px solid #3b82f6;
 }
-
-    .event-item.status-scheduled:hover {
-        background: #2563eb;
-    }
 
 .event-item.status-completed {
-    background: #10b981;
+    border-left: 3px solid #10b981;
 }
-
-    .event-item.status-completed:hover {
-        background: #059669;
-    }
 
 .event-item.status-cancelled {
-    background: #8b5cf6;
+    border-left: 3px solid #8b5cf6;
 }
 
-    .event-item.status-cancelled:hover {
-        background: #7c3aed;
-    }
-
-/* Other Event Type Colors */
 .event-item.type-consultation {
-    background: #f59e0b;
+    border-left: 3px solid #f59e0b;
 }
-
-    .event-item.type-consultation:hover {
-        background: #d97706;
-    }
 
 .event-item.type-followup {
-    background: #06b6d4;
+    border-left: 3px solid #06b6d4;
 }
-
-    .event-item.type-followup:hover {
-        background: #0891b2;
-    }
 
 .event-item.type-other {
-    background: #6366f1;
+    border-left: 3px solid #6366f1;
 }
 
-    .event-item.type-other:hover {
-        background: #4f46e5;
-    }
-
-/* Past Event Styling */
+/* Past event styling */
 .event-item.past-event {
-    opacity: 0.5;
-    background: var(--border-color);
-    color: var(--text-secondary);
+    opacity: 0.6;
+    background: var(--bg-tertiary);
 }
 
-    .event-item.past-event:hover {
-        opacity: 0.6;
-        transform: none;
-    }
-
-    .event-item.status-no-show.past-event {
-        background: #7f1d1d;
-        opacity: 0.5;
-    }
-
-    .event-item.status-completed.past-event {
-        background: #064e3b;
-        opacity: 0.5;
-    }
-
-    .event-item.status-cancelled.past-event {
-        background: #4c1d95;
-        opacity: 0.5;
-    }
-
-    .event-item.type-consultation.past-event {
-        background: #78350f;
-        opacity: 0.5;
-    }
-
-    .event-item.type-followup.past-event {
-        background: #164e63;
-        opacity: 0.5;
-    }
-
-    .event-item.type-other.past-event {
-        background: #312e81;
-        opacity: 0.5;
-    }
-
-.event-time {
-    font-weight: 700;
-    font-size: 0.62rem;
-    white-space: nowrap;
-    flex-shrink: 0;
+.event-item.past-event:hover {
+    transform: none;
+    box-shadow: none;
 }
 
-.event-client {
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 0.63rem;
-    flex: 1;
-    min-width: 60px;
+.event-item.past-event .event-indicator {
+    opacity: 0.6;
 }
 
-.event-test {
-    font-size: 0.62rem;
-    opacity: 0.9;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.event-more {
-    text-align: center;
-    font-size: 0.62rem;
-    color: var(--text-secondary);
-    padding: 0.15rem;
-    font-weight: 600;
-}
-
-.time-input-group {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.time-input-group select {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background: var(--bg-primary);
-    color: var(--text-primary);
-    font-size: 0.95rem;
-    cursor: pointer;
-}
-
-.time-separator {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-}
-
+/* Mobile responsiveness */
 @media (max-width: 768px) {
-    .calendar-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.75rem;
-    }
-
-    .nav-controls {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-        .nav-controls h2 {
-            min-width: auto;
-            flex: 1;
-        }
-
-    .view-controls {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .btn-today {
-        flex: 1;
-    }
-
-    .time-input-group {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .time-input-group select {
-        width: 100%;
-    }
-
-    .time-separator {
-        display: none;
-    }
-
-    .calendar-day {
-        min-height: 120px;
-        padding: 0.5rem;
-        font-size: 0.8rem;
-    }
-
-    .day-number {
-        margin-bottom: 0.3rem;
-    }
-
     .event-item {
-        padding: 0.2rem 0.3rem;
-        font-size: 0.6rem;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.7rem;
     }
 
-    .modal-content {
-        padding: 1.5rem;
+    .event-time {
+        font-size: 0.65rem;
     }
 
-    .event-modal {
-        width: 95%;
+    .event-name {
+        font-size: 0.7rem;
     }
 
-    .form-row {
-        grid-template-columns: 1fr;
+    .event-tooltip {
+        position: fixed;
+        bottom: auto;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 250px;
+        max-width: 90vw;
+        margin-bottom: 0;
+        z-index: 1002;
+    }
+
+    .event-item:hover .event-tooltip {
+        display: block;
     }
 }

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../../public/css/animations.css">
     <link rel="stylesheet" href="../../public/css/responsive.css">
     <link rel="stylesheet" href="../../public/css/admin.css">
+    <link rel="stylesheet" href="../../public/css/notifications.css">
 </head>
 <body>
     <nav class="navbar">
@@ -178,8 +179,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+    <!-- Core Modules -->
     <script src="../../public/js/config.js"></script>
     <script src="../../public/js/theme-switcher.js"></script>
-    <script src="../../public/js/pages/admin-calendar.js"></script>
+    <!-- Notification Service -->
+    <script src="../../public/js/lib/NotificationService.js"></script>
+    <!-- Calendar Modules -->
+    <script src="../../public/js/pages/admin/calendar/CalendarUtils.js"></script>
+    <script src="../../public/js/pages/admin/calendar/EventManager.js"></script>
+    <script src="../../public/js/pages/admin/calendar/ModalManager.js"></script>
+    <script src="../../public/js/pages/admin/calendar/ContextMenu.js"></script>
+    <script src="../../public/js/pages/admin/calendar/CalendarRenderer.js"></script>
+    <script src="../../public/js/pages/admin/calendar/CalendarManager.js"></script>
 </body>
 </html>
