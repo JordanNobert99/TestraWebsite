@@ -136,8 +136,10 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.displayMonth.setMonth(this.displayMonth.getMonth() - 1);
         } else {
-            // Always go back 7 days
-            this.weekStartDate.setDate(this.weekStartDate.getDate() - 7);
+            // Navigate to the previous Sunday (start of previous week)
+            const currentStart = CalendarUtils.getStartOfWeek(this.weekStartDate);
+            currentStart.setDate(currentStart.getDate() - 7);
+            this.weekStartDate = currentStart;
             // Derive displayMonth from weekStartDate
             this.displayMonth = new Date(this.weekStartDate);
         }
@@ -148,8 +150,10 @@ class CalendarManager {
         if (this.currentView === 'month') {
             this.displayMonth.setMonth(this.displayMonth.getMonth() + 1);
         } else {
-            // Always advance 7 days
-            this.weekStartDate.setDate(this.weekStartDate.getDate() + 7);
+            // Navigate to the next Sunday (start of next week)
+            const currentStart = CalendarUtils.getStartOfWeek(this.weekStartDate);
+            currentStart.setDate(currentStart.getDate() + 7);
+            this.weekStartDate = currentStart;
             // Derive displayMonth from weekStartDate
             this.displayMonth = new Date(this.weekStartDate);
         }
