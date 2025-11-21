@@ -249,10 +249,18 @@ class CalendarRenderer {
             headerText = `${monthStr} ${year} - Week ${weekNum}`;
         } else {
             // Week spans two months - count which has more days
-            const daysInFirst = 7 - firstDay.getDate() + 1;
-            const daysInSecond = lastDay.getDate();
+            let daysInFirstMonth = 0;
+            let daysInSecondMonth = 0;
             
-            if (daysInFirst > daysInSecond) {
+            for (const day of weekDays) {
+                if (day.getMonth() === firstDay.getMonth()) {
+                    daysInFirstMonth++;
+                } else {
+                    daysInSecondMonth++;
+                }
+            }
+            
+            if (daysInFirstMonth > daysInSecondMonth) {
                 const monthStr = firstDay.toLocaleDateString('en-US', { month: 'long' });
                 const year = firstDay.getFullYear();
                 const weekNum = CalendarUtils.getWeekNumberForMonth(firstDay, firstDay);
