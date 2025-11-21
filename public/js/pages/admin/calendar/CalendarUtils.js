@@ -150,4 +150,52 @@ class CalendarUtils {
 
         return { hours, minutes };
     }
+
+    handleNextMonth() {
+        if (this.currentView === 'month') {
+            this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+        } else {
+            const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
+            const endOfCurrentWeek = new Date(startOfCurrentWeek);
+            endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
+
+            // Week spans two months if start and end are different months
+            const weekSpansTwoMonths = startOfCurrentWeek.getMonth() !== endOfCurrentWeek.getMonth();
+
+            if (weekSpansTwoMonths) {
+                // Just change the month - we're already viewing the boundary week
+                this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+                console.log('MONTH CHANGED ONLY - already on boundary week');
+            } else {
+                // Normal week - advance 7 days
+                this.currentDate.setDate(this.currentDate.getDate() + 7);
+                console.log('ADVANCED 7 DAYS - normal week');
+            }
+        }
+        this.renderCalendar();
+    }
+
+    handlePrevMonth() {
+        if (this.currentView === 'month') {
+            this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+        } else {
+            const startOfCurrentWeek = CalendarUtils.getStartOfWeek(this.currentDate);
+            const endOfCurrentWeek = new Date(startOfCurrentWeek);
+            endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
+
+            // Week spans two months if start and end are different months
+            const weekSpansTwoMonths = startOfCurrentWeek.getMonth() !== endOfCurrentWeek.getMonth();
+
+            if (weekSpansTwoMonths) {
+                // Just change the month - we're already viewing the boundary week
+                this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+                console.log('MONTH CHANGED ONLY - already on boundary week');
+            } else {
+                // Normal week - go back 7 days
+                this.currentDate.setDate(this.currentDate.getDate() - 7);
+                console.log('WENT BACK 7 DAYS - normal week');
+            }
+        }
+        this.renderCalendar();
+    }
 }

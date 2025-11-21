@@ -152,15 +152,15 @@ class CalendarManager {
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const startMonth = startOfCurrentWeek.getMonth();
-            const endMonth = endOfCurrentWeek.getMonth();
-            const startYear = startOfCurrentWeek.getFullYear();
-            const endYear = endOfCurrentWeek.getFullYear();
+            // Week spans two months if start and end are different months
+            const weekSpansTwoMonths = startOfCurrentWeek.getMonth() !== endOfCurrentWeek.getMonth();
 
-            if ((startMonth !== endMonth || startYear !== endYear) && startOfCurrentWeek.getMonth() === this.currentDate.getMonth()) {
+            if (weekSpansTwoMonths) {
+                // Just change the month - we're already viewing the boundary week
                 this.currentDate.setMonth(this.currentDate.getMonth() - 1);
-                console.log('MONTH CHANGED ONLY - boundary week');
+                console.log('MONTH CHANGED ONLY - already on boundary week');
             } else {
+                // Normal week - go back 7 days
                 this.currentDate.setDate(this.currentDate.getDate() - 7);
                 console.log('WENT BACK 7 DAYS - normal week');
             }
@@ -176,15 +176,15 @@ class CalendarManager {
             const endOfCurrentWeek = new Date(startOfCurrentWeek);
             endOfCurrentWeek.setDate(endOfCurrentWeek.getDate() + 6);
 
-            const startMonth = startOfCurrentWeek.getMonth();
-            const endMonth = endOfCurrentWeek.getMonth();
-            const startYear = startOfCurrentWeek.getFullYear();
-            const endYear = endOfCurrentWeek.getFullYear();
+            // Week spans two months if start and end are different months
+            const weekSpansTwoMonths = startOfCurrentWeek.getMonth() !== endOfCurrentWeek.getMonth();
 
-            if ((startMonth !== endMonth || startYear !== endYear) && endOfCurrentWeek.getMonth() === this.currentDate.getMonth()) {
+            if (weekSpansTwoMonths) {
+                // Just change the month - we're already viewing the boundary week
                 this.currentDate.setMonth(this.currentDate.getMonth() + 1);
-                console.log('MONTH CHANGED ONLY - boundary week');
+                console.log('MONTH CHANGED ONLY - already on boundary week');
             } else {
+                // Normal week - advance 7 days
                 this.currentDate.setDate(this.currentDate.getDate() + 7);
                 console.log('ADVANCED 7 DAYS - normal week');
             }
