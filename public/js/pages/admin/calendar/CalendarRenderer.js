@@ -236,17 +236,18 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Get canonical week number and month (consistent across month boundaries)
-        const weekNum = CalendarUtils.getCanonicalWeekNumber(currentDate);
-        const canonicalMonthDate = CalendarUtils.getCanonicalMonthForWeek(currentDate);
-        const monthStr = canonicalMonthDate.toLocaleDateString('en-US', { month: 'short' });
-        const year = canonicalMonthDate.getFullYear();
-
+        // Get week number and display month for the current date's context
+        // This way, Oct 27-Nov 2 shows as "Oct Week 5" when currentDate is in Oct
+        // and as "Nov Week 1" when currentDate is in Nov
+        const weekNum = CalendarUtils.getWeekNumberInMonth(currentDate);
+        const monthStr = currentDate.toLocaleDateString('en-US', { month: 'short' });
+        const year = currentDate.getFullYear();
+        
         document.getElementById('currentMonth').textContent = `${monthStr} ${year} - Week ${weekNum}`;
 
         calendar.classList.add('week-view');
 
-        // Create day cells
+        // Create day cells - show all 7 days regardless of month
         for (const date of weekDays) {
             const dateStr = CalendarUtils.formatDate(date);
             const dayNum = date.getDate();

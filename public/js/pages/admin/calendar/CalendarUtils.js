@@ -33,74 +33,22 @@ class CalendarUtils {
     }
 
     /**
-     * Get the canonical week number for a week
-     * When a week spans two months, uses the month with more days in that week
-     * This ensures consistent numbering when navigating across month boundaries
+     * Get the week number for a specific date within its current month context
+     * Does NOT adjust for month boundaries - just calculates the week within that month
      */
-    static getCanonicalWeekNumber(date) {
-        const startOfWeek = this.getStartOfWeek(date);
-        const weekDays = [];
-
-        // Build array of all 7 days in the week
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(startOfWeek);
-            d.setDate(d.getDate() + i);
-            weekDays.push(d);
-        }
-
-        const firstDayMonth = weekDays[0].getMonth();
-        const lastDayMonth = weekDays[6].getMonth();
-
-        // If week doesn't span months, just return the normal week number
-        if (firstDayMonth === lastDayMonth) {
-            return this.getWeekNumberInMonth(date);
-        }
-
-        // Week spans two months - determine which month to use for numbering
-        // Count days in each month
-        const daysInFirstMonth = weekDays.filter(d => d.getMonth() === firstDayMonth).length;
-        const daysInSecondMonth = 7 - daysInFirstMonth;
-
-        // Use the month with more days (or first month if equal)
-        if (daysInSecondMonth > daysInFirstMonth) {
-            return this.getWeekNumberInMonth(weekDays[6]); // Use second month
-        } else {
-            return this.getWeekNumberInMonth(weekDays[0]); // Use first month
-        }
-    }
-
-    /**
-     * Get canonical month and year for a week
-     * When a week spans two months, returns the month with more days
-     */
-    static getCanonicalMonthForWeek(date) {
-        const startOfWeek = this.getStartOfWeek(date);
-        const weekDays = [];
-
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(startOfWeek);
-            d.setDate(d.getDate() + i);
-            weekDays.push(d);
-        }
-
-        const firstDayMonth = weekDays[0].getMonth();
-        const lastDayMonth = weekDays[6].getMonth();
-
-        // If week doesn't span months, return first month
-        if (firstDayMonth === lastDayMonth) {
-            return weekDays[0];
-        }
-
-        // Count days in each month
-        const daysInFirstMonth = weekDays.filter(d => d.getMonth() === firstDayMonth).length;
-        const daysInSecondMonth = 7 - daysInFirstMonth;
-
-        // Return the month with more days (or first month if equal)
-        if (daysInSecondMonth > daysInFirstMonth) {
-            return weekDays[6]; // Second month
-        } else {
-            return weekDays[0]; // First month
-        }
+    static getWeekNumberForMonth(date, referenceMonth) {
+        const year = date.getFullYear();
+        const month = referenceMonth.getMonth();
+        
+        // Get the first day of the reference month
+        const firstDay = new Date(year, month, 1);
+        const firstDayOfWeek = firstDay.getDay();
+        
+        // Calculate which week this date falls into in the reference month
+        // This handles dates from the previous/next month as well
+        const weekNum = Math.floor((date.getDate() - 1 + firstDayOfWeek) / 7) + 1;
+        
+        return weekNum;
     }
 
     /**
