@@ -236,8 +236,23 @@ class CalendarRenderer {
             weekdaysHeader.appendChild(header);
         }
 
-        // Update header with week number - uses calendar week number that spans months correctly
-        const weekNum = CalendarUtils.getCalendarWeekNumber(currentDate);
+        // Determine week number - use the date with most days in the current month
+        // If week spans months, prefer the month with more days in the week
+        const firstDayMonth = startOfWeek.getMonth();
+        const lastDayMonth = weekDays[6].getMonth();
+        
+        let weekNumDate = currentDate;
+        if (firstDayMonth !== lastDayMonth) {
+            // Week spans two months - count days in each month
+            const daysInFirstMonth = weekDays.filter(d => d.getMonth() === firstDayMonth).length;
+            const daysInSecondMonth = 7 - daysInFirstMonth;
+            // Use the month with more days (or first month if equal)
+            if (daysInSecondMonth > daysInFirstMonth) {
+                weekNumDate = weekDays[6]; // Use last day for second month's week number
+            }
+        }
+
+        const weekNum = CalendarUtils.getWeekNumberInMonth(weekNumDate);
         const startMonth = startOfWeek.toLocaleDateString('en-US', { month: 'short' });
         const endMonth = weekDays[6].toLocaleDateString('en-US', { month: 'short' });
         const year = currentDate.getFullYear();
