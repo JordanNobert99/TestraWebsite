@@ -653,36 +653,42 @@
 /* Status-specific event styling */
 .event-item.status-no-show {
     border-left: 3px solid #dc2626;
+    background: rgba(220, 38, 38, 0.1);
 }
 
 .event-item.status-scheduled {
     border-left: 3px solid #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
 }
 
 .event-item.status-completed {
     border-left: 3px solid #10b981;
+    background: rgba(16, 185, 129, 0.08);
 }
 
 .event-item.status-cancelled {
     border-left: 3px solid #8b5cf6;
+    background: rgba(139, 92, 246, 0.08);
 }
 
 .event-item.type-consultation {
     border-left: 3px solid #f59e0b;
+    background: rgba(245, 158, 11, 0.08);
 }
 
 .event-item.type-followup {
     border-left: 3px solid #06b6d4;
+    background: rgba(6, 182, 212, 0.08);
 }
 
 .event-item.type-other {
     border-left: 3px solid #6366f1;
+    background: rgba(99, 102, 241, 0.08);
 }
 
-/* Past event styling */
+/* Past event styling - ONLY dims, doesn't override background */
 .event-item.past-event {
     opacity: 0.6;
-    background: var(--bg-tertiary);
 }
 
 .event-item.past-event:hover {

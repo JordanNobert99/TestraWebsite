@@ -14,6 +14,11 @@ class ContextMenu {
             }
         });
 
+        // Hide context menu when scrolling
+        document.addEventListener('scroll', () => {
+            this.hide();
+        }, true);
+
         // Handle delete button click
         document.getElementById('deleteEventBtn')?.addEventListener('click', () => {
             if (this.onDeleteCallback && this.eventId) {
@@ -32,6 +37,15 @@ class ContextMenu {
         contextMenu.style.left = x + 'px';
         contextMenu.style.top = y + 'px';
         contextMenu.style.display = 'block';
+        
+        // Adjust if menu goes off-screen
+        const rect = contextMenu.getBoundingClientRect();
+        if (rect.right > window.innerWidth) {
+            contextMenu.style.left = (x - rect.width) + 'px';
+        }
+        if (rect.bottom > window.innerHeight) {
+            contextMenu.style.top = (y - rect.height) + 'px';
+        }
     }
 
     hide() {

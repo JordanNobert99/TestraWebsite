@@ -94,8 +94,10 @@ class CalendarManager {
             const eventElement = e.target.closest('.event-item');
             if (eventElement) {
                 e.preventDefault();
+                e.stopPropagation();
                 const eventId = eventElement.dataset.eventId;
-                this.contextMenu.show(e.pageX, e.pageY, eventId, (id) => this.handleDeleteEvent(id));
+                console.log('Context menu triggered for event:', eventId);
+                this.contextMenu.show(e.clientX, e.clientY, eventId, (id) => this.handleDeleteEvent(id));
             }
         });
 
