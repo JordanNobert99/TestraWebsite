@@ -21,34 +21,35 @@
     margin-bottom: 2rem;
 }
 
-/* Use a responsive flex grid so cards flow horizontally and wrap */
+/* Grid layout: 3 columns desktop, 2 on medium, 1 on small screens */
 .dashboard-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.5rem;                /* horizontal/vertical gap between cards */
-    align-items: stretch;       /* make cards the same row height */
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;                /* spacing between cards */
+    align-items: stretch;       /* make all cards equal height on a row */
 }
 
-/* Each card becomes a flexible column that grows/shrinks and keeps consistent height */
+/* dashboard cards participate in grid cells and keep internal vertical layout */
 .dashboard-grid > .dashboard-card {
-    flex: 1 1 280px;            /* preferred width, will wrap if viewport is narrow */
-    min-width: 220px;
-    max-width: 420px;           /* prevents cards from becoming overly wide on very large screens */
-    width: 100%;
     display: flex;
-    flex-direction: column;     /* allow content + icon/arrow to sit at bottom */
+    flex-direction: column;
     justify-content: space-between;
     box-sizing: border-box;
+    width: 100%;
 }
 
-/* small tweak for very narrow screens to keep spacing reasonable */
-@media (max-width: 480px) {
+/* Medium screens: 2 columns */
+@media (max-width: 1100px) {
     .dashboard-grid {
-        gap: 1rem;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .dashboard-grid > .dashboard-card {
-        flex-basis: 100%;
-        max-width: 100%;
+}
+
+/* Small screens: single column */
+@media (max-width: 640px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }
 
