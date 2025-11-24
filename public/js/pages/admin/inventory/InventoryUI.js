@@ -43,10 +43,15 @@ class InventoryUI {
             document.getElementById('unit').value = item.unit;
             document.getElementById('reorderLevel').value = item.reorderLevel;
             document.getElementById('notes').value = item.notes || '';
+            // If allocations textarea exists, populate it as JSON
+            const allocEl = document.getElementById('allocations');
+            if (allocEl) allocEl.value = JSON.stringify(item.allocations || [], null, 2);
             return item.id;
         } else {
             document.getElementById('formTitle').textContent = 'Add New Item';
             document.getElementById('itemForm').reset();
+            const allocEl = document.getElementById('allocations');
+            if (allocEl) allocEl.value = '';
             return null;
         }
     }
@@ -60,12 +65,32 @@ class InventoryUI {
     }
 
     getFormData() {
+        // Read allocations JSON if the textarea exists (optional)
+        let allocations = [];
+        const allocEl = document.getElementById('allocations');
+        if (allocEl && allocEl.value && allocEl.value.trim()) {
+            try {
+                const parsed = JSON.parse(allocEl.value);
+                if (Array.isArray(parsed)) {
+                    allocations = parsed.map(a => ({
+                        companyId: a.companyId || (a.companyName ? a.companyName.toLowerCase().replace(/\s+/g, '-') : 'default'),
+                        companyName: a.companyName || 'Unspecified',
+                        qty: Number(a.qty) || 0
+                    }));
+                }
+            } catch (err) {
+                console.warn('InventoryUI: Invalid allocations JSON, ignoring:', err);
+            }
+        }
+
         return {
             itemName: document.getElementById('itemName').value,
-            quantity: parseInt(document.getElementById('quantity').value),
+            // quantity kept for backwards-compatibility, will be overridden by allocations sum if allocations provided
+            quantity: parseInt(document.getElementById('quantity').value) || 0,
             unit: document.getElementById('unit').value,
-            reorderLevel: parseInt(document.getElementById('reorderLevel').value),
-            notes: document.getElementById('notes').value
+            reorderLevel: parseInt(document.getElementById('reorderLevel').value) || 0,
+            notes: document.getElementById('notes').value,
+            allocations
         };
     }
 }
