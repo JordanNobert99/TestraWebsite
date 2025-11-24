@@ -38,19 +38,27 @@ class InventoryUI {
 
         if (item) {
             document.getElementById('formTitle').textContent = 'Edit Item';
-            document.getElementById('itemName').value = item.itemName;
-            document.getElementById('companyName').value = item.companyName || '';
-            document.getElementById('category').value = item.category || '';
-            document.getElementById('quantity').value = item.quantity;
-            document.getElementById('reorderLevel').value = item.reorderLevel;
-            document.getElementById('notes').value = item.notes || '';
+            const itemNameEl = document.getElementById('itemName');
+            const companyEl = document.getElementById('companyName');
+            const categoryEl = document.getElementById('category');
+            const quantityEl = document.getElementById('quantity');
+            const reorderEl = document.getElementById('reorderLevel');
+            const notesEl = document.getElementById('notes');
+            if (itemNameEl) itemNameEl.value = item.itemName || '';
+            if (companyEl) companyEl.value = item.companyName || '';
+            if (categoryEl) categoryEl.value = item.category || '';
+            if (quantityEl) quantityEl.value = item.quantity ?? '';
+            if (reorderEl) reorderEl.value = item.reorderLevel ?? '';
+            if (notesEl) notesEl.value = item.notes || '';
+
             // If allocations textarea exists, populate it as JSON
             const allocEl = document.getElementById('allocations');
             if (allocEl) allocEl.value = JSON.stringify(item.allocations || [], null, 2);
             return item.id;
         } else {
             document.getElementById('formTitle').textContent = 'Add New Item';
-            document.getElementById('itemForm').reset();
+            const form = document.getElementById('itemForm');
+            if (form) form.reset();
             const allocEl = document.getElementById('allocations');
             if (allocEl) allocEl.value = '';
             return null;
@@ -85,14 +93,14 @@ class InventoryUI {
         }
 
         return {
-            itemName: document.getElementById('itemName').value,
+            itemName: document.getElementById('itemName')?.value || '',
             // companyName used to indicate which company this item belongs to (free-text for now)
-            companyName: document.getElementById('companyName').value || 'Unspecified',
+            companyName: document.getElementById('companyName')?.value || 'Unspecified',
             category: (document.getElementById('category')?.value || '').trim(),
             // quantity kept for backwards-compatibility, will be overridden by allocations sum if allocations provided
-            quantity: parseInt(document.getElementById('quantity').value) || 0,
-            reorderLevel: parseInt(document.getElementById('reorderLevel').value) || 0,
-            notes: document.getElementById('notes').value,
+            quantity: parseInt(document.getElementById('quantity')?.value || '0') || 0,
+            reorderLevel: parseInt(document.getElementById('reorderLevel')?.value || '0') || 0,
+            notes: document.getElementById('notes')?.value || '',
             allocations
         };
     }

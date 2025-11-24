@@ -60,6 +60,7 @@
             <div id="inventoryForm" class="admin-form" style="display: none;">
                 <h2 id="formTitle">Add New Item</h2>
                 <form id="itemForm">
+                    <!-- Row 1: Item name + Company -->
                     <div class="form-row">
                         <div class="form-group">
                             <label for="itemName">Item Name</label>
@@ -69,6 +70,10 @@
                             <label for="companyName">Company</label>
                             <input type="text" id="companyName" placeholder="e.g. CannAmm or SureHire" required>
                         </div>
+                    </div>
+
+                    <!-- Row 2: Category, Quantity, Reorder Level (all on same horizontal line) -->
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="category">Category</label>
                             <input type="text" id="category" placeholder="e.g. Test Kits, PPE, Consumables">
@@ -77,19 +82,18 @@
                             <label for="quantity">Quantity</label>
                             <input type="number" id="quantity" min="0" required>
                         </div>
-                    </div>
-
-                    <div class="form-row">
                         <div class="form-group">
                             <label for="reorderLevel">Reorder Level</label>
                             <input type="number" id="reorderLevel" min="0" required>
                         </div>
-                        <div class="form-group" style="flex:1"></div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="notes">Notes</label>
-                        <textarea id="notes" placeholder="Additional notes about this item"></textarea>
+                    <!-- Row 3: Notes (full width) -->
+                    <div class="form-row">
+                        <div class="form-group" style="flex:1;">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" placeholder="Additional notes about this item"></textarea>
+                        </div>
                     </div>
 
                     <div class="form-actions">

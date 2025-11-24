@@ -119,3 +119,20 @@
     border: 1px solid #bbf7d0;
     text-align: center;
 }
+
+/* appended rules scoped to the inventory form to keep layout tight */
+#inventoryForm .form-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+#inventoryForm .form-row .form-group {
+    flex: 1 1 220px;
+    min-width: 180px;
+}
+
+#inventoryForm .form-row .form-group textarea {
+    min-height: 120px;
+}
