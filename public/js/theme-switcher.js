@@ -38,7 +38,7 @@
     updateIcon() {
         if (this.themeIcon) {
             // Show icon representing the current theme
-            this.themeIcon.textContent = this.currentTheme === 'dark' ? '🌙' : '☀️';
+            this.themeIcon.textContent = this.currentTheme === 'dark' ? '☀️' : '🌙';
         }
     }
 
