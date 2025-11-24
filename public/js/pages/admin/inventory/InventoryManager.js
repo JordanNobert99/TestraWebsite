@@ -7,7 +7,7 @@ class InventoryManager {
         this.editingId = null;
 
         // sorting state
-        this.sortField = null; // e.g. 'itemName', 'companyName', 'category', 'quantity', 'reorderLevel'
+        this.sortField = 'companyName'; // default: alphabetical by company name
         this.sortDir = 'asc'; // 'asc' or 'desc'
 
         this.init();
@@ -89,6 +89,9 @@ class InventoryManager {
             this.populateCategoryFilter();
             // apply current sorting & filters when first loading
             this.applyFilters();
+
+            // ensure header shows the current sort indicator
+            this.updateSortIndicators();
         } catch (error) {
             console.error('InventoryManager: Error loading inventory:', error);
         }
