@@ -313,3 +313,38 @@
     padding: 6px 10px;
     font-weight: 600;
 }
+
+/* Make Actions cell match other TDs: same padding, alignment and compact buttons */
+.inventory-table td.actions {
+    padding: 6px 10px;        /* same as other td */
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+
+/* Make .btn-small inside the table compact and vertically centered */
+.inventory-table td.actions .btn-small {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;             /* matches .qty-input row height */
+    padding: 0 8px;           /* horizontal padding only */
+    margin: 0 6px 0 0;        /* small spacing between buttons */
+    line-height: 1;
+    font-size: 0.82rem;       /* keep compact */
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+/* Ensure no extra top/bottom margins from button styles interfere */
+.inventory-table td.actions .btn-small,
+.inventory-table td.actions .btn-small * {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+/* if you have icon-only buttons, keep them square */
+.inventory-table td.actions .btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+}
