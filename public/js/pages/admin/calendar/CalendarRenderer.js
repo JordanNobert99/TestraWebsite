@@ -14,7 +14,7 @@ class CalendarRenderer {
             if (event.status === 'no-show') return '#dc2626'; // Red for no-show
             if (event.status === 'scheduled') return '#3b82f6'; // Blue
             if (event.status === 'completed') return '#10b981'; // Green
-            if (event.status === 'cancelled') return '#8b5cf6'; // Purple
+            if (event.status === 'cancelled') return '#ff4433'; // Orange
             return '#3b82f6'; // Default blue
         } else if (eventType === 'consultation') {
             return '#f59e0b'; // Amber
@@ -33,7 +33,6 @@ class CalendarRenderer {
         const labels = {
             'drug-testing': 'Drug Test',
             'consultation': 'Consult',
-            'follow-up': 'Follow-up',
             'other': 'Other'
         };
         return labels[eventType] || eventType;
