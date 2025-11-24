@@ -317,4 +317,5 @@
 /* Fix: make actions cell use the same vertical rules as other TDs and center its flex children */
 .inventory-table td {
     vertical-align: middle; /* ensure all cells align to middle (won't change widths) */
+    height: 60px;
 }
