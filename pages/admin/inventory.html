@@ -57,6 +57,10 @@
                             <input type="text" id="itemName" required>
                         </div>
                         <div class="form-group">
+                            <label for="companyName">Company</label>
+                            <input type="text" id="companyName" placeholder="e.g. CannAmm or SureHire" required>
+                        </div>
+                        <div class="form-group">
                             <label for="quantity">Quantity</label>
                             <input type="number" id="quantity" min="0" required>
                         </div>
@@ -96,6 +100,7 @@
                     <thead>
                         <tr>
                             <th>Item Name</th>
+                            <th>Company</th>
                             <th>Quantity</th>
                             <th>Unit</th>
                             <th>Reorder Level</th>
@@ -106,7 +111,7 @@
                     </thead>
                     <tbody id="inventoryTableBody">
                         <tr id="emptyRow">
-                            <td colspan="7" class="empty-state">No inventory items. Add one to get started.</td>
+                            <td colspan="8" class="empty-state">No inventory items. Add one to get started.</td>
                         </tr>
                     </tbody>
                 </table>

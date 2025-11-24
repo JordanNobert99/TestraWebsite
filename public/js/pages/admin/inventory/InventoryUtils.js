@@ -28,11 +28,12 @@ class InventoryUtils {
         return `
             <tr>
                 <td>${item.itemName}</td>
+                <td>${item.companyName || '-'}</td>
                 <td>${item.quantity}</td>
                 <td>${item.unit}</td>
                 <td>${item.reorderLevel}</td>
                 <td>${this.getStatus(item)}</td>
-                <td>${this.formatAllocations(item)}</td>
+                <td>${item.notes || '-'}</td>
                 <td class="actions">
                     <button class="btn-small" onclick="inventoryManager.editItem('${item.id}')">Edit</button>
                     <button class="btn-small btn-danger" onclick="inventoryManager.deleteItem('${item.id}')">Delete</button>
