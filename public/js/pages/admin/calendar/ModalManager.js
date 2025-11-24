@@ -28,13 +28,21 @@ class ModalManager {
 
     handleEventTypeChange(eventType) {
         const testTypeContainer = document.getElementById('testTypeContainer');
+        const companyContainer = document.getElementById('companyContainer');
+        const companyInput = document.getElementById('companyName');
         const timeInputs = document.querySelectorAll('.time-input-group select');
 
         if (eventType === 'drug-testing') {
+            // show test-specific fields and require time/company
             testTypeContainer.style.display = 'grid';
+            if (companyContainer) companyContainer.style.display = '';
+            if (companyInput) companyInput.setAttribute('required', 'required');
             timeInputs.forEach(input => input.setAttribute('required', 'required'));
         } else {
+            // hide test-specific fields and make company non-required/hidden
             testTypeContainer.style.display = 'none';
+            if (companyContainer) companyContainer.style.display = 'none';
+            if (companyInput) companyInput.removeAttribute('required');
             timeInputs.forEach(input => input.removeAttribute('required'));
         }
     }
@@ -48,6 +56,7 @@ class ModalManager {
             this.editingId = event.id;
             document.getElementById('modalTitle').textContent = 'Edit Event';
             document.getElementById('clientName').value = event.clientName;
+            // populate company even if hidden; visibility controlled in handleEventTypeChange
             document.getElementById('companyName').value = event.companyName || '';
             document.getElementById('date').value = event.date;
             document.getElementById('eventType').value = event.eventType || 'drug-testing';
@@ -57,14 +66,25 @@ class ModalManager {
             document.getElementById('timeMinute').value = minutes;
             
             if (event.eventType === 'drug-testing') {
-                // support both array and string stored test types -> prefer first value if array
-                const storedTestType = Array.isArray(event.testType) ? event.testType[0] : event.testType;
-                const testTypeEl = document.getElementById('testType');
-                if (testTypeEl) testTypeEl.value = storedTestType || '';
+                // handle multiple testType values (array) or string
+                const selValues = Array.isArray(event.testType) ? event.testType.map(t => String(t)) : (event.testType ? [String(event.testType)] : []);
+                const selectEl = document.getElementById('testType');
+                if (selectEl) {
+                    Array.from(selectEl.options).forEach(opt => {
+                        opt.selected = selValues.includes(opt.value);
+                    });
+                }
 
                 // testMethod may be stored as string
                 const testMethodEl = document.getElementById('testMethod');
                 if (testMethodEl) testMethodEl.value = event.testMethod || '';
+            } else {
+                // clear test-specific fields when not drug-testing
+                const selectEl = document.getElementById('testType');
+                if (selectEl) Array.from(selectEl.options).forEach(opt => opt.selected = false);
+                const testMethodEl = document.getElementById('testMethod');
+                if (testMethodEl) testMethodEl.value = '';
+                document.getElementById('companyName').value = '';
             }
 
             // status is global: populate regardless of event type
@@ -76,6 +96,16 @@ class ModalManager {
             document.getElementById('modalTitle').textContent = 'Add New Event';
             document.getElementById('eventFormElement').reset();
             this.editingId = null;
+
+            // sensible defaults
+            document.getElementById('eventType').value = 'drug-testing';
+            const methodEl = document.getElementById('testMethod');
+            if (methodEl) methodEl.value = ''; // placeholder
+            const statusEl = document.getElementById('status');
+            if (statusEl) statusEl.value = '';
+            const selectEl = document.getElementById('testType');
+            if (selectEl) Array.from(selectEl.options).forEach(opt => opt.selected = false);
+            this.handleEventTypeChange('drug-testing');
         }
     }
 
@@ -100,13 +130,18 @@ class ModalManager {
         document.getElementById('timeMinute').value = minutes;
         document.getElementById('eventType').value = 'drug-testing';
         
-        // keep testMethod default to placeholder (do not force 'express')
+        // keep testMethod default to placeholder
         const methodEl = document.getElementById('testMethod');
         if (methodEl) methodEl.value = '';
 
-        // clear status by default
+        // clear status and company by default
         const statusEl = document.getElementById('status');
         if (statusEl) statusEl.value = '';
+        const companyEl = document.getElementById('companyName');
+        if (companyEl) companyEl.value = '';
+
+        const selectEl = document.getElementById('testType');
+        if (selectEl) Array.from(selectEl.options).forEach(opt => opt.selected = false);
 
         this.handleEventTypeChange('drug-testing');
         this.editingId = null;
@@ -131,7 +166,7 @@ class ModalManager {
 
         const eventData = {
             clientName: document.getElementById('clientName').value,
-            companyName: document.getElementById('companyName').value || null,
+            companyName: null,
             date: document.getElementById('date').value,
             time: time,
             eventType: eventType,
@@ -141,15 +176,16 @@ class ModalManager {
         if (eventType === 'drug-testing') {
             const supportedTests = ['urine', 'breath', 'oral'];
             const select = document.getElementById('testType');
-            const selected = select ? select.value : '';
+            const selected = select ? Array.from(select.selectedOptions).map(o => o.value) : [];
 
-            if (!selected) {
-                throw new Error('Please select a test type (Urine, Oral or Breath).');
+            if (!selected.length) {
+                throw new Error('Please select at least one test type (Urine, Oral or Breath).');
             }
 
             // ensure only supported tests are chosen
-            if (!supportedTests.includes(selected.toLowerCase())) {
-                throw new Error(`Unsupported test type selected: ${selected}`);
+            const invalid = selected.filter(s => !supportedTests.includes(s.toLowerCase()));
+            if (invalid.length) {
+                throw new Error(`Unsupported test type selected: ${invalid.join(', ')}`);
             }
 
             // test method validation
@@ -160,12 +196,21 @@ class ModalManager {
                 throw new Error('Please select a test method (Express, Express-to-Lab, or Lab Test).');
             }
 
+            // company is required for drug-testing
+            const companyVal = document.getElementById('companyName') ? document.getElementById('companyName').value.trim() : '';
+            if (!companyVal) {
+                throw new Error('Company name is required for drug testing events.');
+            }
+
             // store test-specific fields
-            eventData.testType = selected;
+            eventData.testType = selected; // store as array
             eventData.testMethod = methodVal;
+            eventData.companyName = companyVal;
         } else {
+            // non-drug events should not include company or test data
             eventData.testType = null;
             eventData.testMethod = null;
+            eventData.companyName = null;
         }
 
         // status is global for all event types
