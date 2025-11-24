@@ -21,10 +21,35 @@
     margin-bottom: 2rem;
 }
 
+/* Use a responsive flex grid so cards flow horizontally and wrap */
 .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;                /* horizontal/vertical gap between cards */
+    align-items: stretch;       /* make cards the same row height */
+}
+
+/* Each card becomes a flexible column that grows/shrinks and keeps consistent height */
+.dashboard-grid > .dashboard-card {
+    flex: 1 1 280px;            /* preferred width, will wrap if viewport is narrow */
+    min-width: 220px;
+    max-width: 420px;           /* prevents cards from becoming overly wide on very large screens */
+    width: 100%;
+    display: flex;
+    flex-direction: column;     /* allow content + icon/arrow to sit at bottom */
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+/* small tweak for very narrow screens to keep spacing reasonable */
+@media (max-width: 480px) {
+    .dashboard-grid {
+        gap: 1rem;
+    }
+    .dashboard-grid > .dashboard-card {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
 }
 
 .user-email {
