@@ -318,4 +318,5 @@
 .inventory-table td {
     vertical-align: middle; /* ensure all cells align to middle (won't change widths) */
     height: 60px;
+    max-height: 60px;
 }
