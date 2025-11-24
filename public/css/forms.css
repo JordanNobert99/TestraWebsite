@@ -48,10 +48,6 @@
     gap: 1.5rem;
 }
 
-.admin-header div:first-child {
-    justify-content: space-between;
-}
-
 .time-input-group {
     display: flex;
     align-items: center;
@@ -249,4 +245,23 @@
 .inventory-table thead th:last-child,
 .inventory-table tbody td.actions {
     min-width: 140px;
+}
+
+/* -- Admin header helper: ensure title and button are vertically aligned -- */
+.admin-header .title-group {
+    display: flex;
+    align-items: center; /* vertically centers the h1 and button */
+    gap: 12px;
+}
+
+/* remove default h1 margin so vertical centering is reliable */
+.admin-header h1 {
+    margin: 0;
+    line-height: 1;
+}
+
+/* optional small tweak so the Add button sits comfortably with the header scale */
+.admin-header #addItemBtn {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }

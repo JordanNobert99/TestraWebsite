@@ -57,12 +57,32 @@ class InventoryUtils {
 
     /**
      * Sort an array of inventory items by a field.
-     * field: string key to sort by (e.g. 'itemName', 'companyName', 'category', 'quantity', 'reorderLevel')
+     * field: string key to sort by (e.g. 'itemName', 'companyName', 'category', 'quantity', 'reorderLevel', 'status')
      * dir: 'asc'|'desc'
      */
     static sortByField(items, field, dir = 'asc') {
         if (!field) return items;
         const direction = dir === 'desc' ? -1 : 1;
+
+        // Special-case: status is derived (not a direct property)
+        if (field === 'status') {
+            const priority = (it) => {
+                const s = this.getStatusText(it);
+                // lower number = higher priority in sort order (out -> low -> in)
+                if (s === 'out of stock') return 0;
+                if (s === 'low stock') return 1;
+                if (s === 'in stock') return 2;
+                return 3;
+            };
+
+            return items.slice().sort((a, b) => {
+                const na = priority(a);
+                const nb = priority(b);
+                if (na < nb) return -1 * direction;
+                if (na > nb) return 1 * direction;
+                return 0;
+            });
+        }
 
         const cmp = (a, b) => {
             const va = (a && a[field] != null) ? a[field] : '';
