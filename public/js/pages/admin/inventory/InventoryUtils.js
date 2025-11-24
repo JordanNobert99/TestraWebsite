@@ -29,6 +29,7 @@ class InventoryUtils {
             <tr>
                 <td>${item.itemName}</td>
                 <td>${item.companyName || '-'}</td>
+                <td>${item.category || '-'}</td>
                 <td>${item.quantity}</td>
                 <td>${item.unit}</td>
                 <td>${item.reorderLevel}</td>

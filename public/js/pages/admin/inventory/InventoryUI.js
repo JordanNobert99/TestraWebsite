@@ -40,6 +40,7 @@ class InventoryUI {
             document.getElementById('formTitle').textContent = 'Edit Item';
             document.getElementById('itemName').value = item.itemName;
             document.getElementById('companyName').value = item.companyName || '';
+            document.getElementById('category').value = item.category || '';
             document.getElementById('quantity').value = item.quantity;
             document.getElementById('unit').value = item.unit;
             document.getElementById('reorderLevel').value = item.reorderLevel;
@@ -88,6 +89,7 @@ class InventoryUI {
             itemName: document.getElementById('itemName').value,
             // companyName used to indicate which company this item belongs to (free-text for now)
             companyName: document.getElementById('companyName').value || 'Unspecified',
+            category: (document.getElementById('category')?.value || '').trim(),
             // quantity kept for backwards-compatibility, will be overridden by allocations sum if allocations provided
             quantity: parseInt(document.getElementById('quantity').value) || 0,
             unit: document.getElementById('unit').value,
