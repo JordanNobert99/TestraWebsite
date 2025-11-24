@@ -103,6 +103,19 @@ class InventoryManager {
         this.editingId = id;
         const item = this.inventoryData.getItemById(id);
         this.inventoryUI.showForm(item);
+
+        // scroll the form into view and focus the first field so user sees the edit view immediately
+        const formEl = document.getElementById('inventoryForm');
+        if (formEl) {
+            // smooth scroll to the top of the form (block: 'start' puts it at top of viewport)
+            formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // focus first visible input after a short delay (allow showForm animation/dom updates)
+            setTimeout(() => {
+                const firstFocusable = formEl.querySelector('input, select, textarea, button');
+                if (firstFocusable) firstFocusable.focus();
+            }, 250);
+        }
     }
 
     async handleSave(e) {
