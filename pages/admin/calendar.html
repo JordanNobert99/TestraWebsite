@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="../../public/css/base.css">
     <link rel="stylesheet" href="../../public/css/navbar.css">
     <link rel="stylesheet" href="../../public/css/buttons.css">
-    <link rel="stylesheet" href="../../public/css/forms.css">
     <link rel="stylesheet" href="../../public/css/cards.css">
     <link rel="stylesheet" href="../../public/css/sections.css">
     <link rel="stylesheet" href="../../public/css/animations.css">
@@ -59,15 +58,16 @@
                         <button id="closeModalBtn" class="close-btn">&times;</button>
                     </div>
                     <form id="eventFormElement">
-                        <!-- Row 1: Client + Company -->
+                        <!-- Row 1: Client + Company (company hidden unless drug-testing) -->
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="clientName">Client Name</label>
                                 <input type="text" id="clientName" required>
                             </div>
-                            <div class="form-group">
+
+                            <div id="companyContainer" class="form-group" style="display: none;">
                                 <label for="companyName">Company</label>
-                                <input type="text" id="companyName" placeholder="Optional">
+                                <input type="text" id="companyName" placeholder="Required for drug tests">
                             </div>
                         </div>
 
@@ -107,7 +107,8 @@
                             </div>
                         </div>
 
-                        <div id="testTypeContainer" class="form-row" style="display: none; grid-template-columns: 1fr 1fr 1fr;">
+                        <!-- Test fields (only visible for drug-testing) -->
+                        <div id="testTypeContainer" class="form-row" style="display: none; grid-template-columns: 1fr 1fr;">
                             <div class="form-group">
                                 <label for="testType">Test Type</label>
                                 <select id="testType">
@@ -127,7 +128,10 @@
                                     <option value="lab">Lab Test</option>
                                 </select>
                             </div>
+                        </div>
 
+                        <!-- Status is global (not restricted to drug-testing) -->
+                        <div class="form-row" style="margin-top:0.5rem;">
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select id="status">

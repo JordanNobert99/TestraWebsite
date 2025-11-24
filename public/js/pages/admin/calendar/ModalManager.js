@@ -65,9 +65,11 @@ class ModalManager {
                 // testMethod may be stored as string
                 const testMethodEl = document.getElementById('testMethod');
                 if (testMethodEl) testMethodEl.value = event.testMethod || '';
-
-                document.getElementById('status').value = event.status || '';
             }
+
+            // status is global: populate regardless of event type
+            const statusEl = document.getElementById('status');
+            if (statusEl) statusEl.value = event.status || '';
             
             this.handleEventTypeChange(event.eventType || 'drug-testing');
         } else {
@@ -98,9 +100,13 @@ class ModalManager {
         document.getElementById('timeMinute').value = minutes;
         document.getElementById('eventType').value = 'drug-testing';
         
-        // sensible default for new drug-testing events
+        // keep testMethod default to placeholder (do not force 'express')
         const methodEl = document.getElementById('testMethod');
-        if (methodEl) methodEl.value = 'express';
+        if (methodEl) methodEl.value = '';
+
+        // clear status by default
+        const statusEl = document.getElementById('status');
+        if (statusEl) statusEl.value = '';
 
         this.handleEventTypeChange('drug-testing');
         this.editingId = null;
@@ -154,16 +160,16 @@ class ModalManager {
                 throw new Error('Please select a test method (Express, Express-to-Lab, or Lab Test).');
             }
 
-            // store
+            // store test-specific fields
             eventData.testType = selected;
             eventData.testMethod = methodVal;
-            // status now carries No Show as a value 'no-show'
-            eventData.status = document.getElementById('status').value;
         } else {
             eventData.testType = null;
             eventData.testMethod = null;
-            eventData.status = document.getElementById('status').value || null;
         }
+
+        // status is global for all event types
+        eventData.status = document.getElementById('status').value || null;
 
         return eventData;
     }
