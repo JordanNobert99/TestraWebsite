@@ -19,7 +19,8 @@
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 0.75rem;
+    /* slightly reduced vertical padding to make rows more compact */
+    padding: 0.6rem;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background-color: var(--bg-primary);
@@ -45,7 +46,8 @@
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    /* slightly tighter gap to reduce overall row height */
+    gap: 0.8rem;
 }
 
 .time-input-group {
@@ -335,7 +337,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    padding: 0.45rem 0.6rem;
+    padding: 0.4rem 0.6rem;
     border: 1px solid var(--border-color);
     border-radius: 6px;
     background: var(--bg-primary);
@@ -343,7 +345,7 @@
     cursor: pointer;
     font-weight: 600;
     font-size: 0.95rem;
-    min-height: 38px;
+    min-height: 34px;
     box-sizing: border-box;
     text-align: left;
 }

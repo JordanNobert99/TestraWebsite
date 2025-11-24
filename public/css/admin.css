@@ -428,7 +428,7 @@
 
 .calendar-day {
     background: var(--bg-primary);
-    padding: 0.75rem;
+    padding: 0.6rem;
     min-height: 160px;
     display: flex;
     flex-direction: column;
@@ -437,7 +437,8 @@
     position: relative;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    overflow-y: auto;
+    /* allow tooltips to escape the scrolling container */
+    overflow: visible;
 }
 
     .calendar-day.today {
@@ -483,6 +484,9 @@
     flex-direction: column;
     gap: 0.35rem;
     flex: 1;
+    /* keep events scrollable inside the day while allowing tooltip to be visible */
+    overflow-y: auto;
+    max-height: calc(100% - 2.25rem);
 }
 
 /* Enhanced Event Items */
