@@ -247,7 +247,7 @@
     min-width: 140px;
 }
 
-/* -- Admin header helper: ensure title is vertically aligned -- */
+/* -- Admin header helper: ensure title and button are vertically aligned -- */
 .admin-header .title-group {
     display: flex;
     align-items: center;
@@ -260,22 +260,9 @@
     line-height: 1;
 }
 
-/* center the Add Item button horizontally within the header */
-.admin-header {
-    position: relative;
-}
-
-/* absolute-center the button (keeps it centered regardless of left/right content) */
-.admin-header .center-btn {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-90%, -50%);
-    z-index: 2;
-}
-
-/* optional small tweak so the Add button sits comfortably with the header scale */
-.admin-header #addItemBtn {
+/* put add button immediately to the right of the title with breathing room */
+.admin-header .title-group #addItemBtn {
+    margin-left: 16px;
     padding-top: 10px;
     padding-bottom: 10px;
 }
