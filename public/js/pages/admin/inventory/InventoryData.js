@@ -170,4 +170,61 @@ class InventoryData {
             throw error;
         }
     }
+
+    // Set item quantity (updates allocations conservatively and quantity)
+    async setItemQuantity(itemId, newQty) {
+        try {
+            const item = this.getItemById(itemId);
+            if (!item) throw new Error('Item not found');
+
+            const allocations = Array.isArray(item.allocations) ? item.allocations.slice() : [];
+
+            // If no allocations, create a single allocation using item.companyName / companyId
+            if (allocations.length === 0) {
+                allocations.push({
+                    companyId: item.companyId || 'default',
+                    companyName: item.companyName || 'Unspecified',
+                    qty: Number(newQty)
+                });
+            } else {
+                // Try to find allocation matching the item's companyName or companyId
+                const matchIndex = allocations.findIndex(a =>
+                    (a.companyName && item.companyName && a.companyName === item.companyName) ||
+                    (a.companyId && item.companyId && a.companyId === item.companyId)
+                );
+
+                if (matchIndex !== -1) {
+                    allocations[matchIndex].qty = Number(newQty);
+                } else {
+                    // If no match, update the first allocation (safe fallback)
+                    allocations[0].qty = Number(newQty);
+                }
+            }
+
+            const totalQty = allocations.reduce((s, a) => s + (Number(a.qty) || 0), 0);
+            const updatedAt = new Date();
+
+            await firebase.firestore().collection('inventory').doc(itemId).update({
+                allocations,
+                quantity: totalQty,
+                updatedAt
+            });
+
+            // update local cache
+            const idx = this.items.findIndex(i => i.id === itemId);
+            if (idx !== -1) {
+                this.items[idx] = {
+                    ...this.items[idx],
+                    allocations,
+                    quantity: totalQty,
+                    updatedAt
+                };
+            }
+
+            return this.items[idx] || null;
+        } catch (error) {
+            console.error('InventoryData: Error setting item quantity:', error);
+            throw error;
+        }
+    }
 }

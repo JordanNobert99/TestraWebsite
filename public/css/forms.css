@@ -153,3 +153,28 @@
 }
 .inventory-table thead th.sorted-asc::after { content: "▲"; }
 .inventory-table thead th.sorted-desc::after { content: "▼"; }
+/* appended rules for inline quantity controls */
+.qty-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.qty-inline .qty-btn {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    min-width: 36px;
+    text-align: center;
+}
+.qty-inline .qty-input {
+    width: 80px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    text-align: center;
+}
