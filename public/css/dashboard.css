@@ -25,7 +25,7 @@
 .dashboard-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1.5rem;                /* spacing between cards */
+    gap: 1rem;                /* spacing between cards */
     align-items: stretch;       /* make all cards equal height on a row */
 }
 
