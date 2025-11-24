@@ -2,6 +2,10 @@
 class ModalManager {
     constructor() {
         this.editingId = null;
+        // setup multi-select control handlers
+        document.addEventListener('DOMContentLoaded', () => {
+            this.setupTestTypeControl();
+        });
     }
 
     populateTimeDropdowns() {
@@ -24,6 +28,104 @@ class ModalManager {
             option.textContent = m;
             minuteSelect.appendChild(option);
         });
+    }
+
+    setupTestTypeControl() {
+        const toggle = document.getElementById('testTypeToggle');
+        const options = document.getElementById('testTypeOptions');
+        if (!toggle || !options) return;
+
+        const updateLabel = () => {
+            const checked = Array.from(options.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+            if (!checked.length) {
+                toggle.textContent = 'Select Test Type';
+                toggle.classList.add('placeholder');
+            } else {
+                toggle.classList.remove('placeholder');
+                // friendly labels (use short names)
+                const labels = checked.map(v => {
+                    if (v === 'urine') return 'Urine';
+                    if (v === 'oral') return 'Oral';
+                    if (v === 'breath') return 'Breath';
+                    return v;
+                });
+                toggle.textContent = labels.join(', ');
+            }
+        };
+
+        // open/close dropdown
+        toggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const visible = options.style.display === 'block';
+            // close any other open multi-selects
+            document.querySelectorAll('.ms-options').forEach(el => el.style.display = 'none');
+            if (!visible) {
+                options.style.display = 'block';
+                options.setAttribute('aria-hidden', 'false');
+            } else {
+                options.style.display = 'none';
+                options.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // toggle option checkboxes
+        Array.from(options.querySelectorAll('input[type="checkbox"]')).forEach(cb => {
+            cb.addEventListener('change', () => {
+                updateLabel();
+            });
+            // allow clicking label to check/uncheck (labels wrap input)
+        });
+
+        // close on outside click
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.multi-select')) {
+                options.style.display = 'none';
+                options.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // keyboard: close on Esc
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                options.style.display = 'none';
+                options.setAttribute('aria-hidden', 'true');
+            }
+        });
+
+        // ensure label initial
+        updateLabel();
+    }
+
+    getSelectedTestTypesFromControl() {
+        const options = document.getElementById('testTypeOptions');
+        if (!options) return [];
+        return Array.from(options.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+    }
+
+    setSelectedTestTypesInControl(values = []) {
+        const options = document.getElementById('testTypeOptions');
+        if (!options) return;
+        Array.from(options.querySelectorAll('input[type="checkbox"]')).forEach(cb => {
+            cb.checked = values.includes(cb.value);
+        });
+        // update toggle label
+        const toggle = document.getElementById('testTypeToggle');
+        if (toggle) {
+            const checked = Array.from(options.querySelectorAll('input[type="checkbox"]:checked')).map(c => c.value);
+            if (!checked.length) {
+                toggle.textContent = 'Select Test Type';
+                toggle.classList.add('placeholder');
+            } else {
+                toggle.classList.remove('placeholder');
+                const labels = checked.map(v => {
+                    if (v === 'urine') return 'Urine';
+                    if (v === 'oral') return 'Oral';
+                    if (v === 'breath') return 'Breath';
+                    return v;
+                });
+                toggle.textContent = labels.join(', ');
+            }
+        }
     }
 
     handleEventTypeChange(eventType) {
@@ -68,20 +170,14 @@ class ModalManager {
             if (event.eventType === 'drug-testing') {
                 // handle multiple testType values (array) or string
                 const selValues = Array.isArray(event.testType) ? event.testType.map(t => String(t)) : (event.testType ? [String(event.testType)] : []);
-                const selectEl = document.getElementById('testType');
-                if (selectEl) {
-                    Array.from(selectEl.options).forEach(opt => {
-                        opt.selected = selValues.includes(opt.value);
-                    });
-                }
+                this.setSelectedTestTypesInControl(selValues);
 
                 // testMethod may be stored as string
                 const testMethodEl = document.getElementById('testMethod');
                 if (testMethodEl) testMethodEl.value = event.testMethod || '';
             } else {
                 // clear test-specific fields when not drug-testing
-                const selectEl = document.getElementById('testType');
-                if (selectEl) Array.from(selectEl.options).forEach(opt => opt.selected = false);
+                this.setSelectedTestTypesInControl([]);
                 const testMethodEl = document.getElementById('testMethod');
                 if (testMethodEl) testMethodEl.value = '';
                 document.getElementById('companyName').value = '';
@@ -89,7 +185,7 @@ class ModalManager {
 
             // status is global: populate regardless of event type
             const statusEl = document.getElementById('status');
-            if (statusEl) statusEl.value = event.status || '';
+            if (statusEl) statusEl.value = event.status || 'scheduled';
             
             this.handleEventTypeChange(event.eventType || 'drug-testing');
         } else {
@@ -102,9 +198,8 @@ class ModalManager {
             const methodEl = document.getElementById('testMethod');
             if (methodEl) methodEl.value = ''; // placeholder
             const statusEl = document.getElementById('status');
-            if (statusEl) statusEl.value = '';
-            const selectEl = document.getElementById('testType');
-            if (selectEl) Array.from(selectEl.options).forEach(opt => opt.selected = false);
+            if (statusEl) statusEl.value = 'scheduled';
+            this.setSelectedTestTypesInControl([]);
             this.handleEventTypeChange('drug-testing');
         }
     }
@@ -134,14 +229,13 @@ class ModalManager {
         const methodEl = document.getElementById('testMethod');
         if (methodEl) methodEl.value = '';
 
-        // clear status and company by default
+        // default status to scheduled and clear company
         const statusEl = document.getElementById('status');
-        if (statusEl) statusEl.value = '';
+        if (statusEl) statusEl.value = 'scheduled';
         const companyEl = document.getElementById('companyName');
         if (companyEl) companyEl.value = '';
 
-        const selectEl = document.getElementById('testType');
-        if (selectEl) Array.from(selectEl.options).forEach(opt => opt.selected = false);
+        this.setSelectedTestTypesInControl([]);
 
         this.handleEventTypeChange('drug-testing');
         this.editingId = null;
@@ -175,8 +269,7 @@ class ModalManager {
 
         if (eventType === 'drug-testing') {
             const supportedTests = ['urine', 'breath', 'oral'];
-            const select = document.getElementById('testType');
-            const selected = select ? Array.from(select.selectedOptions).map(o => o.value) : [];
+            const selected = this.getSelectedTestTypesFromControl();
 
             if (!selected.length) {
                 throw new Error('Please select at least one test type (Urine, Oral or Breath).');

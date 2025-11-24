@@ -696,6 +696,57 @@
     opacity: 0.6;
 }
 
+/* Calendar stuff */
+.multi-select {
+    position: relative;
+}
+
+.ms-toggle {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.ms-options {
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-top: 0.5rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    z-index: 1003;
+    max-height: 200px;
+    overflow-y: auto;
+    display: none;
+}
+
+.ms-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.25rem;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+    .ms-option input {
+        margin: 0;
+    }
+
+.ms-toggle.placeholder {
+    color: var(--text-secondary);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
     .event-item {

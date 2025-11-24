@@ -68,7 +68,7 @@
 
                             <div id="companyContainer" class="form-group" style="display: none;">
                                 <label for="companyName">Company</label>
-                                <input type="text" id="companyName" placeholder="Required for drug tests">
+                                <input type="text" id="companyName">
                             </div>
                         </div>
 
@@ -107,8 +107,7 @@
                             <div class="form-group">
                                 <label for="status">Status</label>
                                 <select id="status">
-                                    <option value="">Select Status</option>
-                                    <option value="scheduled">Scheduled</option>
+                                    <option value="scheduled" selected>Scheduled</option>
                                     <option value="completed">Completed</option>
                                     <option value="cancelled">Cancelled</option>
                                     <option value="no-show">No Show</option>
@@ -116,15 +115,18 @@
                             </div>
                         </div>
 
-                        <!-- Test fields (only visible for drug-testing). testType supports multi-select -->
+                        <!-- Test fields (only visible for drug-testing). custom multi-select for testType -->
                         <div id="testTypeContainer" class="form-row" style="display: none; grid-template-columns: 1fr 1fr;">
                             <div class="form-group">
-                                <label for="testType">Test Type <small style="font-weight:400; font-size:0.85rem; color:var(--text-secondary);"> (select one or more)</small></label>
-                                <select id="testType" multiple size="3">
-                                    <option value="urine">Urine Test</option>
-                                    <option value="oral">Oral Test</option>
-                                    <option value="breath">Breath Test</option>
-                                </select>
+                                <label for="testTypeDropdown">Test Type <small style="font-weight:400; font-size:0.85rem; color:var(--text-secondary);"> (select one or more)</small></label>
+                                <div id="testTypeDropdown" class="multi-select" aria-haspopup="listbox">
+                                    <button type="button" id="testTypeToggle" class="ms-toggle placeholder">Select Test Type</button>
+                                    <div class="ms-options" id="testTypeOptions" aria-hidden="true">
+                                        <label class="ms-option"><input type="checkbox" value="urine"> Urine Test</label>
+                                        <label class="ms-option"><input type="checkbox" value="oral"> Oral Test</label>
+                                        <label class="ms-option"><input type="checkbox" value="breath"> Breath Test</label>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="form-group">
