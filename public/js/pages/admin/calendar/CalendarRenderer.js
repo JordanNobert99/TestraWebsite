@@ -73,6 +73,14 @@ class CalendarRenderer {
             }
         }
 
+        // map testMethod to a friendly label
+        const methodMap = {
+            'express': 'Express',
+            'express-to-lab': 'Express-to-Lab',
+            'lab': 'Lab Test'
+        };
+        const testMethodLabel = event.testMethod ? (methodMap[event.testMethod] || event.testMethod) : null;
+
         const company = event.companyName ? event.companyName : null;
 
         let tooltipHTML = `
@@ -109,6 +117,18 @@ class CalendarRenderer {
                     <span class="tooltip-label">Test:</span>
                     <span class="tooltip-value">${testType}</span>
                 </div>
+            `;
+
+            if (testMethodLabel) {
+                tooltipHTML += `
+                    <div class="tooltip-row">
+                        <span class="tooltip-label">Method:</span>
+                        <span class="tooltip-value">${testMethodLabel}</span>
+                    </div>
+                `;
+            }
+
+            tooltipHTML += `
                 <div class="tooltip-row">
                     <span class="tooltip-label">Status:</span>
                     <span class="tooltip-value">${status}</span>

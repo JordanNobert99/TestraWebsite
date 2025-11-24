@@ -57,12 +57,14 @@ class ModalManager {
             document.getElementById('timeMinute').value = minutes;
             
             if (event.eventType === 'drug-testing') {
-                // handle both array and string stored test types
-                const selValues = Array.isArray(event.testType) ? event.testType.map(t => String(t)) : (event.testType ? [String(event.testType)] : []);
-                const selectEl = document.getElementById('testType');
-                Array.from(selectEl.options).forEach(opt => {
-                    opt.selected = selValues.includes(opt.value);
-                });
+                // support both array and string stored test types -> prefer first value if array
+                const storedTestType = Array.isArray(event.testType) ? event.testType[0] : event.testType;
+                const testTypeEl = document.getElementById('testType');
+                if (testTypeEl) testTypeEl.value = storedTestType || '';
+
+                // testMethod may be stored as string
+                const testMethodEl = document.getElementById('testMethod');
+                if (testMethodEl) testMethodEl.value = event.testMethod || '';
 
                 document.getElementById('status').value = event.status || '';
             }
@@ -96,6 +98,10 @@ class ModalManager {
         document.getElementById('timeMinute').value = minutes;
         document.getElementById('eventType').value = 'drug-testing';
         
+        // sensible default for new drug-testing events
+        const methodEl = document.getElementById('testMethod');
+        if (methodEl) methodEl.value = 'express';
+
         this.handleEventTypeChange('drug-testing');
         this.editingId = null;
     }
@@ -129,24 +135,33 @@ class ModalManager {
         if (eventType === 'drug-testing') {
             const supportedTests = ['urine', 'breath', 'oral'];
             const select = document.getElementById('testType');
-            const selected = Array.from(select.selectedOptions).map(o => o.value);
+            const selected = select ? select.value : '';
 
-            if (!selected.length) {
-                throw new Error('Please select at least one test type (Urine and/or Breath/Oral).');
+            if (!selected) {
+                throw new Error('Please select a test type (Urine, Oral or Breath).');
             }
 
             // ensure only supported tests are chosen
-            const invalid = selected.filter(s => !supportedTests.includes(s.toLowerCase()));
-            if (invalid.length) {
-                throw new Error(`Unsupported test type selected: ${invalid.join(', ')}`);
+            if (!supportedTests.includes(selected.toLowerCase())) {
+                throw new Error(`Unsupported test type selected: ${selected}`);
             }
 
-            // store as an array (one or more)
+            // test method validation
+            const methodSelect = document.getElementById('testMethod');
+            const methodVal = methodSelect ? methodSelect.value : '';
+            const supportedMethods = ['express', 'express-to-lab', 'lab'];
+            if (!methodVal || !supportedMethods.includes(methodVal)) {
+                throw new Error('Please select a test method (Express, Express-to-Lab, or Lab Test).');
+            }
+
+            // store
             eventData.testType = selected;
+            eventData.testMethod = methodVal;
             // status now carries No Show as a value 'no-show'
             eventData.status = document.getElementById('status').value;
         } else {
             eventData.testType = null;
+            eventData.testMethod = null;
             eventData.status = document.getElementById('status').value || null;
         }
 
