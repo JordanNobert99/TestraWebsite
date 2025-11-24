@@ -31,7 +31,6 @@ class InventoryUtils {
                 <td>${item.companyName || '-'}</td>
                 <td>${item.category || '-'}</td>
                 <td>${item.quantity}</td>
-                <td>${item.unit}</td>
                 <td>${item.reorderLevel}</td>
                 <td>${this.getStatus(item)}</td>
                 <td>${item.notes || '-'}</td>

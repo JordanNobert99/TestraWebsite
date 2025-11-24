@@ -42,7 +42,6 @@ class InventoryUI {
             document.getElementById('companyName').value = item.companyName || '';
             document.getElementById('category').value = item.category || '';
             document.getElementById('quantity').value = item.quantity;
-            document.getElementById('unit').value = item.unit;
             document.getElementById('reorderLevel').value = item.reorderLevel;
             document.getElementById('notes').value = item.notes || '';
             // If allocations textarea exists, populate it as JSON
@@ -92,7 +91,6 @@ class InventoryUI {
             category: (document.getElementById('category')?.value || '').trim(),
             // quantity kept for backwards-compatibility, will be overridden by allocations sum if allocations provided
             quantity: parseInt(document.getElementById('quantity').value) || 0,
-            unit: document.getElementById('unit').value,
             reorderLevel: parseInt(document.getElementById('reorderLevel').value) || 0,
             notes: document.getElementById('notes').value,
             allocations

@@ -81,18 +81,10 @@
 
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="unit">Unit</label>
-                            <select id="unit" required>
-                                <option value="pieces">Pieces</option>
-                                <option value="boxes">Boxes</option>
-                                <option value="bottles">Bottles</option>
-                                <option value="kits">Kits</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label for="reorderLevel">Reorder Level</label>
                             <input type="number" id="reorderLevel" min="0" required>
                         </div>
+                        <div class="form-group" style="flex:1"></div>
                     </div>
 
                     <div class="form-group">
@@ -116,7 +108,6 @@
                             <th>Company</th>
                             <th>Category</th>
                             <th>Quantity</th>
-                            <th>Unit</th>
                             <th>Reorder Level</th>
                             <th>Status</th>
                             <th>Notes</th>
@@ -125,7 +116,7 @@
                     </thead>
                     <tbody id="inventoryTableBody">
                         <tr id="emptyRow">
-                            <td colspan="9" class="empty-state">No inventory items. Add one to get started.</td>
+                            <td colspan="8" class="empty-state">No inventory items. Add one to get started.</td>
                         </tr>
                     </tbody>
                 </table>
