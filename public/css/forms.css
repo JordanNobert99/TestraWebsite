@@ -194,7 +194,7 @@
     box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
     }
 
-/* Inventory: wider status column, non-wrapping status badges */
+ /* Inventory: wider status column, non-wrapping status badges */
 .inventory-table thead th:nth-child(6),
 .inventory-table tbody td:nth-child(6) {
     min-width: 140px;       /* widen Status column */
@@ -270,35 +270,46 @@
 /* Compact inventory table rows - reduce vertical padding and control input/badge height */
 .inventory-table th,
 .inventory-table td {
-    padding: 8px 12px;       /* smaller than typical form cells */
+    padding: 6px 10px;       /* tighter cells */
     vertical-align: middle;
     line-height: 1;
+    font-size: 0.95rem;      /* slightly smaller so content fits */
+    box-sizing: border-box;
 }
 
 /* Make rows visually tighter (no forced large min-height) */
 .inventory-table tbody tr {
     height: auto;
-    min-height: 30px;       /* tweak up/down as needed */
+    min-height: 28px;       /* tweak down for skinnier rows */
 }
 
 /* Compact the inline quantity control */
 .qty-inline .qty-input {
-    padding: 4px 8px;
-    height: 32px;
+    padding: 2px 6px;
+    height: 28px;
     line-height: 1;
     box-sizing: border-box;
+    font-size: 0.95rem;
 }
 
 /* Slightly reduce badge padding / font-size so status cell is shorter */
 .inventory-table .status-out,
 .inventory-table .status-low,
 .inventory-table .status-ok {
+    padding: 3px 6px;
+    font-size: 0.8rem;
+    line-height: 1;
+}
+
+/* Make small action buttons inside table compact */
+.inventory-table .btn-small {
     padding: 4px 8px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    line-height: 1;
 }
 
 /* Optional: slightly smaller header cells to match body */
 .inventory-table thead th {
-    padding: 8px 12px;
+    padding: 6px 10px;
     font-weight: 600;
 }
