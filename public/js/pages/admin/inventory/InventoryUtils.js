@@ -25,6 +25,7 @@ class InventoryUtils {
     }
 
     static createItemRow(item) {
+        // Use only the native number input (no left/right buttons).
         return `
             <tr>
                 <td>${item.itemName}</td>
@@ -32,9 +33,7 @@ class InventoryUtils {
                 <td>${item.category || '-'}</td>
                 <td>
                     <div class="qty-inline" data-id="${item.id}">
-                        <button class="qty-btn" data-action="dec" data-id="${item.id}" title="Decrease">−</button>
                         <input type="number" class="qty-input" data-id="${item.id}" value="${item.quantity}" min="0" />
-                        <button class="qty-btn" data-action="inc" data-id="${item.id}" title="Increase">+</button>
                     </div>
                 </td>
                 <td>${item.reorderLevel}</td>
@@ -46,5 +45,39 @@ class InventoryUtils {
                 </td>
             </tr>
         `;
+    }
+
+    /**
+     * Sort an array of inventory items by a field.
+     * field: string key to sort by (e.g. 'itemName', 'companyName', 'category', 'quantity', 'reorderLevel')
+     * dir: 'asc'|'desc'
+     */
+    static sortByField(items, field, dir = 'asc') {
+        if (!field) return items;
+        const direction = dir === 'desc' ? -1 : 1;
+
+        const cmp = (a, b) => {
+            const va = (a && a[field] != null) ? a[field] : '';
+            const vb = (b && b[field] != null) ? b[field] : '';
+
+            // numeric comparison if both are numbers
+            const na = Number(va);
+            const nb = Number(vb);
+            if (!Number.isNaN(na) && !Number.isNaN(nb)) {
+                if (na < nb) return -1 * direction;
+                if (na > nb) return 1 * direction;
+                return 0;
+            }
+
+            // string comparison
+            const sa = String(va).toLowerCase();
+            const sb = String(vb).toLowerCase();
+            if (sa < sb) return -1 * direction;
+            if (sa > sb) return 1 * direction;
+            return 0;
+        };
+
+        // return a new sorted array (non-mutating)
+        return items.slice().sort(cmp);
     }
 }

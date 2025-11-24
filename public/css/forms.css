@@ -177,4 +177,72 @@
     background: var(--bg-primary);
     color: var(--text-primary);
     text-align: center;
+    -moz-appearance: textfield;
+}
+
+/* keep spinner on WebKit, make it visually small */
+.qty-inline .qty-input::-webkit-outer-spin-button,
+.qty-inline .qty-input::-webkit-inner-spin-button {
+    -webkit-appearance: auto;
+    margin: 0;
+}
+
+/* accessibility: focus state */
+.qty-inline .qty-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.08);
+    }
+
+/* Inventory: wider status column, non-wrapping status badges */
+.inventory-table thead th:nth-child(6),
+.inventory-table tbody td:nth-child(6) {
+    min-width: 140px;       /* widen Status column */
+    white-space: nowrap;    /* prevent wrapping */
+}
+
+/* Ensure status badges don't wrap and look like badges */
+.inventory-table .status-out,
+.inventory-table .status-low,
+.inventory-table .status-ok {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1;
+}
+
+/* Make status variants visually distinct if your existing styles don't already */
+.inventory-table .status-out { background: rgba(220, 38, 38, 0.08); color: var(--text-primary); border: 1px solid rgba(220,38,38,0.12); }
+.inventory-table .status-low { background: rgba(245,158,11,0.06); color: var(--text-primary); border: 1px solid rgba(245,158,11,0.12); }
+.inventory-table .status-ok  { background: rgba(16,185,129,0.06); color: var(--text-primary); border: 1px solid rgba(16,185,129,0.12); }
+
+/* Sorting indicators for header (visible by default as ⇅, change to ▲/▼ when active) */
+.inventory-table thead th[data-sort] {
+    position: relative;
+    cursor: pointer;
+    padding-right: 36px; /* room for indicator */
+}
+
+.inventory-table thead th[data-sort]::after {
+    content: "⇅";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    opacity: 0.6;
+}
+
+/* When sorted, show arrow up/down */
+.inventory-table thead th.sorted-asc::after  { content: "▲"; opacity: 1; }
+.inventory-table thead th.sorted-desc::after { content: "▼"; opacity: 1; }
+
+/* Small layout tweak to ensure the actions column isn't squashed */
+.inventory-table thead th:last-child,
+.inventory-table tbody td.actions {
+    min-width: 140px;
 }

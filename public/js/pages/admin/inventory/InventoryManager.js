@@ -59,35 +59,9 @@ class InventoryManager {
             });
         });
 
-        // Delegated listeners for inline quantity controls
+        // Delegated listener for direct numeric input changes only (no +/- buttons)
         const tbody = document.getElementById('inventoryTableBody');
         if (tbody) {
-            // Clicks for +/- buttons
-            tbody.addEventListener('click', async (e) => {
-                const btn = e.target.closest('.qty-btn');
-                if (!btn) return;
-                const action = btn.dataset.action;
-                const itemId = btn.dataset.id;
-                if (!itemId || !action) return;
-
-                const item = this.inventoryData.getItemById(itemId);
-                if (!item) return;
-
-                const current = Number(item.quantity || 0);
-                let newQty = current;
-                if (action === 'inc') newQty = current + 1;
-                if (action === 'dec') newQty = Math.max(0, current - 1);
-
-                try {
-                    await this.inventoryData.setItemQuantity(itemId, newQty);
-                    await this.inventoryData.loadItems();
-                    this.applyFilters();
-                } catch (err) {
-                    console.error('InventoryManager: Error updating quantity:', err);
-                    alert('Failed to update quantity: ' + err.message);
-                }
-            });
-
             // Change / blur for direct numeric input
             tbody.addEventListener('change', async (e) => {
                 const input = e.target.closest('.qty-input');
@@ -113,7 +87,8 @@ class InventoryManager {
         try {
             await this.inventoryData.loadItems();
             this.populateCategoryFilter();
-            this.inventoryUI.renderTable(this.inventoryData.items);
+            // apply current sorting & filters when first loading
+            this.applyFilters();
         } catch (error) {
             console.error('InventoryManager: Error loading inventory:', error);
         }
@@ -144,7 +119,7 @@ class InventoryManager {
             // Refresh local UI and filters
             await this.inventoryData.loadItems();
             this.populateCategoryFilter();
-            this.inventoryUI.renderTable(this.inventoryData.items);
+            this.applyFilters();
         } catch (error) {
             console.error('InventoryManager: Error saving item:', error);
             alert('Failed to save item: ' + error.message);
@@ -157,7 +132,7 @@ class InventoryManager {
                 await this.inventoryData.deleteItem(id);
                 await this.inventoryData.loadItems();
                 this.populateCategoryFilter();
-                this.inventoryUI.renderTable(this.inventoryData.items);
+                this.applyFilters();
             } catch (error) {
                 console.error('InventoryManager: Error deleting item:', error);
                 alert('Failed to delete item: ' + error.message);
@@ -213,29 +188,36 @@ class InventoryManager {
             return hay.includes(q);
         });
 
-        this.inventoryUI.renderTable(filtered);
+        const sorted = this.applySort(filtered);
+
+        this.inventoryUI.renderTable(sorted);
+    }
+
+    applySort(items) {
+        if (!this.sortField) return items;
+        return InventoryUtils.sortByField(items, this.sortField, this.sortDir);
     }
 
     toggleSort(field) {
+        if (!field) return;
         if (this.sortField === field) {
-            // If already sorted by this field, toggle direction
-            this.sortDir = (this.sortDir === 'asc') ? 'desc' : 'asc';
+            // toggle direction
+            this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
         } else {
-            // Otherwise, set new field and default to ascending
             this.sortField = field;
             this.sortDir = 'asc';
         }
-
-        // Sort items array
-        const direction = (this.sortDir === 'asc') ? 1 : -1;
-        this.inventoryData.items.sort((a, b) => {
-            if (a[field] < b[field]) return -1 * direction;
-            if (a[field] > b[field]) return 1 * direction;
-            return 0;
-        });
-
-        // Reapply filters after sorting
+        this.updateSortIndicators();
         this.applyFilters();
+    }
+
+    updateSortIndicators() {
+        document.querySelectorAll('.inventory-table thead th[data-sort]').forEach(th => {
+            th.classList.remove('sorted-asc', 'sorted-desc');
+            if (th.dataset.sort === this.sortField) {
+                th.classList.add(this.sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+            }
+        });
     }
 
     setupLogout() {
