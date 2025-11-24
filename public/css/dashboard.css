@@ -1,12 +1,12 @@
 /* Dashboard Pages */
 .dashboard-container {
     min-height: calc(100vh - 140px);
-    padding: 4rem 0;
+    padding: 1rem 0;
 }
 
 .dashboard-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 1rem;
 }
 
 .dashboard-header h1 {
