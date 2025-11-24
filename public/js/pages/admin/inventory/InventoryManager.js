@@ -178,11 +178,18 @@ class InventoryManager {
 
             if (!q) return true;
 
+            // build searchable haystack including status and allocations and numeric values
+            const statusText = InventoryUtils.getStatusText(item);
+            const allocationsText = InventoryUtils.formatAllocations(item).replace(/<br>/g, ' ');
             const hay = [
                 item.itemName,
                 item.companyName,
                 item.category,
-                item.notes
+                item.notes,
+                String(item.quantity),
+                String(item.reorderLevel),
+                statusText,
+                allocationsText
             ].filter(Boolean).join(' ').toLowerCase();
 
             return hay.includes(q);

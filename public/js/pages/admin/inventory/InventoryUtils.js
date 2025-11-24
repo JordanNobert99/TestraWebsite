@@ -10,6 +10,14 @@ class InventoryUtils {
         return '<span class="status-ok">In Stock</span>';
     }
 
+    // New: return plain text status for searching/filtering
+    static getStatusText(item) {
+        const qty = Number(item.quantity || 0);
+        if (qty === 0) return 'out of stock';
+        if (qty <= (item.reorderLevel || 0)) return 'low stock';
+        return 'in stock';
+    }
+
     static sortByDate(items) {
         return items.sort((a, b) => {
             const timeA = a.createdAt?.toDate?.() || new Date(a.createdAt);
