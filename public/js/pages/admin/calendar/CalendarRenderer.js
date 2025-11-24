@@ -126,21 +126,22 @@ class CalendarRenderer {
                     </div>
                 `;
             }
+        }
 
-            tooltipHTML += `
+        // Always show status for visibility
+        tooltipHTML += `
                 <div class="tooltip-row">
                     <span class="tooltip-label">Status:</span>
                     <span class="tooltip-value">${status}</span>
                 </div>
-            `;
+        `;
 
-            if (event.status === 'no-show') {
-                tooltipHTML += `
-                    <div class="tooltip-row tooltip-warning">
-                        <span class="tooltip-label">⚠️ No Show</span>
-                    </div>
-                `;
-            }
+        if (event.eventType === 'drug-testing' && event.status === 'no-show') {
+            tooltipHTML += `
+                <div class="tooltip-row tooltip-warning">
+                    <span class="tooltip-label">⚠️ No Show</span>
+                </div>
+            `;
         }
 
         tooltipHTML += `</div>`;
@@ -158,11 +159,19 @@ class CalendarRenderer {
         const classes = this.getEventClasses(event);
         const tooltip = this.createEventTooltip(event);
 
+        // friendly test method label for inline display
+        const methodMap = {
+            'express': 'Express',
+            'express-to-lab': 'Express-to-Lab',
+            'lab': 'Lab'
+        };
+        const testMethodLabel = event.testMethod ? (methodMap[event.testMethod] || event.testMethod) : null;
+
         // display company under client if present
         const companyLine = event.companyName ? `<div class="event-company" style="font-size:0.75rem; color:var(--text-secondary);">${event.companyName}</div>` : '';
 
         return `
-            <div class="${classes}" data-event-id="${event.id}" draggable="true" title="${event.clientName}">
+            <div class="${classes}" data-event-id="${event.id}" draggable="true" aria-label="${event.clientName}">
                 <div class="event-indicator" style="background-color: ${statusColor};" title="${event.status || 'scheduled'}"></div>
                 <div class="event-body">
                     <div class="event-time">${displayTime}</div>
@@ -171,6 +180,7 @@ class CalendarRenderer {
                     <div class="event-meta">
                         <span class="event-type">${eventTypeLabel}</span>
                         ${testTypeAbbrev ? `<span class="event-test-abbrev">${testTypeAbbrev}</span>` : ''}
+                        ${testMethodLabel ? `<span class="event-method" style="margin-left:6px; font-size:0.8rem; color:var(--text-secondary);">${testMethodLabel}</span>` : ''}
                         ${event.status === 'no-show' ? '<span class="event-no-show-badge">No Show</span>' : ''}
                     </div>
                 </div>

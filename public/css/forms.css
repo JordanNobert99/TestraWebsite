@@ -320,3 +320,118 @@
     height: 60px;
     max-height: 60px;
 }
+
+/* Compact multi-select (Test Type) styling - appended */
+.multi-select {
+    position: relative;
+    display: block;
+    width: 100%;
+    font-family: inherit;
+}
+
+.ms-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    min-height: 38px;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.ms-toggle.placeholder {
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.ms-options {
+    position: absolute;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(2,6,23,0.5);
+    padding: 6px;
+    margin-top: 6px;
+    display: none;
+    max-height: 220px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+/* Each option row: compact, aligned and clickable */
+.ms-options .ms-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* make clicking the label toggle the checkbox easily */
+.ms-options .ms-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+/* Label text compact */
+.ms-options .ms-option label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+/* hover / active state for option rows */
+.ms-options .ms-option:hover {
+    background: rgba(59,130,246,0.06);
+}
+
+/* small spacing between options */
+.ms-options .ms-option + .ms-option {
+    margin-top: 4px;
+}
+
+/* scrollbar styling to keep the dropdown compact */
+.ms-options::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+.ms-options::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.18);
+    border-radius: 6px;
+}
+
+/* In modal context ensure the dropdown doesn't exceed modal boundaries */
+.event-modal .ms-options {
+    max-height: 180px;
+}
+
+/* ensure toggle and options respect reduced font-size in compact forms */
+.form-row .multi-select .ms-toggle,
+.form-row .multi-select .ms-options .ms-option label {
+    font-size: 0.95rem;
+}
+
+/* end appended rules */
