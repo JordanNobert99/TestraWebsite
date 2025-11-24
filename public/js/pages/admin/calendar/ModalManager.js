@@ -3,9 +3,14 @@ class ModalManager {
     constructor() {
         this.editingId = null;
         // setup multi-select control handlers
-        document.addEventListener('DOMContentLoaded', () => {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                this.setupTestTypeControl();
+            });
+        } else {
+            // DOM already ready — attach handlers immediately
             this.setupTestTypeControl();
-        });
+        }
     }
 
     populateTimeDropdowns() {
@@ -180,7 +185,10 @@ class ModalManager {
                 this.setSelectedTestTypesInControl([]);
                 const testMethodEl = document.getElementById('testMethod');
                 if (testMethodEl) testMethodEl.value = '';
-                document.getElementById('companyName').value = '';
+
+                // Clear company name explicitly
+                const companyNameEl = document.getElementById('companyName');
+                if (companyNameEl) companyNameEl.value = '';
             }
 
             // status is global: populate regardless of event type
