@@ -1,4 +1,4 @@
-/* Form Styles */
+﻿/* Form Styles */
 .contact-form,
 .auth-form {
     max-width: 500px;
@@ -136,3 +136,20 @@
 #inventoryForm .form-row .form-group textarea {
     min-height: 120px;
 }
+
+/* Inventory table sort indicators */
+.inventory-table thead th[data-sort] {
+    position: relative;
+    padding-right: 28px;
+}
+.inventory-table thead th.sorted-asc::after,
+.inventory-table thead th.sorted-desc::after {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+.inventory-table thead th.sorted-asc::after { content: "▲"; }
+.inventory-table thead th.sorted-desc::after { content: "▼"; }
