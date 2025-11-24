@@ -48,6 +48,10 @@
     gap: 1.5rem;
 }
 
+#addItemBtn {
+    justify-self: center;
+}
+
 .time-input-group {
     display: flex;
     align-items: center;
