@@ -48,6 +48,7 @@ class ModalManager {
             this.editingId = event.id;
             document.getElementById('modalTitle').textContent = 'Edit Event';
             document.getElementById('clientName').value = event.clientName;
+            document.getElementById('companyName').value = event.companyName || '';
             document.getElementById('date').value = event.date;
             document.getElementById('eventType').value = event.eventType || 'drug-testing';
             
@@ -118,6 +119,7 @@ class ModalManager {
 
         const eventData = {
             clientName: document.getElementById('clientName').value,
+            companyName: document.getElementById('companyName').value || null,
             date: document.getElementById('date').value,
             time: time,
             eventType: eventType,

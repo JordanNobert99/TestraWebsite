@@ -73,12 +73,26 @@ class CalendarRenderer {
             }
         }
 
+        const company = event.companyName ? event.companyName : null;
+
         let tooltipHTML = `
             <div class="event-tooltip">
                 <div class="tooltip-row">
                     <span class="tooltip-label">Client:</span>
                     <span class="tooltip-value">${event.clientName}</span>
                 </div>
+        `;
+
+        if (company) {
+            tooltipHTML += `
+                <div class="tooltip-row">
+                    <span class="tooltip-label">Company:</span>
+                    <span class="tooltip-value">${company}</span>
+                </div>
+            `;
+        }
+
+        tooltipHTML += `
                 <div class="tooltip-row">
                     <span class="tooltip-label">Time:</span>
                     <span class="tooltip-value">${event.time || 'N/A'}</span>
@@ -125,12 +139,16 @@ class CalendarRenderer {
         const classes = this.getEventClasses(event);
         const tooltip = this.createEventTooltip(event);
 
+        // display company under client if present
+        const companyLine = event.companyName ? `<div class="event-company" style="font-size:0.75rem; color:var(--text-secondary);">${event.companyName}</div>` : '';
+
         return `
             <div class="${classes}" data-event-id="${event.id}" draggable="true" title="${event.clientName}">
                 <div class="event-indicator" style="background-color: ${statusColor};" title="${event.status || 'scheduled'}"></div>
                 <div class="event-body">
                     <div class="event-time">${displayTime}</div>
                     <div class="event-name">${event.clientName}</div>
+                    ${companyLine}
                     <div class="event-meta">
                         <span class="event-type">${eventTypeLabel}</span>
                         ${testTypeAbbrev ? `<span class="event-test-abbrev">${testTypeAbbrev}</span>` : ''}
