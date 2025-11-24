@@ -104,17 +104,31 @@ class InventoryManager {
         const item = this.inventoryData.getItemById(id);
         this.inventoryUI.showForm(item);
 
-        // scroll the form into view and focus the first field so user sees the edit view immediately
+        // scroll the form into view, accounting for fixed navbar/header so it doesn't sit underneath them
         const formEl = document.getElementById('inventoryForm');
         if (formEl) {
-            // smooth scroll to the top of the form (block: 'start' puts it at top of viewport)
-            formEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // determine offset (navbar or admin header) to avoid being hidden under fixed elements
+            const navbar = document.querySelector('.navbar');
+            const adminHeader = document.querySelector('.admin-header');
+            const offsetElem = navbar || adminHeader;
+            const offset = (offsetElem ? offsetElem.offsetHeight : 0) + 16; // 16px breathing room
+
+            const rect = formEl.getBoundingClientRect();
+
+            // use modern window.scrollY with a fallback instead of deprecated pageYOffset
+            const scrollY = (typeof window.scrollY === 'number')
+                ? window.scrollY
+                : (document.documentElement && document.documentElement.scrollTop) || document.body.scrollTop || 0;
+
+            const targetY = scrollY + rect.top - offset;
+
+            window.scrollTo({ top: Math.max(0, targetY), behavior: 'smooth' });
 
             // focus first visible input after a short delay (allow showForm animation/dom updates)
             setTimeout(() => {
                 const firstFocusable = formEl.querySelector('input, select, textarea, button');
                 if (firstFocusable) firstFocusable.focus();
-            }, 250);
+            }, 350);
         }
     }
 
