@@ -48,8 +48,8 @@
     gap: 1.5rem;
 }
 
-#addItemBtn {
-    justify-self: center;
+.admin-header div:first-child {
+    justify-content: space-between;
 }
 
 .time-input-group {
