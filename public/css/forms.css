@@ -321,6 +321,15 @@
     box-sizing: border-box;
 }
 
+/* Ensure actions container centers its buttons vertically */
+.inventory-table td.actions,
+.inventory-table td.actions .actions {
+    vertical-align: middle;
+    display: flex;           /* .actions already uses flex in admin.css; re-assert here */
+    align-items: center;     /* vertically center buttons inside the flex container */
+    gap: 0.5rem;
+}
+
 /* Make .btn-small inside the table compact and vertically centered */
 .inventory-table td.actions .btn-small {
     display: inline-flex;
@@ -335,11 +344,18 @@
     vertical-align: middle;
 }
 
-/* Ensure no extra top/bottom margins from button styles interfere */
+/* Fix: make actions cell use the same vertical rules as other TDs and center its flex children */
+.inventory-table td {
+    vertical-align: middle; /* ensure all cells align to middle (won't change widths) */
+}
+
+/* Remove stray vertical margins from buttons that can increase row height */
 .inventory-table td.actions .btn-small,
 .inventory-table td.actions .btn-small * {
     margin-top: 0;
     margin-bottom: 0;
+    line-height: 1;         /* keep button height predictable */
+    box-sizing: border-box;
 }
 
 /* if you have icon-only buttons, keep them square */
