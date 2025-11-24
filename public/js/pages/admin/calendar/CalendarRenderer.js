@@ -11,7 +11,7 @@ class CalendarRenderer {
         const eventType = event.eventType || 'drug-testing';
 
         if (eventType === 'drug-testing') {
-            if (event.noShow) return '#dc2626'; // Red
+            if (event.status === 'no-show') return '#dc2626'; // Red for no-show
             if (event.status === 'scheduled') return '#3b82f6'; // Blue
             if (event.status === 'completed') return '#10b981'; // Green
             if (event.status === 'cancelled') return '#8b5cf6'; // Purple
@@ -40,18 +40,23 @@ class CalendarRenderer {
     }
 
     /**
-     * Get test type abbreviation
+     * Get test type abbreviation (supports array or string)
      */
     getTestTypeAbbrev(testType) {
         if (!testType) return '';
-        const abbrevs = {
-            'urine': 'U',
-            'hair': 'H',
-            'saliva': 'S',
-            'blood': 'B',
-            'breath': 'BR'
+        const mapOne = (t) => {
+            const abbrevs = {
+                'urine': 'Urine',
+                'oral': 'Oral',
+                'breath': 'Breath'
+            };
+            return abbrevs[t.toLowerCase()] || t.charAt(0).toUpperCase();
         };
-        return abbrevs[testType.toLowerCase()] || testType.charAt(0).toUpperCase();
+
+        if (Array.isArray(testType)) {
+            return testType.map(mapOne).join('/');
+        }
+        return mapOne(testType);
     }
 
     /**
@@ -59,7 +64,14 @@ class CalendarRenderer {
      */
     createEventTooltip(event) {
         const status = event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'N/A';
-        const testType = event.testType ? event.testType.charAt(0).toUpperCase() + event.testType.slice(1) : 'N/A';
+        let testType = 'N/A';
+        if (event.eventType === 'drug-testing') {
+            if (Array.isArray(event.testType)) {
+                testType = event.testType.map(t => t.charAt(0).toUpperCase() + t.slice(1)).join(', ');
+            } else if (event.testType) {
+                testType = event.testType.charAt(0).toUpperCase() + event.testType.slice(1);
+            }
+        }
 
         let tooltipHTML = `
             <div class="event-tooltip">
@@ -89,7 +101,7 @@ class CalendarRenderer {
                 </div>
             `;
 
-            if (event.noShow) {
+            if (event.status === 'no-show') {
                 tooltipHTML += `
                     <div class="tooltip-row tooltip-warning">
                         <span class="tooltip-label">⚠️ No Show</span>
@@ -122,7 +134,7 @@ class CalendarRenderer {
                     <div class="event-meta">
                         <span class="event-type">${eventTypeLabel}</span>
                         ${testTypeAbbrev ? `<span class="event-test-abbrev">${testTypeAbbrev}</span>` : ''}
-                        ${event.noShow ? '<span class="event-no-show-badge">No Show</span>' : ''}
+                        ${event.status === 'no-show' ? '<span class="event-no-show-badge">No Show</span>' : ''}
                     </div>
                 </div>
                 ${tooltip}
@@ -135,7 +147,7 @@ class CalendarRenderer {
         const eventType = event.eventType || 'drug-testing';
 
         if (eventType === 'drug-testing') {
-            if (event.noShow) {
+            if (event.status === 'no-show') {
                 classes += ' status-no-show';
             } else if (event.status === 'scheduled') {
                 classes += ' status-scheduled';

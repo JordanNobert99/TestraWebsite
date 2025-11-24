@@ -97,13 +97,10 @@
 
                         <div id="testTypeContainer" class="form-row" style="display: none;">
                             <div class="form-group">
-                                <label for="testType">Test Type</label>
-                                <select id="testType">
-                                    <option value="">Select Test Type</option>
+                                <label for="testType">Test Type <small style="font-weight:400; font-size:0.85rem; color:var(--text-secondary);"> (select one or more)</small></label>
+                                <select id="testType" multiple size="3">
                                     <option value="urine">Urine Test</option>
-                                    <option value="hair">Hair Test</option>
-                                    <option value="saliva">Saliva Test</option>
-                                    <option value="blood">Blood Test</option>
+                                    <option value="oral">Oral Test</option>
                                     <option value="breath">Breath Test</option>
                                 </select>
                             </div>
@@ -114,16 +111,12 @@
                                     <option value="scheduled">Scheduled</option>
                                     <option value="completed">Completed</option>
                                     <option value="cancelled">Cancelled</option>
+                                    <option value="no-show">No Show</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div id="noShowContainer" class="form-group checkbox-group" style="display: none;">
-                            <label for="noShow">
-                                <input type="checkbox" id="noShow">
-                                No Show
-                            </label>
-                        </div>
+                        <!-- removed separate No Show checkbox; status includes 'No Show' now -->
 
                         <div class="form-actions">
                             <button type="submit" class="btn-primary">Save Event</button>

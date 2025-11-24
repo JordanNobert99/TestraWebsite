@@ -28,16 +28,13 @@ class ModalManager {
 
     handleEventTypeChange(eventType) {
         const testTypeContainer = document.getElementById('testTypeContainer');
-        const noShowContainer = document.getElementById('noShowContainer');
         const timeInputs = document.querySelectorAll('.time-input-group select');
 
         if (eventType === 'drug-testing') {
             testTypeContainer.style.display = 'grid';
-            noShowContainer.style.display = 'block';
             timeInputs.forEach(input => input.setAttribute('required', 'required'));
         } else {
             testTypeContainer.style.display = 'none';
-            noShowContainer.style.display = 'none';
             timeInputs.forEach(input => input.removeAttribute('required'));
         }
     }
@@ -59,9 +56,14 @@ class ModalManager {
             document.getElementById('timeMinute').value = minutes;
             
             if (event.eventType === 'drug-testing') {
-                document.getElementById('testType').value = event.testType;
-                document.getElementById('status').value = event.status;
-                document.getElementById('noShow').checked = event.noShow || false;
+                // handle both array and string stored test types
+                const selValues = Array.isArray(event.testType) ? event.testType.map(t => String(t)) : (event.testType ? [String(event.testType)] : []);
+                const selectEl = document.getElementById('testType');
+                Array.from(selectEl.options).forEach(opt => {
+                    opt.selected = selValues.includes(opt.value);
+                });
+
+                document.getElementById('status').value = event.status || '';
             }
             
             this.handleEventTypeChange(event.eventType || 'drug-testing');
@@ -123,13 +125,27 @@ class ModalManager {
         };
 
         if (eventType === 'drug-testing') {
-            eventData.testType = document.getElementById('testType').value;
+            const supportedTests = ['urine', 'breath', 'oral'];
+            const select = document.getElementById('testType');
+            const selected = Array.from(select.selectedOptions).map(o => o.value);
+
+            if (!selected.length) {
+                throw new Error('Please select at least one test type (Urine and/or Breath/Oral).');
+            }
+
+            // ensure only supported tests are chosen
+            const invalid = selected.filter(s => !supportedTests.includes(s.toLowerCase()));
+            if (invalid.length) {
+                throw new Error(`Unsupported test type selected: ${invalid.join(', ')}`);
+            }
+
+            // store as an array (one or more)
+            eventData.testType = selected;
+            // status now carries No Show as a value 'no-show'
             eventData.status = document.getElementById('status').value;
-            eventData.noShow = document.getElementById('noShow').checked;
         } else {
             eventData.testType = null;
-            eventData.status = null;
-            eventData.noShow = false;
+            eventData.status = document.getElementById('status').value || null;
         }
 
         return eventData;

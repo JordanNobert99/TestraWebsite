@@ -93,45 +93,57 @@ class EventManager {
 
     async updateInventory(eventData) {
         try {
+            // Only support inventory updates for tests we actually do
+            const supportedTests = ['urine', 'breath'];
+            const testTypes = Array.isArray(eventData.testType) ? eventData.testType : (eventData.testType ? [eventData.testType] : []);
+            if (!testTypes.length) {
+                console.warn('EventManager: No test types provided for inventory update.');
+                return;
+            }
+
             const testSupplies = {
                 'urine': [{ name: 'Urine Test Cups', quantity: 1 }],
-                'hair': [{ name: 'Hair Test Vials', quantity: 1 }],
-                'saliva': [{ name: 'Saliva Test Strips', quantity: 1 }],
-                'blood': [
-                    { name: 'Blood Test Vials', quantity: 2 },
-                    { name: 'Blood Test Needles', quantity: 1 }
-                ],
                 'breath': [{ name: 'Breathalyzer Cartridges', quantity: 1 }]
             };
 
-            const supplies = testSupplies[eventData.testType.toLowerCase()] || [];
             const updatedItems = [];
 
-            for (const supply of supplies) {
-                const inventorySnapshot = await firebase.firestore()
-                    .collection('inventory')
-                    .where('userId', '==', this.userId)
-                    .where('itemName', '==', supply.name)
-                    .get();
+            // iterate each selected test type and deduct supplies sequentially
+            for (const rawTest of testTypes) {
+                const testKey = (rawTest || '').toLowerCase();
+                if (!supportedTests.includes(testKey)) {
+                    console.warn(`EventManager: Skipping unsupported test type "${rawTest}"`);
+                    continue;
+                }
 
-                if (!inventorySnapshot.empty) {
-                    const docId = inventorySnapshot.docs[0].id;
-                    const currentQuantity = inventorySnapshot.docs[0].data().quantity;
-                    const newQuantity = Math.max(0, currentQuantity - supply.quantity);
+                const supplies = testSupplies[testKey] || [];
 
-                    await firebase.firestore()
+                for (const supply of supplies) {
+                    const inventorySnapshot = await firebase.firestore()
                         .collection('inventory')
-                        .doc(docId)
-                        .update({
-                            quantity: newQuantity,
-                            updatedAt: new Date()
-                        });
+                        .where('userId', '==', this.userId)
+                        .where('itemName', '==', supply.name)
+                        .get();
 
-                    updatedItems.push({
-                        name: supply.name,
-                        deducted: supply.quantity,
-                        newQuantity: newQuantity
-                    });
+                    if (!inventorySnapshot.empty) {
+                        const docId = inventorySnapshot.docs[0].id;
+                        const currentQuantity = inventorySnapshot.docs[0].data().quantity;
+                        const newQuantity = Math.max(0, currentQuantity - supply.quantity);
+
+                        await firebase.firestore()
+                            .collection('inventory')
+                            .doc(docId)
+                            .update({
+                                quantity: newQuantity,
+                                updatedAt: new Date()
+                            });
+
+                        updatedItems.push({
+                            name: supply.name,
+                            deducted: supply.quantity,
+                            newQuantity: newQuantity
+                        });
+                    }
                 }
             }
 
@@ -144,11 +156,11 @@ class EventManager {
                 await this.notificationService.createNotification(
                     'inventory',
                     'Inventory Updated',
-                    `Supplies deducted for ${eventData.testType}: ${itemsList}`,
+                    `Supplies deducted for ${testTypes.join(', ')}: ${itemsList}`,
                     {
                         eventId: eventData.id,
                         eventType: eventData.eventType,
-                        testType: eventData.testType,
+                        testTypes: testTypes,
                         clientName: eventData.clientName,
                         updatedItems: updatedItems
                     }
