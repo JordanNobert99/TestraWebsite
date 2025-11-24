@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="../../public/css/animations.css">
     <link rel="stylesheet" href="../../public/css/responsive.css">
     <link rel="stylesheet" href="../../public/css/admin.css">
+    <script src="../../public/js/theme-loader.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -76,7 +77,14 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="category">Category</label>
-                            <input type="text" id="category" placeholder="e.g. Test Kits, PPE, Consumables">
+                            <select id="category">
+                                <option value="">Select category</option>
+                                <option value="Forms">Forms</option>
+                                <option value="Testing Kits">Testing Kits</option>
+                                <option value="Sample Cups">Sample Cups</option>
+                                <option value="Cleaning Supplies">Cleaning Supplies</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="quantity">Quantity</label>

@@ -2,8 +2,13 @@
     constructor() {
         this.themeToggleBtn = document.getElementById('themeToggle');
         this.themeIcon = document.querySelector('.theme-icon');
-        this.currentTheme = this.getStoredTheme() || 'light';
-        
+
+        // prefer stored theme; otherwise use system preference
+        this.currentTheme = this.getStoredTheme();
+        if (!this.currentTheme) {
+            this.currentTheme = this.getPreferredTheme();
+        }
+
         this.init();
     }
 
@@ -23,6 +28,7 @@
     }
 
     setTheme(theme) {
+        theme = (theme === 'dark') ? 'dark' : 'light'; // normalize
         this.currentTheme = theme;
         document.documentElement.setAttribute('data-theme', theme);
         this.updateIcon();
@@ -31,16 +37,37 @@
 
     updateIcon() {
         if (this.themeIcon) {
-            this.themeIcon.textContent = this.currentTheme === 'light' ? '🌙' : '☀️';
+            // Show icon representing the current theme
+            this.themeIcon.textContent = this.currentTheme === 'dark' ? '🌙' : '☀️';
         }
     }
 
     storeTheme(theme) {
-        localStorage.setItem('testra-theme', theme);
+        try {
+            localStorage.setItem('testra-theme', theme);
+        } catch (e) {
+            // ignore storage errors (private mode, etc.)
+        }
     }
 
     getStoredTheme() {
-        return localStorage.getItem('testra-theme');
+        try {
+            const t = localStorage.getItem('testra-theme');
+            return (t === 'dark' || t === 'light') ? t : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    getPreferredTheme() {
+        try {
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                return 'dark';
+            }
+        } catch (e) {
+            // ignore
+        }
+        return 'light';
     }
 }
 
