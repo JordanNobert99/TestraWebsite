@@ -272,13 +272,13 @@
 .inventory-table td {
     padding: 8px 12px;       /* smaller than typical form cells */
     vertical-align: middle;
-    line-height: 1.2;
+    line-height: 1;
 }
 
 /* Make rows visually tighter (no forced large min-height) */
 .inventory-table tbody tr {
     height: auto;
-    min-height: 36px;       /* tweak up/down as needed */
+    min-height: 30px;       /* tweak up/down as needed */
 }
 
 /* Compact the inline quantity control */
